@@ -1,0 +1,90 @@
+// Providers dataset for the platform (no network fetch required)
+// Each provider should include: id, name, category, schedule, location, address, coords, description, images, timeline
+
+window.providersData = {
+  'dongshi-fisher': {
+    id: 'dongshi-fisher',
+    name: '東石漁囡仔',
+    category: '養殖/食農加工',
+    schedule: '每週六 09:00–12:00',
+    location: '嘉義縣 東石鄉',
+    address: '嘉義縣東石鄉東石村XX路XX號',
+    coords: { lat: 23.455, lng: 120.152 },
+    gmapUrl: 'https://www.google.com/maps?q=23.455,120.152',
+    featuredOnIndex: true,
+    description: '體驗從產地到餐桌的完整流程，認識在地漁業文化，學習牡蠣養殖與海鮮加工基礎。',
+    know: ['在地漁業文化與生態', '漁村生活樣貌', '產地到餐桌流程'],
+    learn: ['綁蚵實作與養殖工序', '簡易海鮮處理與料理', '活動企劃基本流程'],
+    gain: ['團隊協作經驗', '自信與表達', '作品與活動紀錄'],
+    images: [
+      'https://picsum.photos/seed/fish1/800/500',
+      'https://picsum.photos/seed/fish2/800/500',
+      'https://picsum.photos/seed/fish3/800/500'
+    ],
+    timeline: [
+      { time: '09:00', title: '場域導覽', detail: '介紹東石漁業與安全規範' },
+      { time: '10:00', title: '牡蠣養殖體驗', detail: '實作綁蚵與養殖流程' },
+      { time: '11:00', title: '產地到餐桌', detail: '簡易海鮮料理與分享' }
+    ],
+    cases: [
+      { id: 'case-1', title: '從漁村到餐桌的行動展', summary: '規劃主題市集，提升在地連結' }
+    ]
+  },
+  'woodwork-day': {
+    id: 'woodwork-day',
+    name: '一日小木匠',
+    category: '工匠/技藝',
+    schedule: '每週日 13:30–17:30',
+    location: '嘉義市 東區',
+    address: '嘉義市東區XX街XX號',
+    coords: { lat: 23.481, lng: 120.449 },
+    gmapUrl: 'https://www.google.com/maps?q=23.481,120.449',
+    featuredOnIndex: true,
+    description: '學習基本木工技巧，親手打造屬於自己的生活小物，從設計、切割到打磨上漆。',
+    know: ['木材種類與特性', '木工安全規範', '工具使用方式'],
+    learn: ['設計打樣與丈量', '鋸切、鑽孔、組裝', '打磨與上油'],
+    gain: ['完成一件手作作品', '細心與耐心的培養', '問題解決能力'],
+    images: [
+      'https://picsum.photos/seed/wood1/800/500',
+      'https://picsum.photos/seed/wood2/800/500',
+      'https://picsum.photos/seed/wood3/800/500'
+    ],
+    timeline: [
+      { time: '13:30', title: '安全說明與工具介紹', detail: '認識鋸、鑽、砂磨工具' },
+      { time: '14:30', title: '木料裁切', detail: '依設計進行裁切與組裝' },
+      { time: '16:00', title: '打磨與上油', detail: '表面處理與完成作品展示' }
+    ],
+    cases: [
+        { id: 'case-1', title: '手作椅製作挑戰', summary: '建立專注與耐心的實作歷程' },
+        { id: 'case-2', title: '手作椅製作挑戰', summary: '建立專注與耐心的實作歷程' }
+    ]
+  },
+  'coffee-starter': {
+    id: 'coffee-starter',
+    name: '小小咖啡師',
+    category: '餐飲服務',
+    schedule: '每週三 15:00–18:00',
+    location: '嘉義市 西區',
+    address: '嘉義市西區XX路XX號',
+    coords: { lat: 23.477, lng: 120.425 },
+    gmapUrl: 'https://www.google.com/maps?q=23.477,120.425',
+    featuredOnIndex: false,
+    description: '從認識咖啡豆到萃取與拉花，探索咖啡文化並建立服務禮儀。',
+    know: ['咖啡豆產區與風味', '烘焙度與研磨度', '服務禮儀與流程'],
+    learn: ['萃取參數調整', '奶泡打發與拉花', '簡易品評'],
+    gain: ['溝通與接待能力', '基礎吧台實作', '參與活動經驗'],
+    images: [
+      'https://picsum.photos/seed/coffee1/800/500',
+      'https://picsum.photos/seed/coffee2/800/500',
+      'https://picsum.photos/seed/coffee3/800/500'
+    ],
+    timeline: [
+      { time: '15:00', title: '咖啡豆認識', detail: '產區與烘焙度差異' },
+      { time: '16:00', title: '萃取實作', detail: '研磨度與萃取參數調整' },
+      { time: '17:00', title: '奶泡與拉花', detail: '基本圖案練習與服務流程' }
+    ],
+    cases: [
+      { id: 'case-1', title: '校園咖啡快閃店', summary: '設計菜單與營運分工' }
+    ]
+  }
+};

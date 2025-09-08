@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索資源平台 - 核心生涯探索平台</title>
+    <script src="./tailwind.config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./css/style.css" rel="stylesheet">
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div id="nav-placeholder"></div>
+
+    <main class="container mx-auto px-6 py-12">
+        <h1 class="text-4xl font-bold text-center mb-12">探索資源平台</h1>
+
+        <!-- Filters and Search -->
+        <section class="mb-12">
+            <div class="flex flex-wrap gap-4 justify-center">
+                <input id="search-input" type="text" placeholder="搜尋關鍵字..." class="px-4 py-2 border rounded-lg dark:bg-gray-800 dark:border-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="輸入搜尋關鍵字">
+                <div id="category-dropdown" class="relative">
+                    <button id="category-button" class="px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-haspopup="true" aria-expanded="false" aria-controls="category-menu">
+                        <span id="category-button-label">所有產業</span>
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+                    <div id="category-menu" class="absolute z-10 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg origin-top transition transform duration-150 ease-out scale-95 opacity-0 pointer-events-none">
+                        <button type="button" data-value="所有產業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">所有產業</button>
+                        <button type="button" data-value="養殖/食農加工" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">養殖/食農加工</button>
+                        <button type="button" data-value="工匠/技藝" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">工匠/技藝</button>
+                        <button type="button" data-value="餐飲服務" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">餐飲服務</button>
+                        <button type="button" data-value="環境永續" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">環境永續</button>
+                        <button type="button" data-value="社會照護" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">社會照護</button>
+                    </div>
+                    <input type="hidden" id="category-select" value="所有產業">
+                </div>
+                <button id="search-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500">搜尋</button>
+            </div>
+        </section>
+
+        <!-- Courses Grid -->
+        <section>
+            <div id="providers-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" aria-live="polite" aria-busy="false"></div>
+        </section>
+
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="./js/data/providers.js"></script>
+    <script src="./js/navFooter.js"></script>
+    <script src="./js/explore.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>

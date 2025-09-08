@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>核心生涯探索平台</title>
+    <script src="./tailwind.config.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="./css/style.css" rel="stylesheet">
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
+    <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
+    <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div id="nav-placeholder"></div>
+
+
+    <main class="container mx-auto px-6 py-12">
+        <!-- Hero Section -->
+        <section class="text-center">
+            <h1 id="hero-title" class="text-4xl md:text-6xl font-bold mb-4">探索你的未來</h1>
+            <p id="hero-subtitle" class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">在核心生涯探索平台，找到屬於你的道路。</p>
+            <a href="./explore.html" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full transition duration-300">開始探索</a>
+        </section>
+
+        <!-- Platform Introduction -->
+        <section class="mt-20">
+            <h2 class="text-3xl font-bold text-center mb-10">平台導覽</h2>
+            <div id="platform-intro" class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl">
+                    <h3 class="text-xl font-bold mb-2">資源整合</h3>
+                    <p>一站式彙整嘉義地區的多元職業與課程資訊。</p>
+                </div>
+                <div class="p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl">
+                    <h3 class="text-xl font-bold mb-2">四階段引導</h3>
+                    <p>透過系統化的引導模型，協助你進行深度自我探索。</p>
+                </div>
+                <div class="p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl">
+                    <h3 class="text-xl font-bold mb-2">成效追蹤</h3>
+                    <p>記錄你的學習歷程，看見自己的成長與轉變。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chiayi Map -->
+        <section class="mt-20 text-center">
+            <div class="flex flex-col items-center gap-2 mb-4">
+              <h2 class="text-3xl font-bold">地區資源地圖 · 當前：<span id="map-region-label" class="text-blue-500">嘉義</span></h2>
+              <div class="flex items-center gap-2 text-sm">
+                <button id="region-prev" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">◀</button>
+                <div id="region-ticker" class="min-w-[240px] px-3 py-1 rounded bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">載入地區中…</div>
+                <button id="region-next" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">▶</button>
+              </div>
+            </div>
+            <div id="chiayi-map" class="w-full h-96 rounded-lg shadow"></div>
+        </section>
+
+        <!-- Featured Cases -->
+        <section class="mt-20">
+            <h2 class="text-3xl font-bold text-center mb-10">精選案例</h2>
+            <div id="featured-cases" class="grid md:grid-cols-2 gap-8">
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="p-6 transition-transform duration-200 hover:-translate-y-0.5">
+                        <h3 class="text-xl font-bold mb-2">從漁村到餐桌：東石漁囡仔的海洋實踐</h3>
+                        <p class="text-gray-600 dark:text-gray-400">學員小明透過課程，不僅學會了牡蠣養殖，更親手策劃了一場海鮮市集活動...</p>
+                        <a href="./provider.html?id=dongshi-fisher" class="text-blue-500 hover:underline mt-4 inline-block transition-colors duration-200">閱讀更多</a>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="p-6 transition-transform duration-200 hover:-translate-y-0.5">
+                        <h3 class="text-xl font-bold mb-2">木作中的專注與創造：打造自己的手作椅</h3>
+                        <p class="text-gray-600 dark:text-gray-400">學員小華從害怕電動工具到完成一張精美的木椅，在過程中找到了自信與耐心...</p>
+                        <a href="./provider.html?id=woodwork-day" class="text-blue-500 hover:underline mt-4 inline-block transition-colors duration-200">閱讀更多</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="./js/data/providers.js"></script>
+    <script src="./js/data/siteContent.js"></script>
+    <script src="./js/navFooter.js"></script>
+    <script src="./js/content-render.js"></script>
+    <script src="./js/map-index.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+/* Global baseline styles and smooth transitions */
+html { color-scheme: light dark; }
+html, body { transition: background-color 0.2s ease, color 0.2s ease; }
+body { font-family: sans-serif; }
+
+/* Improve interaction feedback */
+a, button, input, select, textarea {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+img { transition: transform 0.3s ease; }
+
+/* Fallback base colors for theme toggle */
+body { background-color: #ffffff; color: #111827; }
+html.dark body { background-color: #111827; color: #f9fafb; }
+
+/* Dark-mode safety fallbacks for common classes (in case a component misses dark: variants) */
+html.dark .bg-white { background-color: #111827 !important; }
+html.dark .bg-white-card { background-color: #3e3460 !important; }
+html.dark .bg-gray-50 { background-color: #1f2937 !important; }
+html.dark .bg-gray-100 { background-color: #1f2937 !important; }
+html.dark .text-gray-700 { color: #e5e7eb !important; }
+html.dark .text-gray-600 { color: #d1d5db !important; }
+html.dark .text-gray-900 { color: #f3f4f6 !important; }
+html.dark .text-gray-800 { color: #e5e7eb !important; }
+html.dark .text-black { color: #f9fafb !important; }
+html.dark .border-gray-200 { border-color: #374151 !important; }
+html.dark .border-gray-300 { border-color: #4b5563 !important; }
+
+/* Rotary knob for font size selection */
+.font-size-knob {
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  border: 1px solid #D1D5DB; /* gray-300 */
+  background: radial-gradient(circle at 30% 30%, #ffffff, #F3F4F6);
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+html.dark .font-size-knob {
+  border-color: #374151; /* gray-700 */
+  background: radial-gradient(circle at 30% 30%, #1F2937, #111827);
+}
+.font-size-knob:focus-visible {
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.6); /* ring-blue-500 */
+}
+.font-size-knob::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 12px;
+  background: currentColor;
+  border-radius: 1px;
+  transform-origin: bottom center;
+  transform: translateY(-4px) rotate(var(--knob-angle, 0deg));
+}
+.knob-angle-0 { --knob-angle: -60deg; }
+.knob-angle-1 { --knob-angle: 0deg; }
+.knob-angle-2 { --knob-angle: 60deg; }
+
+/* Utility: min-height used in member.html */
+.min-h-content { min-height: calc(100vh - 200px); }
+
+/* Simple circular font size button */
+.font-size-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 1px solid #D1D5DB; /* gray-300 */
+  background: radial-gradient(circle at 30% 30%, #ffffff, #F3F4F6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+html.dark .font-size-btn { border-color: #374151; background: radial-gradient(circle at 30% 30%, #1F2937, #111827); box-shadow: 0 1px 2px rgba(255,255,255,0.05); }
+.font-size-btn:focus-visible { box-shadow: 0 0 0 2px rgba(59,130,246,0.6); outline: none; }
+.font-size-label { pointer-events: none; }
+
+@keyframes btn-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.btn-bounce { animation: btn-pop 200ms ease; }
+
+/* Inputs global focus enhancement */
+input[type="text"], input[type="password"], input[type="email"], input[type="tel"], select, textarea {
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.6), 0 8px 16px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+/* Do not nudge password input that has a toggle button to avoid overlap */
+.has-toggle:focus { transform: none; }
+
+/* Expandable intro cards on index */
+.intro-card { cursor: pointer; border-top: 3px solid transparent; position: relative; overflow: hidden; isolation: isolate; }
+.intro-card:hover { filter: saturate(1.05); }
+.intro-card { z-index: 0; }
+.intro-card .collapse-content {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(.98);
+  transition: opacity 160ms ease, transform 160ms ease, visibility 0s linear 160ms;
+  z-index: 20;
+  background-color: rgba(255,255,255,.98);
+  border-radius: .75rem;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  pointer-events: none;
+  border: 1px solid rgba(59,130,246,.15);
+  overflow: auto;
+}
+.dark .intro-card .collapse-content { background-color: rgba(17,24,39,.95); border-color: rgba(96,165,250,.2); }
+.intro-card.is-open { border-top-color: #60a5fa; /* blue-400 */ }
+.intro-card.is-open { z-index: 50; }
+.intro-card.is-open .collapse-content { opacity: 1; visibility: visible; transform: scale(1); transition-delay: 0s; pointer-events: auto; }
+
+/* Ticker subtle animation */
+@keyframes tickerPulse { 0%{opacity:.9} 50%{opacity:1} 100%{opacity:.9} }
+#region-ticker { animation: tickerPulse 2.6s ease-in-out infinite; }
+
+/* Surfaces for member profile cards (distinct tones across dark/light) */
+.surface-1 { background-color: #F9FAFB; }
+.dark .surface-1 { background-color: #1F2937; }
+.surface-2 { background-color: #F3F4F6; }
+.dark .surface-2 { background-color: #111827; }
+.surface-3 { background-color: #FFFFFF; }
+.dark .surface-3 { background-color: #374151; }
+
+/* Mobile nav menu animation */
+#mobile-menu.mobile-menu-collapsible {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transition: max-height 240ms ease, opacity 200ms ease, transform 200ms ease;
+  overflow: hidden;
+  pointer-events: none;
+}
+#mobile-menu.mobile-menu-collapsible.open {
+  max-height: 480px; /* enough for links */
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}

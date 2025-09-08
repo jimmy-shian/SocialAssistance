@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>業者介紹 - 核心生涯探索平台</title>
+  <script src="./tailwind.config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./css/style.css" rel="stylesheet">
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
+  <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
+  <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <div id="nav-placeholder"></div>
+
+  <main class="container mx-auto px-6 py-12" id="provider-root">
+    <!-- 內容由 js/provider-detail.js 根據 URL ?id=... 動態注入 -->
+    <div class="text-center text-gray-500">載入中…</div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="./js/data/providers.js"></script>
+  <script src="./js/navFooter.js"></script>
+  <script src="./js/provider-detail.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./js/map-provider.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>

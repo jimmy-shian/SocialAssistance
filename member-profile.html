@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員資料 - 核心生涯探索平台</title>
+  <script src="./tailwind.config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./css/style.css" rel="stylesheet">
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <div id="nav-placeholder"></div>
+
+  <main class="container mx-auto px-6 py-12 min-h-content">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold">會員資料</h1>
+      <p id="welcome-user" class="text-gray-600 dark:text-gray-300 mt-1">歡迎回來！</p>
+    </header>
+
+    <section id="profile-sections" class="space-y-6">
+      <!-- 內容由 js/member-profile.js 動態注入 -->
+      <div class="text-gray-500">載入中…</div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="./js/config.js"></script>
+  <script src="./js/navFooter.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/member-data.js"></script>
+  <script src="./js/member-profile.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>
