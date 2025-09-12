@@ -21,15 +21,15 @@
     title.textContent = p.name;
     inner.appendChild(title);
 
-    const cat = el('p', 'text-gray-500 dark:text-gray-400 mb-1');
+    const cat = el('p', 'text-gray-500 dark:text-gray-200 mb-1');
     cat.textContent = p.category;
     inner.appendChild(cat);
 
-    const sched = el('p', 'text-gray-500 dark:text-gray-400 mb-1');
+    const sched = el('p', 'text-gray-500 dark:text-gray-200 mb-1');
     sched.textContent = `時間：${p.schedule || '-'}`;
     inner.appendChild(sched);
 
-    const loc = el('p', 'text-gray-500 dark:text-gray-400 mb-4');
+    const loc = el('p', 'text-gray-500 dark:text-gray-200 mb-4');
     loc.textContent = `地點：${p.location || '-'}`;
     inner.appendChild(loc);
 
@@ -37,9 +37,9 @@
     desc.textContent = p.description || '';
     inner.appendChild(desc);
 
-    const link = el('a', 'text-blue-500 hover:underline inline-block transition-colors duration-200');
+    const link = el('a', 'link-cta small');
     link.href = `./provider.html?id=${encodeURIComponent(p.id)}`;
-    link.textContent = '查看詳情';
+    link.innerHTML = '查看詳情 <span class="arrow">→</span>';
     inner.appendChild(link);
 
     card.appendChild(inner);

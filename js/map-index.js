@@ -6,6 +6,35 @@
   let currentRegionIndex = 0;
   let suppressInitialFit = false;
 
+  function installWheelGuard(map, container) {
+    if (!container) return;
+    const hint = document.createElement('div');
+    hint.className = 'map-zoom-hint';
+    hint.textContent = '點擊地圖以啟用滾輪縮放';
+    container.appendChild(hint);
+
+    let enabled = false;
+    const enable = () => {
+      if (enabled) return;
+      map.scrollWheelZoom.enable();
+      enabled = true;
+      hint.textContent = '滾輪縮放啟用中（按 ESC 或滑出地圖關閉）';
+    };
+    const disable = () => {
+      if (!enabled) return;
+      map.scrollWheelZoom.disable();
+      enabled = false;
+      hint.textContent = '點擊地圖以啟用滾輪縮放';
+    };
+
+    container.addEventListener('click', enable);
+    container.addEventListener('mouseleave', disable);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') disable(); });
+
+    // start disabled
+    disable();
+  }
+
   function initMap() {
     if (initialized) return;
     const mapEl = document.getElementById('chiayi-map');
@@ -23,7 +52,7 @@
       zoom: 11,
       maxBounds: taiwanBounds,
       maxBoundsViscosity: 0.2, // gentle constraint
-      scrollWheelZoom: true,
+      scrollWheelZoom: false,
       updateWhenIdle: true,
       preferCanvas: true
     });
@@ -59,11 +88,31 @@
       if (!p.coords) return;
       const marker = L.marker([p.coords.lat, p.coords.lng]).addTo(map);
       const href = `./provider.html?id=${encodeURIComponent(p.id)}`;
-      marker.bindPopup(`<strong>${p.name}</strong><br><a href="${href}">前往介紹頁</a>`);
+      marker.bindPopup(`<strong>${p.name}</strong><br><span style="font-size:12px;color:#6b7280">再次點選標註以開啟詳情</span>`);
+      marker.__armed = false;
       marker.on('click', () => {
-        window.location.href = href;
+        // 第一次：只開啟名稱；第二次：導向
+        if (!marker.isPopupOpen()) {
+          marker.openPopup();
+          marker.__armed = true;
+          // 給使用者 3 秒內第二次點擊才會跳轉，超時重新計數
+          clearTimeout(marker.__armTimer);
+          marker.__armTimer = setTimeout(() => { marker.__armed = false; }, 3000);
+        } else {
+          if (marker.__armed) {
+            window.location.href = href;
+          } else {
+            marker.openPopup();
+            marker.__armed = true;
+            clearTimeout(marker.__armTimer);
+            marker.__armTimer = setTimeout(() => { marker.__armed = false; }, 3000);
+          }
+        }
       });
     });
+
+    // Wheel zoom guard
+    installWheelGuard(map, mapEl);
 
     // Regions and ticker
     initRegionTicker();

@@ -53,6 +53,57 @@
     const profile = await window.MemberData.loadProfile(user);
     sections.innerHTML = '';
 
+    // Dashboard summary (completion + export)
+    function completion(profile) {
+      const b = profile.basic || {};
+      const s = profile.selfEvaluation || {};
+      const basicFields = ['name','email','phone','birthday','address'];
+      const selfFields = ['interests','strengths','goals'];
+      const basicFilled = basicFields.reduce((acc,k)=> acc + (b[k]?1:0), 0);
+      const selfFilled = selfFields.reduce((acc,k)=> acc + (s[k]?1:0), 0);
+      const actCount = (profile.activities||[]).length;
+      const lrCount = (profile.learningRecords||[]).length;
+      const score = Math.min(100,
+        Math.round((basicFilled/5)*45 + (selfFilled/3)*30 + Math.min(actCount,3)/3*12 + Math.min(lrCount,3)/3*13)
+      );
+      return { score, basicFilled, selfFilled, actCount, lrCount };
+    }
+
+    function dashboardCard(p){
+      const d = completion(p);
+      const body = `
+        <div class="grid md:grid-cols-4 gap-4 items-center">
+          <div class="md:col-span-2">
+            <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">完成度</div>
+            <div class="w-full h-3 rounded bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div class="h-3 bg-blue-500" style="width:${d.score}%;"></div>
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${d.score}%</div>
+          </div>
+          <div class="space-y-1">
+            <div class="text-sm">基本資料 <span class="text-gray-500">${d.basicFilled}/5</span></div>
+            <div class="text-sm">自立評估 <span class="text-gray-500">${d.selfFilled}/3</span></div>
+          </div>
+          <div class="space-y-1">
+            <div class="text-sm">活動記錄 <span class="text-gray-500">${d.actCount}</span></div>
+            <div class="text-sm">學習歷程 <span class="text-gray-500">${d.lrCount}</span></div>
+          </div>
+        </div>
+      `;
+      const actions = `
+        <div class="flex gap-2">
+          <button id="export-json" class="px-3 py-2 rounded bg-indigo-500 hover:bg-indigo-600 text-white">匯出 JSON</button>
+          <button id="export-png" class="px-3 py-2 rounded bg-sky-500 hover:bg-sky-600 text-white">匯出圖片</button>
+        </div>
+      `;
+      const c = card('資料總覽', body, actions);
+      c.id = 'profile-dashboard';
+      return c;
+    }
+
+    const dash = dashboardCard(profile);
+    sections.appendChild(dash);
+
     // Basic
     const basicBody = `
       ${textInput('pf-name','姓名', profile.basic?.name)}
@@ -150,6 +201,31 @@
       const res = await window.MemberData.saveProfile(user, profile);
       toast(res.ok? '已新增學習紀錄':'新增失敗', !!res.ok);
       render();
+    });
+
+    // Export handlers
+    qs('#export-json')?.addEventListener('click', ()=>{
+      const dataStr = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(profile, null, 2));
+      const a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `profile_${user || 'guest'}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+    qs('#export-png')?.addEventListener('click', async ()=>{
+      if (!window.html2canvas) {
+        toast('圖片匯出元件未載入', false);
+        return;
+      }
+      const target = qs('#profile-sections');
+      const bg = getComputedStyle(document.body).backgroundColor || (document.documentElement.classList.contains('dark') ? '#111827' : '#ffffff');
+      const canvas = await window.html2canvas(target, { useCORS: true, backgroundColor: bg, scale: 2 });
+      canvas.toBlob((blob)=>{
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `profile_${user || 'guest'}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(()=> URL.revokeObjectURL(url), 1500);
+      });
     });
   }
 

@@ -12,6 +12,34 @@
     return token || '';
   }
 
+  function installWheelGuard(map, container) {
+    if (!container) return;
+    const hint = document.createElement('div');
+    hint.className = 'map-zoom-hint';
+    hint.textContent = '點擊地圖以啟用滾輪縮放';
+    container.appendChild(hint);
+
+    let enabled = false;
+    const enable = () => {
+      if (enabled) return;
+      map.scrollWheelZoom.enable();
+      enabled = true;
+      hint.textContent = '滾輪縮放啟用中（按 ESC 或滑出地圖關閉）';
+    };
+    const disable = () => {
+      if (!enabled) return;
+      map.scrollWheelZoom.disable();
+      enabled = false;
+      hint.textContent = '點擊地圖以啟用滾輪縮放';
+    };
+
+    container.addEventListener('click', enable);
+    container.addEventListener('mouseleave', disable);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') disable(); });
+
+    disable();
+  }
+
   function init() {
     const mapEl = document.getElementById('provider-map');
     if (!mapEl) return;
@@ -40,7 +68,7 @@
       zoom: 13,
       maxBounds: countyBounds,
       maxBoundsViscosity: 0.5,
-      scrollWheelZoom: true
+      scrollWheelZoom: false
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -94,6 +122,9 @@
 
     // Default to county lock as requested
     applyLock();
+
+    // Wheel zoom guard
+    installWheelGuard(map, mapEl);
   }
 
   if (document.readyState === 'loading') {

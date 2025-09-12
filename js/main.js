@@ -237,3 +237,117 @@ function bindFontSizeButton() {
 }
 bindFontSizeButton();
 document.addEventListener('nav-footer-rendered', bindFontSizeButton);
+
+// ==============================
+// Flowing background (blobs)
+// ==============================
+(function () {
+  const MIN_SPEED = 0.35;
+  const MAX_SPEED = 1.2;
+  const COUNT = 6; // reasonable for performance
+
+  function prefersReduced() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  class BlobMover {
+    constructor(el) {
+      this.el = el;
+      const rect = this.el.getBoundingClientRect();
+      this.size = rect.width || Math.max(240, Math.min(window.innerWidth * 0.28, 560));
+      // random start
+      this.initialX = Math.random() * Math.max(1, window.innerWidth - this.size);
+      this.initialY = Math.random() * Math.max(1, window.innerHeight - this.size);
+      this.x = this.initialX;
+      this.y = this.initialY;
+      this.vx = (MIN_SPEED + Math.random() * (MAX_SPEED - MIN_SPEED)) * (Math.random() > 0.5 ? 1 : -1);
+      this.vy = (MIN_SPEED + Math.random() * (MAX_SPEED - MIN_SPEED)) * (Math.random() > 0.5 ? 1 : -1);
+      this.el.style.top = this.initialY + 'px';
+      this.el.style.left = this.initialX + 'px';
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      const maxX = window.innerWidth - this.size;
+      const maxY = window.innerHeight - this.size;
+      if (this.x >= maxX) { this.x = maxX; this.vx *= -1; }
+      if (this.y >= maxY) { this.y = maxY; this.vy *= -1; }
+      if (this.x <= 0) { this.x = 0; this.vx *= -1; }
+      if (this.y <= 0) { this.y = 0; this.vy *= -1; }
+      this.el.style.transform = `translate(${this.x - this.initialX}px, ${this.y - this.initialY}px)`;
+    }
+  }
+
+  function initBlobs() {
+    if (prefersReduced()) return; // respect user preference
+    if (document.querySelector('.blobs')) return; // already added
+
+    const container = document.createElement('div');
+    container.className = 'blobs';
+    for (let i = 0; i < COUNT; i++) {
+      const b = document.createElement('div');
+      b.className = 'blob';
+      container.appendChild(b);
+    }
+    document.body.appendChild(container);
+
+    const elems = Array.from(container.querySelectorAll('.blob'));
+    const movers = elems.map(el => new BlobMover(el));
+
+    function tick() {
+      if (prefersReduced()) return; // stop if changed
+      movers.forEach(m => m.update());
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    window.addEventListener('resize', () => {
+      // reset initial positions to avoid drift when viewport changes a lot
+      movers.forEach(m => {
+        m.initialX = Math.max(0, Math.min(m.initialX, window.innerWidth - m.size));
+        m.initialY = Math.max(0, Math.min(m.initialY, window.innerHeight - m.size));
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initBlobs);
+  } else {
+    initBlobs();
+  }
+})();
+
+// ==============================
+// Global left-click ripple effect
+// ==============================
+(function(){
+  function prefersReduced() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  const lightColors = ['rgba(59,130,246,.35)','rgba(16,185,129,.35)','rgba(245,158,11,.35)','rgba(236,72,153,.35)','rgba(99,102,241,.35)'];
+  const darkColors  = ['rgba(147,197,253,.5)','rgba(134,239,172,.5)','rgba(253,186,116,.5)','rgba(244,114,182,.5)','rgba(165,180,252,.5)'];
+
+  function colorPick(){
+    const dark = document.documentElement.classList.contains('dark');
+    const arr = dark ? darkColors : lightColors;
+    return arr[Math.floor(Math.random()*arr.length)];
+  }
+
+  function spawnRipple(x,y){
+    if(prefersReduced()) return;
+    const d = document.createElement('div');
+    d.className = 'ripple';
+    d.style.left = x + 'px';
+    d.style.top = y + 'px';
+    d.style.setProperty('--ripple-color', colorPick());
+    document.body.appendChild(d);
+    const remove = () => d.remove();
+    d.addEventListener('animationend', remove, {once:true});
+    setTimeout(remove, 800);
+  }
+
+  function onPointerDown(e){
+    if(e.button !== 0) return; // left click only
+    spawnRipple(e.clientX, e.clientY);
+  }
+
+  window.addEventListener('pointerdown', onPointerDown, {passive:true});
+})();

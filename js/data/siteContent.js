@@ -1,5 +1,23 @@
-// Centralized site textual content. Edit this file to update visible texts.
-// You can add more sections/pages as needed.
+// 全站文案集中設定（Site Content）
+// 全域命名空間：window.siteContent
+// 說明：集中管理首頁等頁面的文案。可依需求擴充其他頁面區塊，不需動 HTML/JS 主流程。
+// 結構：
+// window.siteContent = {
+//   index: {
+//     heroTitle: string          首屏主標題。
+//     heroSubtitle: string       首屏副標題。
+//     platformIntro: Array<{     平台導覽卡片（3 欄，可彈性增減）
+//       title: string,
+//       text: string,
+//       details?: string         （可選）展開或補充內容。
+//     }>
+//     featured: Array<{          首頁精選案例（卡片區）
+//       title: string,
+//       text: string,
+//       link: string             連結到對應的 provider.html?id=...
+//     }>
+//   }
+// }
 
 window.siteContent = {
   index: {

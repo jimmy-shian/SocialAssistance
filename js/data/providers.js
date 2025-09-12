@@ -1,5 +1,29 @@
-// Providers dataset for the platform (no network fetch required)
-// Each provider should include: id, name, category, schedule, location, address, coords, description, images, timeline
+// 業者/課程資料集（不需網路請求，直接由前端載入）
+// 全域命名空間：window.providersData
+// 說明：以「鍵值（provider id）」為索引的物件，描述平台上的每個業者/課程。
+// 欄位定義（Provider）：
+// - id: string                 唯一識別（同鍵名），用於組路由連結，如 provider.html?id=...。
+// - name: string               顯示名稱。
+// - category: string           類別（例如：養殖/食農加工、工匠/技藝、餐飲服務、環境永續、社會照護…）。
+// - schedule: string           上課/營運時間（自由文字）。
+// - location: string           地理區域與行政區（例如：嘉義縣 東石鄉）。
+// - address: string            具體地址（自由文字）。
+// - coords: { lat: number, lng: number }  地圖定位座標（Leaflet 使用）。
+// - gmapUrl?: string           （可選）Google 地圖連結；若未提供，頁面會以 coords 產生查詢連結。
+// - featuredOnIndex?: boolean  （可選）是否於首頁精選露出。
+// - description: string        簡介描述。
+// - know?: string[]            （可選）「你將認識」要點清單。
+// - learn?: string[]           （可選）「你將學到」要點清單。
+// - gain?: string[]            （可選）「你將獲得」要點清單。
+// - images: string[]           照片 URL 清單，供輪播與燈箱使用。
+// - timeline: Array<{ time: string, title: string, detail: string }>
+//                               課程流程/時間軸。
+// - cases?: Array<{ id: string, title: string, summary: string }>
+//                               （可選）精選案例清單。
+// 注意：
+// - 建議 id 與鍵名一致，避免混淆。
+// - 若缺 coords，首頁地圖不會放置標註。
+// - 任一可選欄位缺省時，頁面會自動隱藏對應區塊或以預設處理。
 
 window.providersData = {
   'dongshi-fisher': {
