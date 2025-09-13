@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>資料管理 - 核心生涯探索平台</title>
+  <script src="./tailwind.config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./css/style.css" rel="stylesheet">
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+  <div id="nav-placeholder"></div>
+
+  <main class="container mx-auto px-6 py-12">
+    <header class="mb-8 text-center">
+      <h1 class="text-3xl font-bold">資料管理（GAS）</h1>
+      <p class="text-gray-600 dark:text-gray-300">登入後可編輯以下三個資料集：About、Providers、Site Content。</p>
+      <div id="gas-url-warning" class="mt-3 hidden text-sm text-red-600 dark:text-red-400">請先在 <code>js/config.js</code> 設定 <strong>GAS_BASE_URL</strong>，並部署 Apps Script Web App。</div>
+    </header>
+
+    <!-- Centered login like member.html -->
+    <div id="admin-login-wrap" class="relative flex items-center justify-center mt-20">
+      <!-- Overlay: shows first, blocks login; click to dismiss -->
+      <div id="admin-warning-overlay" class="fixed inset-0 z-50 w-full h-full flex items-center justify-center cursor-pointer">
+        <div class="overlay-bg fixed inset-0 rounded-none bg-slate-900/45 dark:bg-slate-900/55"></div>
+        <section id="admin-warning" class="admin-warning group relative z-10 w-full max-w-3xl">
+          <div class="neon-card neon-ring rounded-xl p-5 bg-gradient-to-br from-indigo-500/5 via-sky-500/5 to-violet-500/5 border border-indigo-500/30">
+            <div class="flex flex-col items-center text-center gap-3">
+              <div class="glitch-title text-2xl md:text-3xl tracking-widest" data-text="SECURITY WARNING">SECURITY WARNING</div>
+              <p class="text-sm md:text-base text-gray-700 dark:text-gray-200">
+                本頁為內部管理界面，未經授權請立即離開。任何嘗試與操作均會被<strong>記錄</strong>（IP / 時間 / 裝置指紋）。
+              </p>
+              <ul class="text-xs md:text-sm text-gray-600 dark:text-gray-300 list-disc list-inside">
+                <li>若你不是系統管理者，請立刻關閉本頁。</li>
+                <li>持續存取將被視為<span class="font-semibold text-rose-500">未經授權行為</span>，系統會自動觸發告警流程。</li>
+                <li>登入即表示你同意並遵守本平台之資安與資料使用政策。</li>
+              </ul>
+              <button id="admin-warning-dismiss" type="button" class="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded bg-rose-600 text-white hover:bg-rose-700">
+                我已了解，進入管理
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+      <section id="admin-login" class="w-full max-w-md">
+        <div class="rounded-lg shadow p-6 bg-white dark:bg-gray-800">
+          <h2 class="text-xl font-semibold mb-4">管理員登入</h2>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-sm mb-1">帳號</label>
+              <input id="adm-usr" type="text" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100" placeholder="admin">
+            </div>
+            <div>
+              <label class="block text-sm mb-1">密碼</label>
+              <input id="adm-pwd" type="password" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100" placeholder="請輸入密碼">
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="adm-login" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">登入</button>
+              <span id="adm-status" class="text-sm text-gray-600 dark:text-gray-300" aria-live="polite"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- (removed separate warning section; overlay is inside login wrap) -->
+
+    <section id="admin-panel" class="hidden">
+      <div class="mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <label class="text-sm">資料集：</label>
+          <select id="ds-select" class="rounded border px-2 py-1 bg-white dark:bg-gray-800">
+            <option value="about">About（aboutContent）</option>
+            <option value="providers">Providers（providers）</option>
+            <option value="site">Site Content（siteContent）</option>
+          </select>
+          <span id="ds-version" class="text-sm text-gray-500"></span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btn-load-remote" class="px-3 py-2 rounded bg-sky-600 text-white hover:bg-sky-700">載入遠端最新</button>
+          <button id="btn-load-current" class="px-3 py-2 rounded bg-gray-600 text-white hover:bg-gray-700">載入目前頁面資料</button>
+          <button id="btn-pretty" class="px-3 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700">格式化</button>
+          <button id="btn-save" class="px-3 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700">儲存至 GAS</button>
+          <button id="btn-logout" class="px-3 py-2 rounded bg-rose-600 text-white hover:bg-rose-700">登出</button>
+        </div>
+      </div>
+      <textarea id="ds-editor" rows="24" class="w-full rounded border px-3 py-2 font-mono text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100" placeholder="{\n  \"key\": \"value\"\n}"></textarea>
+      <div id="admin-hint" class="text-sm text-gray-500 mt-2">儲存時會驗證 JSON 格式，通過後才會送出。</div>
+    </section>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="./js/config.js"></script>
+  <script src="./js/data-loader.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/navFooter.js"></script>
+  <script src="./js/admin.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>

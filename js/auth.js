@@ -33,9 +33,18 @@
     const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
     if (base) {
       try {
+        if (window.DataAPI && window.DataAPI.login) {
+          const data = await window.DataAPI.login(username, password);
+          if (!data || !data.ok || !data.token) return { ok: false, message: data && data.message || '登入失敗' };
+          // mirror to auth_token for pages that rely on it
+          localStorage.setItem('auth_token', data.token);
+          localStorage.setItem('auth_user', username);
+          return { ok: true, token: data.token };
+        }
+        // fallback to JSON if DataAPI not present
         const resp = await fetch(base + AppConfig.endpoints.login, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ username, password })
         });
         if (!resp.ok) return { ok: false, message: '登入失敗，請確認帳密' };

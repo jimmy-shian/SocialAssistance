@@ -1,10 +1,19 @@
-// Global configuration (edit for your GAS backend)
+// Global configuration for GAS backend integration
 window.AppConfig = {
-  // TODO: Replace with your deployed Google Apps Script Web App URL (do not include trailing slash)
+  // TODO: 填入你部署完成的 Google Apps Script Web App URL（結尾不要有斜線）
   GAS_BASE_URL: '',
-  // Endpoint paths if your GAS provides multiple actions
+  // 以單一 Web App 端點 + action 路由
   endpoints: {
-    login: '/login',
-    profile: '/profile'
-  }
+    login: '?action=login',
+    data: '?action=data',
+    update: '?action=update',
+    version: '?action=version'
+  },
+  // 前端統一的資料集鍵
+  datasets: {
+    about: 'aboutContent',
+    providers: 'providers',
+    site: 'siteContent'
+  },
+  versionCacheKey: 'app_data_version'
 };

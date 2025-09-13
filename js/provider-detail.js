@@ -349,4 +349,19 @@
   } else {
     start();
   }
+
+  // Re-render when providers updated
+  try {
+    const EVT = (window.DataAPI && window.DataAPI.EVENT) || 'data:updated';
+    document.addEventListener(EVT, (ev) => {
+      const ds = (window.AppConfig && window.AppConfig.datasets && window.AppConfig.datasets.providers) || 'providers';
+      const keys = (ev && ev.detail && ev.detail.keys) || [];
+      if (!keys.length || keys.includes(ds)) {
+        const id = getParam('id');
+        const dataset = window.providersData || {};
+        const p = dataset[id];
+        if (p) render(p);
+      }
+    });
+  } catch (e) {}
 })();

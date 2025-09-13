@@ -198,4 +198,15 @@
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded', render);
   } else { render(); }
+
+  // Re-render when datasets are updated from GAS
+  try {
+    document.addEventListener((window.DataAPI && window.DataAPI.EVENT) || 'data:updated', (ev) => {
+      const ds = (window.AppConfig && window.AppConfig.datasets && window.AppConfig.datasets.about) || 'aboutContent';
+      const keys = (ev && ev.detail && ev.detail.keys) || [];
+      if (!keys.length || keys.includes(ds)) {
+        render();
+      }
+    });
+  } catch (e) {}
 })();

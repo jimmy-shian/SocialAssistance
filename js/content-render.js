@@ -75,4 +75,16 @@
   } else {
     init();
   }
+
+  // Re-render when remote datasets updated
+  try {
+    const EVT = (window.DataAPI && window.DataAPI.EVENT) || 'data:updated';
+    document.addEventListener(EVT, (ev) => {
+      const ds = (window.AppConfig && window.AppConfig.datasets) || { providers: 'providers', site: 'siteContent' };
+      const keys = (ev && ev.detail && ev.detail.keys) || [];
+      if (!keys.length || keys.includes(ds.providers) || keys.includes(ds.site)) {
+        renderIndex();
+      }
+    });
+  } catch (e) {}
 })();
