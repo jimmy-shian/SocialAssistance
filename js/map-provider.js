@@ -90,7 +90,7 @@
       if (!btn) return;
       btn.setAttribute('aria-pressed', String(pressed));
       btn.classList.toggle('ring-2', pressed);
-      btn.classList.toggle('ring-blue-500', pressed);
+      btn.classList.toggle('ring-purple-500', pressed);
     }
 
     function applyLock() {

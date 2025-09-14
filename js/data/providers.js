@@ -18,8 +18,16 @@
 // - images: string[]           照片 URL 清單，供輪播與燈箱使用。
 // - timeline: Array<{ time: string, title: string, detail: string }>
 //                               課程流程/時間軸。
-// - cases?: Array<{ id: string, title: string, summary: string }>
-//                               （可選）精選案例清單。
+// - cases?: Array<{
+//     id: string,            唯一識別
+//     title: string,         題名
+//     summary?: string,      摘要/說明
+//     images?: string[],     （可選）圖片 URL 清單；有圖時在頁面以「直式卡片」呈現
+//     video?: string         （可選）影片網址：支援 YouTube / Vimeo / 直接 mp4 連結
+//   }>
+//   注意：
+//   - 當 cases 只有單一且包含 images/video 時，詳頁將以「橫向交錯」版呈現（圖文左右並排）。
+//   - 當 cases 多筆且含 images/video，會以直式卡片網格呈現；無圖/無影片的仍以原先清單樣式呈現。
 // 注意：
 // - 建議 id 與鍵名一致，避免混淆。
 // - 若缺 coords，首頁地圖不會放置標註。
@@ -51,7 +59,26 @@ window.providersData = {
       { time: '11:00', title: '產地到餐桌', detail: '簡易海鮮料理與分享' }
     ],
     cases: [
-      { id: 'case-1', title: '從漁村到餐桌的行動展', summary: '規劃主題市集，提升在地連結' }
+      {
+        id: 'case-1',
+        title: '從漁村到餐桌的行動展',
+        summary: '規劃主題市集，提升在地連結',
+        images: [
+          'https://picsum.photos/seed/fishc1/800/600',
+          'https://picsum.photos/seed/fishc2/800/600'
+        ]
+      },
+      {
+        id: 'case-2',
+        title: '海口小旅行花絮',
+        summary: '活動紀錄影片（YouTube 範例）',
+        video: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      },
+      {
+        id: 'case-3',
+        title: '在地菜市場企劃',
+        summary: '純文字說明的案例，無圖無影片'
+      }
     ]
   },
   'woodwork-day': {
@@ -79,8 +106,18 @@ window.providersData = {
       { time: '16:00', title: '打磨與上油', detail: '表面處理與完成作品展示' }
     ],
     cases: [
-        { id: 'case-1', title: '手作椅製作挑戰', summary: '建立專注與耐心的實作歷程' },
-        { id: 'case-2', title: '手作椅製作挑戰', summary: '建立專注與耐心的實作歷程' }
+      {
+        id: 'case-1',
+        title: '手作椅製作挑戰',
+        summary: '建立專注與耐心的實作歷程',
+        images: ['https://picsum.photos/seed/woodc1/900/1200']
+      },
+      {
+        id: 'case-2',
+        title: '社區木作服務',
+        summary: '協助社區修繕與製作傢具',
+        images: ['https://picsum.photos/seed/woodc2/800/600','https://picsum.photos/seed/woodc3/800/600']
+      }
     ]
   },
   'coffee-starter': {
@@ -108,7 +145,8 @@ window.providersData = {
       { time: '17:00', title: '奶泡與拉花', detail: '基本圖案練習與服務流程' }
     ],
     cases: [
-      { id: 'case-1', title: '校園咖啡快閃店', summary: '設計菜單與營運分工' }
+      { id: 'case-1', title: '校園咖啡快閃店', summary: '設計菜單與營運分工' },
+      { id: 'case-2', title: '拉花示範影片', summary: 'mp4 直連影片範例', video: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' }
     ]
   }
 };

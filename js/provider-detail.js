@@ -221,23 +221,122 @@
       </div>
     `).join('<div class="h-4"></div>');
 
-    const casesHtml = (provider.cases || []).map(c => `
-      <li class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-        <div class="font-semibold">${c.title}</div>
-        <div class="text-gray-600 dark:text-gray-300">${c.summary}</div>
-      </li>
-    `).join('');
+    function isYouTube(url){ return /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/i.test(url||''); }
+    function ytId(url){ const m=(url||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/i); return m?m[1]:''; }
+    function isVimeo(url){ return /vimeo\.com\/(\d+)/i.test(url||''); }
+    function vimeoId(url){ const m=(url||'').match(/vimeo\.com\/(\d+)/i); return m?m[1]:''; }
+    function isMp4(url){ return /\.mp4($|\?)/i.test(url||''); }
+
+    function ensureVideoModal(){
+      let vm = document.getElementById('video-modal');
+      if (vm && vm.__open) return vm.__open;
+      vm = document.createElement('div');
+      vm.id = 'video-modal';
+      vm.className = 'lightbox';
+      vm.innerHTML = `
+        <div class="video-shell" style="max-width:min(92vw,1200px);width:100%;aspect-ratio:16/9;position:relative;">
+          <div class="video-frame" style="position:absolute;inset:0;display:grid;place-items:center;"></div>
+          <button class="close-btn" aria-label="關閉" style="position:absolute;top:8px;right:8px;z-index:2;width:36px;height:36px;border:none;border-radius:9999px;background:rgba(0,0,0,.55);color:#fff;font-size:22px;line-height:1;cursor:pointer;">×</button>
+        </div>`;
+      document.body.appendChild(vm);
+      const frame = vm.querySelector('.video-frame');
+      const btnClose = vm.querySelector('.close-btn');
+      function close(){ vm.classList.remove('open'); frame.innerHTML=''; }
+      btnClose.addEventListener('click', close);
+      vm.addEventListener('click', (e)=>{ if (e.target===vm) close(); });
+      document.addEventListener('keydown', (e)=>{ if (vm.classList.contains('open') && e.key==='Escape') close(); });
+      function open(url){
+        let html='';
+        if (isYouTube(url)) {
+          const id = ytId(url);
+          html = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        } else if (isVimeo(url)) {
+          const id = vimeoId(url);
+          html = `<iframe width="100%" height="100%" src="https://player.vimeo.com/video/${id}?autoplay=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+        } else if (isMp4(url)) {
+          html = `<video src="${url}" controls autoplay playsinline style="width:100%;height:100%;object-fit:contain;background:#000"></video>`;
+        }
+        frame.innerHTML = html;
+        vm.classList.add('open');
+      }
+      vm.__open = open;
+      return open;
+    }
+
+    function renderCases(provider){
+      const cases = Array.isArray(provider.cases)? provider.cases : [];
+      if (!cases.length) return '';
+      const withMedia = cases.filter(c => (c && ((Array.isArray(c.images)&&c.images.length) || c.video)));
+      const textOnly = cases.filter(c => !withMedia.includes(c));
+
+      const parts = [];
+
+      // 1) Single media case -> horizontal alternating layout
+      if (withMedia.length === 1) {
+        const c = withMedia[0];
+        const hasImg = Array.isArray(c.images) && c.images.length;
+        const mediaHtml = hasImg ? `
+          <div class="rounded-xl overflow-hidden shadow-md case-media" data-images="${(c.images||[]).join('|')}">
+            <img src="${c.images[0]}" alt="${c.title||''}" class="w-full h-64 md:h-80 object-cover" />
+          </div>` : `
+          <button class="case-video w-full aspect-video rounded-xl overflow-hidden shadow-md bg-black text-white grid place-items-center" data-video="${c.video}">
+            <span class="inline-flex items-center gap-2 font-semibold"><span class="text-2xl">▶</span> 觀看影片</span>
+          </button>`;
+        const textHtml = `
+          <div>
+            <h3 class="text-xl font-bold mb-2">${c.title||''}</h3>
+            ${c.summary?`<p class="text-gray-700 dark:text-gray-300">${c.summary}</p>`:''}
+          </div>`;
+        parts.push(`
+          <div class="grid md:grid-cols-2 gap-6 items-center">
+            <div>${mediaHtml}</div>
+            <div>${textHtml}</div>
+          </div>`);
+      }
+
+      // 2) Multi media cases -> vertical cards grid
+      if (withMedia.length >= 2) {
+        const cards = withMedia.map((c)=>{
+          const mediaBlock = (Array.isArray(c.images) && c.images.length) ? `
+            <div class="rounded-lg overflow-hidden case-media" data-images="${(c.images||[]).join('|')}">
+              <img src="${c.images[0]}" alt="${c.title||''}" class="w-full h-56 object-cover" />
+            </div>` : (c.video ? `
+            <button class="case-video w-full aspect-video rounded-lg overflow-hidden bg-black text-white grid place-items-center" data-video="${c.video}">
+              <span class="inline-flex items-center gap-2 font-semibold"><span class="text-xl">▶</span> 播放影片</span>
+            </button>` : '');
+          return `
+            <article class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hover:shadow-md transition">
+              ${mediaBlock}
+              <h3 class="mt-3 font-semibold">${c.title||''}</h3>
+              ${c.summary?`<p class="text-gray-600 dark:text-gray-300 text-sm">${c.summary}</p>`:''}
+            </article>`;
+        }).join('');
+        parts.push(`<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>`);
+      }
+
+      // 3) Text-only list (no media)
+      if (textOnly.length) {
+        const items = textOnly.map(c=>`
+          <li class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+            <div class="font-semibold">${c.title||''}</div>
+            ${c.summary?`<div class="text-gray-600 dark:text-gray-300">${c.summary}</div>`:''}
+          </li>`).join('');
+        parts.push(`<ul class="mt-6 space-y-3">${items}</ul>`);
+      }
+
+      return parts.join('\n');
+    }
 
     root.innerHTML = `
       <nav class="text-sm mb-6" aria-label="麵包屑">
-        <a class="text-blue-500 hover:underline" href="./explore.html">探索資源平台</a>
+        <a class="link-soft link-purple" href="./explore.html">探索資源平台</a>
         <span class="mx-2 text-gray-400">/</span>
         <span class="text-gray-500 dark:text-gray-300">${provider.name}</span>
       </nav>
 
       <header class="mb-8">
         <h1 class="text-3xl md:text-4xl font-bold">${provider.name}</h1>
-        <div class="mt-2 inline-block bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 text-sm px-2 py-1 rounded">${provider.category}</div>
+        <div class="mt-2 inline-block bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200 text-sm px-2 py-1 rounded">${provider.category}</div>
         <p class="mt-4 text-gray-700 dark:text-gray-300">${provider.description}</p>
       </header>
 
@@ -250,7 +349,7 @@
         const hasAny = blocks.some(b => Array.isArray(provider[b.key]) && provider[b.key].length);
         if (!hasAny) return '';
         const cols = blocks.map(b => {
-          const items = (provider[b.key] || []).map(v => `<li class="interactive-li flex items-start gap-2"><span class="icon text-blue-500">•</span><span>${v}</span></li>`).join('');
+          const items = (provider[b.key] || []).map(v => `<li class=\"interactive-li flex items-start gap-2\"><span class=\"icon text-purple-500\">•</span><span>${v}</span></li>`).join('');
           return `
             <div class="p-5 rounded-lg bg-gradient-to-br ${b.color} to-transparent shadow">
               <div class="flex items-center gap-2 mb-2"><span>${b.icon}</span><h3 class="font-semibold">${b.title}</h3></div>
@@ -276,7 +375,7 @@
             const coord = (lat && lng) ? `${lat.toFixed(3)}, ${lng.toFixed(3)}` : '';
             const display = [name, coord ? `（${coord}）` : ''].join('');
             if (!url) return `<div class=\"font-semibold mt-1\">${display || '-'}</div>`;
-            return `<a class=\"font-semibold mt-1 text-blue-600 dark:text-blue-400 hover:underline break-all\" href=\"${url}\" target=\"_blank\" rel=\"noopener\">${display || '查看地圖'}</a>`;
+            return `<a class=\"font-semibold mt-1 link-soft link-purple break-all\" href=\"${url}\" target=\"_blank\" rel=\"noopener\">${display || '查看地圖'}</a>`;
           })()}
         </div>
       </section>
@@ -284,7 +383,7 @@
       <section aria-labelledby="sec-photos" class="mb-12">
         <div class="flex items-center justify-between mb-4">
           <h2 id="sec-photos" class="text-2xl font-bold">活動照片</h2>
-          <a href="#sec-cases" class="text-blue-500 hover:underline">精選案例</a>
+          <a href="#sec-cases" class="link-soft link-orange">精選案例</a>
         </div>
         <div class="carousel-marquee" id="photos-carousel">
           <div class="carousel-track">
@@ -319,15 +418,58 @@
 
       <section aria-labelledby="sec-cases" class="mb-12">
         <h2 id="sec-cases" class="text-2xl font-bold mb-4">精選案例</h2>
-        <ul class="space-y-3">
-          ${casesHtml}
-        </ul>
+        ${renderCases(provider)}
       </section>
     `;
 
     // Lightbox binding for photos & marquee sizing
     const carousel = document.getElementById('photos-carousel');
     if (carousel) { enableLightboxOn(carousel, imgs); setupMarquee(carousel); }
+    // Cases: bind lightbox on media and video modal
+    try {
+      const casesRoot = document.getElementById('sec-cases')?.parentElement;
+      if (casesRoot) {
+        // bind images
+        casesRoot.querySelectorAll('.case-media').forEach(box => {
+          const sources = ((box.getAttribute('data-images')||'').split('|').filter(Boolean));
+          if (sources.length) enableLightboxOn(box, sources);
+        });
+        // bind video
+        const openVideo = ensureVideoModal();
+        casesRoot.addEventListener('click', (e) => {
+          const btn = e.target.closest('.case-video');
+          if (!btn) return;
+          const url = btn.getAttribute('data-video');
+          if (url) { e.preventDefault(); openVideo(url); }
+        });
+
+        // apply video posters (YouTube/Vimeo)
+        function posterFrom(url){
+          if (!url) return '';
+          if (isYouTube(url)) return `https://i.ytimg.com/vi/${ytId(url)}/hqdefault.jpg`;
+          if (isVimeo(url)) return `https://vumbnail.com/${vimeoId(url)}.jpg`;
+          return '';
+        }
+        casesRoot.querySelectorAll('.case-video').forEach(btn => {
+          const url = btn.getAttribute('data-video') || '';
+          const poster = posterFrom(url);
+          if (poster) {
+            btn.style.backgroundImage = `url('${poster}')`;
+            btn.style.backgroundSize = 'cover';
+            btn.style.backgroundPosition = 'center';
+            btn.style.color = '#fff';
+            // add overlay blur/shine for better contrast
+            if (!btn.querySelector('.overlay')) {
+              const ov = document.createElement('div');
+              ov.className = 'overlay';
+              ov.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,.25);pointer-events:none;';
+              btn.style.position = 'relative';
+              btn.prepend(ov);
+            }
+          }
+        });
+      }
+    } catch(e){}
     attachInteractiveChecklist(root);
   }
 

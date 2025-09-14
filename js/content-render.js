@@ -9,36 +9,93 @@
     const h1 = document.getElementById('hero-title');
     const p = document.getElementById('hero-subtitle');
     if (h1) h1.textContent = data.heroTitle || h1.textContent;
-    if (p) p.textContent = data.heroSubtitle || p.textContent;
+    if (p) {
+      const html = data.heroSubtitle || p.textContent;
+      // 支援含超連結的 HTML
+      p.innerHTML = html;
+    }
 
     const intro = document.getElementById('platform-intro');
     if (intro && Array.isArray(data.platformIntro)) {
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      // ensure intro background var matches actual background color (light/dark or custom)
+      try {
+        function getBgColor(el){
+          while (el) {
+            const cs = getComputedStyle(el);
+            const bg = cs.backgroundColor || 'rgba(0,0,0,0)';
+            if (bg && !bg.includes('rgba(0, 0, 0, 0)') && bg !== 'transparent' && bg !== 'none') return bg;
+            el = el.parentElement;
+          }
+          return getComputedStyle(document.body).backgroundColor || '#ffffff';
+        }
+        const bg = getBgColor(intro);
+        intro.style.setProperty('--intro-bg', bg);
+      } catch(e) {}
+
       intro.innerHTML = '';
       data.platformIntro.forEach((item, idx) => {
-        const card = document.createElement('div');
-        card.className = 'intro-card p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl text-left';
-        const accent = idx % 3 === 0 ? 'from-blue-500/10' : idx % 3 === 1 ? 'from-green-500/10' : 'from-purple-500/10';
-        card.style.backgroundImage = 'linear-gradient(to right, transparent, transparent)';
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <h3 class="text-xl font-bold mb-2">${item.title}</h3>
-          </div>
-          <p class="text-gray-700 dark:text-gray-300">${item.text}</p>
-          <div class="collapse-content">
-            <p class="text-sm text-gray-700 dark:text-gray-200">${item.details || ''}</p>
+        const row = document.createElement('div');
+        row.className = 'intro-row grid md:grid-cols-2 gap-8 items-center reveal-item';
+
+        const imgWrap = document.createElement('div');
+        const txtWrap = document.createElement('div');
+        const leftImg = (idx % 2 === 0);
+        imgWrap.className = leftImg ? 'md:order-1 order-1' : 'md:order-2 order-1';
+        txtWrap.className = leftImg ? 'md:order-2 order-2' : 'md:order-1 order-2';
+
+        // image block (pure CSS zigzag edge)
+        const imgUrl = item.image || 'https://picsum.photos/seed/intro' + (idx+1) + '/1200/800';
+        imgWrap.innerHTML = `
+          <div class="intro-imgwrap ${leftImg ? 'zig-right' : 'zig-left'} shadow-lg">
+            <img src="${imgUrl}" alt="${item.title || ''}" class="w-full h-64 md:h-80 object-cover">
           </div>
         `;
-        card.addEventListener('click', () => {
-          const open = card.classList.toggle('is-open');
+
+        // text block
+        txtWrap.innerHTML = `
+          <div class="pl-8 p-2 md:p-3 md:text-left">
+            <h3 class="text-2xl font-bold mb-2">${item.title || ''}</h3>
+            <p class="text-lg text-gray-700 dark:text-gray-300">${item.text || ''}</p>
+            <div class="collapse-content mt-3">
+              <p class="text-base md:text-lg text-gray-700 dark:text-gray-200">${item.details || ''}</p>
+            </div>
+          </div>
+        `;
+
+        row.appendChild(imgWrap);
+        row.appendChild(txtWrap);
+
+        // toggle collapse on text click
+        row.addEventListener('click', (e) => {
+          // avoid toggling when clicking links inside
+          if (e.target && e.target.closest('a')) return;
+          const open = row.classList.toggle('is-open');
           // close others
-          intro.querySelectorAll('.intro-card.is-open').forEach(el => {
-            if (el !== card) el.classList.remove('is-open');
-          });
-          if (!open) return;
+          intro.querySelectorAll('.intro-row.is-open').forEach(el => { if (el !== row) el.classList.remove('is-open'); });
         });
-        intro.appendChild(card);
+
+        intro.appendChild(row);
       });
 
+      // reveal on scroll（桌機）；手機直接顯示
+      try {
+        const els = intro.querySelectorAll('.reveal-item');
+        if (isMobile) {
+          els.forEach(el => el.classList.add('show'));
+        } else {
+          const io = new IntersectionObserver(entries => {
+            entries.forEach(en => {
+              if (en.intersectionRatio >= 0.5) {
+                en.target.classList.add('show');
+              } else {
+                en.target.classList.remove('show');
+              }
+            });
+          }, { threshold: [0, 0.5, 1] });
+          els.forEach(el => io.observe(el));
+        }
+      } catch(e) {}
     }
 
     const featured = document.getElementById('featured-cases');
@@ -58,7 +115,7 @@
         inner.innerHTML = `
           <h3 class="text-xl font-bold mb-2">${p.name || p.title}</h3>
           <p class="text-gray-600 dark:text-gray-400">${p.description || p.text || ''}</p>
-          <a href="${href}" class="text-blue-500 hover:underline mt-4 inline-block transition-colors duration-200">閱讀更多</a>
+          <a href="${href}" class="link-soft link-purple mt-4 inline-block transition-colors duration-200">閱讀更多</a>
         `;
         wrap.appendChild(inner);
         featured.appendChild(wrap);

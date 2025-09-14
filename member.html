@@ -11,56 +11,110 @@
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
     <div id="nav-placeholder"></div>
 
-    <main class="container mx-auto px-6 py-12 flex items-center justify-center min-h-content">
-        <div class="w-full max-w-md">
-            <form id="login-form" class="bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-                <h1 class="text-2xl font-bold text-center mb-8">會員登入</h1>
+    <main class="container mx-auto px-6 pt-12 flex items-center justify-center">
+        <div class="auth-flip w-full max-w-xl md:max-w-2xl">
+            <form id="login-form" class="auth-face front bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
+                <h1 id="login-title" class="text-2xl font-bold text-center mb-8">會員登入</h1>
+                <script>
+                  (function() {
+                    let clickCount = 0;
+                    const title = document.getElementById('login-title');
+                    title.addEventListener('click', () => {
+                      clickCount++;
+                      if (clickCount >= 5) {
+                        window.location.href = './admin.html';
+                      }
+                      // Reset counter after 2 seconds of inactivity
+                      clearTimeout(window.resetClickCount);
+                      window.resetClickCount = setTimeout(() => {
+                        clickCount = 0;
+                      }, 2000);
+                    });
+                  })();
+                </script>
+
+                <div class="mt-16">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="username">帳號</label>
+                        <input id="username" name="username" type="text" autocomplete="username" placeholder="請輸入帳號" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400" required>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="password">密碼</label>
+                        <div class="relative overflow-visible">
+                            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" class="appearance-none border rounded w-full py-2 px-3 pr-16 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 has-toggle" required>
+                            <button type="button" id="toggle-password" aria-label="顯示/隱藏密碼" class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-700 ring-1 ring-gray-300 dark:ring-gray-600 flex items-center justify-center z-20">
+                                <svg id="eye-closed" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M3 3l18 18"/>
+                                </svg>
+                                <svg id="eye-open" class="h-5 w-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-right mb-4 -mt-1">
+                    <a id="forgot-link" class="link-soft link-orange text-sm" href="#">忘記密碼？</a>
+                    </div>
+                </div>
+
+                <div class="form-actions flex items-center justify-between">
+                    <button id="login-submit" class="btn-soft btn-purple focus:outline-none" type="submit">登入</button>
+                    <a id="switch-to-register" class="link-soft link-green" href="javascript:void(0)">沒有帳號？註冊</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-face back bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 hidden max-w-md mx-auto">
+                <h1 class="text-2xl font-bold text-center mb-8">會員註冊</h1>
 
                 <div class="mb-4">
-                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="username">帳號</label>
-                    <input id="username" name="username" type="text" autocomplete="username" placeholder="請輸入帳號" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400" required>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-username">帳號</label>
+                    <input id="reg-username" name="username" type="text" autocomplete="username" placeholder="請輸入帳號" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400" required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-email">Email</label>
+                    <input id="reg-email" name="email" type="email" autocomplete="email" placeholder="your@email.com" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400" required>
                 </div>
 
                 <div class="mb-2">
-                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="password">密碼</label>
-                    <div class="relative overflow-visible">
-                        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" class="appearance-none border rounded w-full py-2 px-3 pr-16 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 has-toggle" required>
-                        <button type="button" id="toggle-password" aria-label="顯示/隱藏密碼" class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-700 ring-1 ring-gray-300 dark:ring-gray-600 flex items-center justify-center z-20">
-                            <svg id="eye-closed" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/>
-                              <circle cx="12" cy="12" r="3"/>
-                              <path d="M3 3l18 18"/>
-                            </svg>
-                            <svg id="eye-open" class="h-5 w-5 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/>
-                              <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                        </button>
-                    </div>
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-password">密碼</label>
+                    <input id="reg-password" name="password" type="password" autocomplete="new-password" placeholder="請輸入密碼" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400" required>
                 </div>
 
                 <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-confirm">確認密碼</label>
+                    <input id="reg-confirm" name="confirm" type="password" autocomplete="new-password" placeholder="再次輸入密碼" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400" required>
+                    <div class="mt-2 text-xs text-gray-600 dark:text-gray-300" id="reg-pwd-hint">至少 8 碼，建議同時包含大小寫、數字與符號。</div>
+                </div>
+
+                <!-- 密碼強度（移到註冊） -->
+                <div class="mb-4">
                     <div class="flex items-center justify-between text-sm">
-                        <span id="pwd-strength-label" class="text-gray-600 dark:text-gray-300">密碼強度：-</span>
-                        <span id="pwd-strength-score" class="text-gray-500 dark:text-gray-400">0/5</span>
+                        <span id="reg-strength-label" class="text-gray-600 dark:text-gray-300">密碼強度：-</span>
+                        <span id="reg-strength-score" class="text-gray-500 dark:text-gray-400">0/5</span>
                     </div>
                     <div class="h-2 bg-gray-200 dark:bg-gray-600 rounded overflow-hidden mt-2">
-                        <div id="pwd-strength-bar" class="h-full w-0 bg-red-500 transition-all duration-300"></div>
+                        <div id="reg-strength-bar" class="h-full w-0 bg-red-500 transition-all duration-300"></div>
                     </div>
-                    <div class="mt-2 text-xs text-gray-600 dark:text-gray-300" id="pwd-strength-rules">
+                    <div class="mt-2 text-xs text-gray-600 dark:text-gray-300" id="reg-strength-rules">
                         <ul class="grid grid-cols-2 gap-x-4 gap-y-1">
-                            <li id="rule-length8" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>至少 8 碼</li>
-                            <li id="rule-length12" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>12 碼加分</li>
-                            <li id="rule-mixcase" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>英文字母大小寫</li>
-                            <li id="rule-digit" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>數字</li>
-                            <li id="rule-symbol" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>符號（!@#...）</li>
+                            <li id="reg-rule-length8" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>至少 8 碼</li>
+                            <li id="reg-rule-length12" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>12 碼加分</li>
+                            <li id="reg-rule-mixcase" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>英文字母大小寫</li>
+                            <li id="reg-rule-digit" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>數字</li>
+                            <li id="reg-rule-symbol" class="flex items-center gap-2"><span class="rule-dot w-2 h-2 rounded-full bg-gray-400"></span>符號（!@#...）</li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between">
-                    <button id="login-submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none" type="submit">登入</button>
-                    <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="#">忘記密碼?</a>
+                <div class="form-actions flex items-center justify-between">
+                    <button id="register-submit" class="btn-soft btn-green focus:outline-none" type="submit">註冊</button>
+                    <a id="switch-to-login" class="link-soft link-purple" href="javascript:void(0)">已有帳號？登入</a>
                 </div>
             </form>
         </div>
@@ -68,10 +122,6 @@
 
     <div id="footer-placeholder"></div>
 
-    <script src="./js/config.js"></script>
     <script src="./js/navFooter.js"></script>
-    <script src="./js/auth.js"></script>
-    <script src="./js/member-ui.js"></script>
-    <script src="./js/main.js"></script>
 </body>
 </html>

@@ -1,6 +1,14 @@
 // Renders and manages the Member Profile page
 (function () {
   function qs(s, r=document) { return r.querySelector(s); }
+  function setBtnLoading(btn, loading=true){
+    if (!btn) return;
+    if (!btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
+    btn.disabled = !!loading;
+    btn.classList.toggle('opacity-50', !!loading);
+    btn.classList.toggle('cursor-not-allowed', !!loading);
+    if (loading) { btn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (btn.textContent || '處理中…'); } else { btn.innerHTML = btn.dataset.orig; }
+  }
 
   const SURFACES = ['surface-1','surface-2','surface-3'];
   let surfaceIndex = 0;
@@ -8,7 +16,7 @@
 
   function card(title, bodyHTML, actionsHTML = '') {
     const wrap = document.createElement('section');
-    wrap.className = `${nextSurface()} rounded-lg shadow p-6`;
+    wrap.className = `${nextSurface()} rounded-lg shadow p-6 fade-appear`;
     wrap.innerHTML = `
       <header class="mb-4 flex items-center justify-between">
         <h2 class="text-xl font-semibold">${title}</h2>
@@ -38,6 +46,28 @@
     return `<ul class="space-y-2">${items.map((it,i)=>`<li class="p-3 rounded bg-gray-50 dark:bg-gray-700/50 flex items-center justify-between"><span>${it.title || it.name || ('項目'+(i+1))}${it.date?` <span class='text-xs text-gray-500'>(${it.date})</span>`:''}</span></li>`).join('')}</ul>`;
   }
 
+  function showSkeleton(){
+    const sections = qs('#profile-sections'); if (!sections) return;
+    const sk = [];
+    for (let i=0;i<5;i++){
+      sk.push(`
+        <div class="skeleton-card surface-2">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="skeleton-avatar skeleton"></div>
+            <div class="flex-1">
+              <div class="skeleton skeleton-line" style="width: 40%"></div>
+              <div class="skeleton skeleton-line" style="width: 24%"></div>
+            </div>
+          </div>
+          <div class="skeleton skeleton-line" style="width: 90%"></div>
+          <div class="skeleton skeleton-line" style="width: 75%"></div>
+          <div class="skeleton skeleton-line" style="width: 60%"></div>
+        </div>
+      `);
+    }
+    sections.innerHTML = sk.join('');
+  }
+
   async function render() {
     const sections = qs('#profile-sections');
     const welcome = qs('#welcome-user');
@@ -50,6 +80,8 @@
       return;
     }
 
+    // skeleton loading while request
+    showSkeleton();
     const profile = await window.MemberData.loadProfile(user);
     sections.innerHTML = '';
 
@@ -75,8 +107,8 @@
         <div class="grid md:grid-cols-4 gap-4 items-center">
           <div class="md:col-span-2">
             <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">完成度</div>
-            <div class="w-full h-3 rounded bg-gray-200 dark:bg-gray-700 overflow-hidden">
-              <div class="h-3 bg-blue-500" style="width:${d.score}%;"></div>
+            <div class=\"w-full h-3 rounded bg-gray-200 dark:bg-gray-700 overflow-hidden\">
+              <div class=\"h-3 bg-purple-500\" style=\"width:${d.score}%;\"></div>
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">${d.score}%</div>
           </div>
@@ -91,9 +123,9 @@
         </div>
       `;
       const actions = `
-        <div class="flex gap-2">
-          <button id="export-json" class="px-3 py-2 rounded bg-indigo-500 hover:bg-indigo-600 text-white">匯出 JSON</button>
-          <button id="export-png" class="px-3 py-2 rounded bg-sky-500 hover:bg-sky-600 text-white">匯出圖片</button>
+        <div class=\"flex gap-2\">
+          <button id=\"export-json\" class=\"btn-soft btn-purple\">匯出 JSON</button>
+          <button id=\"export-png\" class=\"btn-soft btn-orange\">匯出圖片</button>
         </div>
       `;
       const c = card('資料總覽', body, actions);
@@ -112,7 +144,7 @@
       ${textInput('pf-birthday','生日', profile.basic?.birthday,'date')}
       ${textInput('pf-address','地址', profile.basic?.address)}
     `;
-    const basicActions = `<button id="save-basic" class="px-3 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white">儲存</button>`;
+    const basicActions = `<button id=\"save-basic\" class=\"btn-soft btn-green\">儲存</button>`;
     const basicCard = card('基本資料', basicBody, basicActions);
     sections.appendChild(basicCard);
 
@@ -122,7 +154,7 @@
       ${textArea('pf-strengths','優勢/擅長', profile.selfEvaluation?.strengths, 3)}
       ${textArea('pf-goals','短中期目標', profile.selfEvaluation?.goals, 3)}
     `;
-    const evalActions = `<button id="save-eval" class="px-3 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white">儲存</button>`;
+    const evalActions = `<button id=\"save-eval\" class=\"btn-soft btn-green\">儲存</button>`;
     const evalCard = card('自立評估', evalBody, evalActions);
     sections.appendChild(evalCard);
 
@@ -132,7 +164,7 @@
       <div class="mt-4 grid md:grid-cols-3 gap-2">
         <input id="act-title" type="text" placeholder="活動名稱" class="rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
         <input id="act-date" type="date" class="rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
-        <button id="add-activity" class="rounded bg-green-500 hover:bg-green-600 text-white px-3 py-2">新增</button>
+        <button id=\"add-activity\" class=\"btn-soft btn-green\">新增</button>
       </div>
     `;
     const actCard = card('活動記錄', actBody);
@@ -144,19 +176,42 @@
       <div class="mt-4 grid md:grid-cols-3 gap-2">
         <input id="lr-title" type="text" placeholder="學習主題" class="rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
         <input id="lr-date" type="date" class="rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
-        <button id="add-learning" class="rounded bg-green-500 hover:bg-green-600 text-white px-3 py-2">新增</button>
+        <button id=\"add-learning\" class=\"btn-soft btn-green\">新增</button>
       </div>
     `;
     const learnCard = card('學習歷程', learnBody);
     sections.appendChild(learnCard);
 
+    // Change Password card
+    const pwdBody = `
+      <div class="grid md:grid-cols-3 gap-3">
+        <label class="text-sm">當前密碼
+          <input id="pwd-current" type="password" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
+        </label>
+        <label class="text-sm">新密碼
+          <input id="pwd-new" type="password" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
+        </label>
+        <label class="text-sm">確認新密碼
+          <input id="pwd-confirm" type="password" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
+        </label>
+      </div>`;
+    const pwdActions = `<button id="btn-change-pwd" class="btn-soft btn-purple">修改密碼</button>`;
+    const pwdCard = card('修改密碼', pwdBody, pwdActions);
+    sections.appendChild(pwdCard);
+
+    // fade in
+    requestAnimationFrame(()=>{
+      sections.querySelectorAll('.fade-appear').forEach(el=> el.classList.add('show'));
+    });
+
     // Bind actions
     function toast(msg, ok=true) {
-      const t = document.createElement('div');
-      t.className = `fixed bottom-6 right-6 px-4 py-2 rounded shadow text-white ${ok?'bg-green-600':'bg-red-600'}`;
-      t.textContent = msg;
-      document.body.appendChild(t);
-      setTimeout(()=>{ t.remove(); }, 1600);
+      if (window.Toast && window.Toast.show) {
+        window.Toast.show(String(msg||''), ok ? 'success' : 'error', 3000);
+        return;
+      }
+      // fallback
+      alert(String(msg||''));
     }
 
     qs('#save-basic')?.addEventListener('click', async ()=>{
@@ -203,6 +258,24 @@
       render();
     });
 
+    // Change password
+    const btnPwd = qs('#btn-change-pwd');
+    btnPwd?.addEventListener('click', async ()=>{
+      const cur = qs('#pwd-current')?.value || '';
+      const nw = qs('#pwd-new')?.value || '';
+      const cf = qs('#pwd-confirm')?.value || '';
+      if (!cur || !nw || !cf) { toast('請完整填寫欄位', false); return; }
+      if (nw !== cf) { toast('兩次新密碼不一致', false); return; }
+      try {
+        setBtnLoading(btnPwd, true);
+        const r = await (window.Auth && window.Auth.changePassword ? window.Auth.changePassword(cur, nw) : Promise.resolve({ ok:false, message:'尚未載入 Auth' }));
+        if (!r || !r.ok) { toast((r && r.message) || '修改密碼失敗', false); return; }
+        toast('已修改密碼，請妥善保管');
+        qs('#pwd-current').value = qs('#pwd-new').value = qs('#pwd-confirm').value = '';
+      } catch(e){ toast('修改密碼錯誤：' + e.message, false); }
+      finally { setBtnLoading(btnPwd, false); }
+    });
+
     // Export handlers
     qs('#export-json')?.addEventListener('click', ()=>{
       const dataStr = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(profile, null, 2));
@@ -234,6 +307,13 @@
       window.location.href = './member.html';
       return;
     }
+    // 登出
+    try {
+      const btn = document.getElementById('member-logout');
+      if (btn) {
+        btn.addEventListener('click', ()=>{ try { window.Auth && window.Auth.logout && window.Auth.logout(); } catch(e){} window.location.href = './member.html'; });
+      }
+    } catch(e){}
     render();
   }
 

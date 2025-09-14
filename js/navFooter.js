@@ -4,11 +4,11 @@ function renderNavFooter() {
     const navHTML = `
     <header class="bg-gray-100 dark:bg-gray-800 shadow-md relative z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="主選單">
-            <a href="./index.html" class="text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-blue-500">核心生涯探索平台</a>
+            <a href="./index.html" class="text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-purple-500">核心生涯探索平台</a>
             <div class="hidden md:flex items-center space-x-6">
-                <a href="./about.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-blue-500 transition-colors duration-300">關於我們</a>
-                <a href="./explore.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-blue-500 transition-colors duration-300">探索資源平台</a>
-                <a href="./member.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-blue-500 transition-colors duration-300">會員專區</a>
+                <a href="./about.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">關於我們</a>
+                <a href="./explore.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">探索資源平台</a>
+                <a href="./member.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">會員專區</a>
                 <button id="theme-toggle" aria-label="切換深淺色主題" class="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
                     <svg id="theme-toggle-dark-icon" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                     <svg id="theme-toggle-light-icon" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
@@ -30,9 +30,9 @@ function renderNavFooter() {
         </nav>
         <div id="mobile-menu" class="md:hidden hidden px-6 pb-4 mobile-menu-collapsible" aria-hidden="true">
             <div class="flex flex-col space-y-3">
-                <a href="./about.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-blue-500 transition-colors duration-200">關於我們</a>
-                <a href="./explore.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-blue-500 transition-colors duration-200">探索資源平台</a>
-                <a href="./member.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-blue-500 transition-colors duration-200">會員專區</a>
+                <a href="./about.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-purple-500 transition-colors duration-200">關於我們</a>
+                <a href="./explore.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-purple-500 transition-colors duration-200">探索資源平台</a>
+                <a href="./member.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-purple-500 transition-colors duration-200">會員專區</a>
                 <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
                     <button id="theme-toggle-mobile" aria-label="切換深淺色主題" class="mt-2 p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
                       <svg id="theme-toggle-dark-icon-mobile" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
@@ -67,7 +67,7 @@ function renderNavFooter() {
             const file = href.split('/').pop();
             if (file === current || (current === '' && file === 'index.html')) {
                 a.classList.remove('text-gray-600');
-                a.classList.add('text-blue-500', 'font-bold');
+                a.classList.add('text-purple-600', 'font-bold');
                 a.setAttribute('aria-current', 'page');
             } else {
                 a.removeAttribute('aria-current');
@@ -121,6 +121,86 @@ function renderNavFooter() {
 
     // 通知其他腳本 nav/footer 已經注入
     document.dispatchEvent(new CustomEvent('nav-footer-rendered'));
+
+    // 動態在頁尾注入共用與頁面腳本，集中管理
+    try {
+        (async function injectScripts() {
+            const page = (location.pathname.split('/').pop() || 'index.html').replace('#','');
+            let base = [
+              './js/config.js',
+              './js/toast.js',
+              './js/data-loader.js',
+              './js/data/providers.js',
+              './js/main.js'
+            ];
+            const perPage = [];
+            const styles = [];
+            if (page === 'explore.html') {
+              perPage.push('./js/explore.js');
+            } else if (page === 'member.html') {
+              perPage.push('./js/auth.js', './js/member-ui.js');
+            } else if (page === 'index.html') {
+              styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+              perPage.push('./js/data/siteContent.js', './js/content-render.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-index.js');
+            } else if (page === 'provider.html') {
+              styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+              perPage.push('./js/provider-detail.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-provider.js');
+            } else if (page === 'about.html') {
+              perPage.push('./js/data/aboutContent.js', './js/about.js');
+            } else if (page === 'admin.html') {
+              // 後台需要以本地 js/data 為來源（非 GAS），因此一併載入三個資料檔
+              perPage.push('./js/data/aboutContent.js', './js/data/siteContent.js', './js/auth.js', './js/admin.js');
+              base = base.filter(src => src !== './js/main.js');
+            }
+
+            const containerId = 'global-script-bundle';
+            let bundle = document.getElementById(containerId);
+            if (!bundle) {
+              bundle = document.createElement('div');
+              bundle.id = containerId;
+              (footerPlaceholder || document.body).appendChild(bundle);
+            }
+
+            function addScriptOnce(src) {
+              const already = [...document.scripts].some(s => {
+                const cur = s.src || '';
+                return cur === src || cur.endsWith(src) || cur.includes(src.replace('https://','').replace('http://',''));
+              });
+              if (already) return Promise.resolve();
+              return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src; s.defer = false; s.async = false;
+                s.onload = () => resolve();
+                s.onerror = (e) => { console.warn('Script load failed:', src, e); resolve(); };
+                bundle.appendChild(s);
+              });
+            }
+
+            function addStyleOnce(href) {
+              const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+              const hit = links.some(l => {
+                const cur = l.href || '';
+                return cur === href || cur.endsWith(href) || cur.includes(href.replace('https://','').replace('http://',''));
+              });
+              if (hit) return Promise.resolve();
+              return new Promise((resolve) => {
+                const l = document.createElement('link');
+                l.rel = 'stylesheet';
+                l.href = href;
+                l.onload = () => resolve();
+                l.onerror = () => { console.warn('Stylesheet load failed:', href); resolve(); };
+                document.head.appendChild(l);
+              });
+            }
+
+            // 依序載入，確保依賴順序（先樣式後腳本）
+            for (const href of styles) { await addStyleOnce(href); }
+            for (const src of base) { await addScriptOnce(src); }
+            for (const src of perPage) { await addScriptOnce(src); }
+        })();
+    } catch (e) {
+        console.warn('Footer script injection failed:', e);
+    }
 }
 
 // 確保無論載入時機，都可以渲染 nav/footer

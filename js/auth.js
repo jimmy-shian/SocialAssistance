@@ -1,6 +1,6 @@
 // Authentication helpers (ready for future GAS backend)
 (function () {
-  const AppConfig = window.AppConfig || { GAS_BASE_URL: '', endpoints: { login: '/login', profile: '/profile' } };
+  const AppConfig = window.AppConfig || { GAS_BASE_URL: '', endpoints: { memberLogin: '/memberLogin', memberRegister: '/memberRegister', memberForgot: '/memberForgot', profileRead: '/profileRead', profileUpdate: '/profileUpdate' } };
 
   function evaluatePasswordStrength(pwd) {
     const max = 5;
@@ -28,21 +28,40 @@
     return { score, label, color, max, rules: { length8, length12, mixcase, digit, symbol } };
   }
 
+  async function register(username, email, password) {
+    if (!username || !email || !password) return { ok: false, message: '請完整填寫資料' };
+    const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
+    if (base) {
+      try {
+        const ep = (AppConfig.endpoints && AppConfig.endpoints.memberRegister) || '/memberRegister';
+        const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ username, email, password }) });
+        if (!resp.ok) return { ok: false, message: '註冊失敗' };
+        const data = await resp.json();
+        if (!data || !data.ok) return { ok: false, message: data && data.message || '註冊失敗' };
+        if (data.token) { localStorage.setItem('auth_token', data.token); localStorage.setItem('auth_user', username); }
+        return { ok: true };
+      } catch(e) {
+        return { ok:false, message: '註冊錯誤：' + e.message };
+      }
+    }
+    // Demo local registration: ensure unique username in localStorage
+    const key = 'registered_users';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    if (list.some(u => u.username === username)) return { ok:false, message: '此帳號已被註冊' };
+    list.push({ username, email });
+    localStorage.setItem(key, JSON.stringify(list));
+    localStorage.setItem('auth_token', 'demo-token');
+    localStorage.setItem('auth_user', username);
+    return { ok:true };
+  }
+
   async function login(username, password) {
     if (!username || !password) return { ok: false, message: '請輸入帳號與密碼' };
     const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
     if (base) {
       try {
-        if (window.DataAPI && window.DataAPI.login) {
-          const data = await window.DataAPI.login(username, password);
-          if (!data || !data.ok || !data.token) return { ok: false, message: data && data.message || '登入失敗' };
-          // mirror to auth_token for pages that rely on it
-          localStorage.setItem('auth_token', data.token);
-          localStorage.setItem('auth_user', username);
-          return { ok: true, token: data.token };
-        }
-        // fallback to JSON if DataAPI not present
-        const resp = await fetch(base + AppConfig.endpoints.login, {
+        const ep = (AppConfig.endpoints && AppConfig.endpoints.memberLogin) || '/memberLogin';
+        const resp = await fetch(base + ep, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ username, password })
@@ -72,5 +91,30 @@
     localStorage.removeItem('auth_user');
   }
 
-  window.Auth = { evaluatePasswordStrength, login, logout };
+  async function forgot(usernameOrEmail){
+    const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
+    if (!base) return { ok:false, message: '未設定後端' };
+    try {
+      const ep = (AppConfig.endpoints && AppConfig.endpoints.memberForgot) || '/memberForgot';
+      const payload = {};
+      if (usernameOrEmail.includes('@')) payload.email = usernameOrEmail; else payload.username = usernameOrEmail;
+      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
+      const data = await resp.json();
+      return data;
+    } catch(e){ return { ok:false, message: '忘記密碼錯誤：' + e.message }; }
+  }
+
+  async function changePassword(currentPassword, newPassword){
+    const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
+    if (!base) return { ok:false, message: '未設定後端' };
+    try {
+      const ep = (AppConfig.endpoints && AppConfig.endpoints.memberChangePassword) || '/memberChangePassword';
+      const token = localStorage.getItem('auth_token') || '';
+      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token, current: currentPassword, new: newPassword }) });
+      const data = await resp.json();
+      return data || { ok:false };
+    } catch(e){ return { ok:false, message: '修改密碼錯誤：' + e.message }; }
+  }
+
+  window.Auth = { evaluatePasswordStrength, login, register, logout, forgot, changePassword };
 })();

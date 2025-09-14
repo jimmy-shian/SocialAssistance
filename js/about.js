@@ -98,8 +98,8 @@
 
   function attachCardInteractions(container){
     container.querySelectorAll('.about-card').forEach(card => {
-      card.addEventListener('mouseenter', () => card.classList.add('ring-1','ring-blue-300','dark:ring-blue-500'));
-      card.addEventListener('mouseleave', () => card.classList.remove('ring-1','ring-blue-300','dark:ring-blue-500'));
+      card.addEventListener('mouseenter', () => card.classList.add('ring-1','ring-purple-300','dark:ring-purple-500'));
+      card.addEventListener('mouseleave', () => card.classList.remove('ring-1','ring-purple-300','dark:ring-purple-500'));
       card.addEventListener('click', (e) => {
         if (e.target && e.target.closest('a')) return; // 僅連結可跳轉
         // 不做整卡跳轉，保留輕量互動
@@ -145,7 +145,7 @@
             return `
             <div class=\"about-card p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-150 hover:-translate-y-0.5\">
               <h3 class=\"font-semibold mb-2\">${m.title}</h3>
-              <p class=\"text-gray-700 dark:text-gray-300 text-sm\">${m.desc}</p>
+              <p class=\"text-gray-700 dark:text-gray-300 text-sm\">${m.desc || ''}</p>
               ${link ? `<div class=\"mt-3\">${link}</div>` : ''}
             </div>`;
           }).join('')}
@@ -176,9 +176,16 @@
     const heroEl = qs('#hero-typed', root);
     const leadEl = qs('#lead-typed', root);
     typeText(heroEl, data.heroTitle || '關於我們', 26);
-    setTimeout(()=> typeText(leadEl, data.lead || '', 14), 150);
+    // 若 lead 含 HTML（例如 <a> 或 <br>），直接 innerHTML 呈現，不做打字動畫
+    const leadStr = data.lead || '';
+    const hasHtml = /<\s*a\b|<\s*br\b|<\s*span\b|<\s*div\b|&lt;/.test(leadStr);
+    if (hasHtml) {
+      leadEl.innerHTML = leadStr;
+    } else {
+      setTimeout(()=> typeText(leadEl, leadStr, 14), 150);
+      leadEl?.addEventListener('click', ()=> shatterAndReveal(leadEl, leadStr));
+    }
     heroEl?.addEventListener('click', ()=> shatterAndReveal(heroEl, data.heroTitle || '關於我們'));
-    leadEl?.addEventListener('click', ()=> shatterAndReveal(leadEl, data.lead || ''));
 
     // interactions and animations
     attachCardInteractions(root);
