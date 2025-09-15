@@ -124,6 +124,23 @@
 
     <div id="footer-placeholder"></div>
 
+    <!-- Forgot Password Modal -->
+    <div id="forgot-modal" class="fixed inset-0 hidden">
+      <div class="overlay-bg fixed inset-0 rounded-none bg-slate-900/45 dark:bg-slate-900/55"></div>
+      <section class="modal-card relative z-10 w-full max-w-md mx-auto">
+        <div class="rounded-lg shadow p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-semibold mb-1">重設密碼</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">請輸入帳號或 Email，我們會寄送重設指示。</p>
+          <input id="forgot-input" type="text" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100" placeholder="帳號或 Email">
+          <div id="forgot-status" class="mt-2 text-sm text-gray-500 dark:text-gray-400" aria-live="polite"></div>
+          <div class="mt-4 flex justify-end gap-2">
+            <button id="forgot-cancel" type="button" class="btn-soft btn-purple">取消</button>
+            <button id="forgot-submit" type="button" class="btn-soft btn-green">送出</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <script src="./js/navFooter.js"></script>
 </body>
 </html>

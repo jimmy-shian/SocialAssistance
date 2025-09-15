@@ -104,20 +104,60 @@
       });
     }
 
-    // 忘記密碼
+    // 忘記密碼（改為 Modal）
     const forgot = qs('#forgot-link');
-    if (forgot) {
-      forgot.addEventListener('click', async (e)=>{
-        e.preventDefault();
+    const modal = qs('#forgot-modal');
+    const modalInput = qs('#forgot-input');
+    const modalCancel = qs('#forgot-cancel');
+    const modalSubmit = qs('#forgot-submit');
+    const modalStatus = qs('#forgot-status');
+    function openForgot(){ if(!modal) return; modal.classList.remove('hidden'); setTimeout(()=> modal.classList.add('open'), 0); modalInput?.focus(); }
+    function closeForgot(){ if(!modal) return; modal.classList.remove('open'); const hide=()=>modal.classList.add('hidden'); modal.addEventListener('transitionend', function onEnd(e){ if(e.target===modal){ modal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
+    function setForgotLoading(on=true){ if(!modalSubmit) return; if(!modalSubmit.dataset.orig) modalSubmit.dataset.orig = modalSubmit.innerHTML; modalSubmit.disabled = !!on; modalSubmit.classList.toggle('opacity-50', !!on); modalSubmit.classList.toggle('cursor-not-allowed', !!on); modalStatus && (modalStatus.textContent = on ? '送出中…' : ''); if(on){ modalSubmit.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (modalSubmit.textContent || '送出'); } else { modalSubmit.innerHTML = modalSubmit.dataset.orig; } }
+    if (forgot && modal) {
+      forgot.addEventListener('click', (e)=>{ e.preventDefault(); openForgot(); });
+      modalCancel?.addEventListener('click', ()=> closeForgot());
+      modal?.addEventListener('click', (e)=>{ const t=e.target; if (t && (t.id==='forgot-modal' || t.classList.contains('overlay-bg'))) closeForgot(); });
+      // 驗證 Email 格式
+      function isValidEmail(email) {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(email);
+      }
+      
+      modalSubmit?.addEventListener('click', async ()=>{
+        const val = (modalInput?.value || '').trim();
+        if (!val) { 
+          modalStatus && (modalStatus.textContent = '請輸入帳號或 Email'); 
+          modalInput?.focus();
+          return; 
+        }
+        // 如果輸入包含 @，則驗證 Email 格式
+        if (val.includes('@') && !isValidEmail(val)) {
+          modalStatus && (modalStatus.textContent = '請輸入有效的 Email 格式（例如：user@example.com）');
+          modalInput?.focus();
+          modalInput?.select();
+          return;
+        }
+        if (!window.Auth || !window.Auth.forgot) { 
+          modalStatus && (modalStatus.textContent = '忘記密碼功能尚未載入'); 
+          return; 
+        }
         try {
-          const input = prompt('請輸入帳號或 Email：');
-          if (!input) return;
-          if (!window.Auth || !window.Auth.forgot) { alert('忘記密碼功能尚未載入'); return; }
-          const r = await window.Auth.forgot(input.trim());
-          if (window.Toast && window.Toast.show) window.Toast.show(r && r.message ? r.message : '已發送重設指示', 'info', 3000);
-          else alert(r && r.message ? r.message : '已發送重設指示');
-        } catch(err){ alert('操作失敗：' + err.message); }
+          setForgotLoading(true);
+          const r = await window.Auth.forgot(val);
+          const msg = (r && r.message) ? r.message : (r && r.ok ? '已發送重設指示' : '操作失敗');
+          if (window.Toast && window.Toast.show) window.Toast.show(msg, r && r.ok ? 'success' : 'error', 3000);
+          modalStatus && (modalStatus.textContent = msg);
+          if (r && r.ok) setTimeout(()=>{ closeForgot(); }, 800);
+        } catch(err){
+          const msg = '操作失敗：' + err.message;
+          if (window.Toast && window.Toast.show) window.Toast.show(msg, 'error', 3000);
+          modalStatus && (modalStatus.textContent = msg);
+        } finally { setForgotLoading(false); }
       });
+      // Enter: submit; Escape: close
+      modalInput?.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); modalSubmit?.click(); } });
+      document.addEventListener('keydown', (e)=>{ if (!modal || modal.classList.contains('hidden')) return; if (e.key==='Escape') { e.preventDefault(); closeForgot(); } });
     }
 
     form.addEventListener('submit', async (e) => {

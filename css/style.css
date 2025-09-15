@@ -602,6 +602,14 @@ input:focus, select:focus, textarea:focus {
 #link-modal .overlay-bg { opacity: 0; transition: opacity .18s ease; }
 #link-modal.open .overlay-bg { opacity: 1; }
 
+/* Member｜忘記密碼 Modal 動畫 */
+#forgot-modal { z-index: 1200; display: none; }
+#forgot-modal:not(.hidden) { display: grid; place-items: center; padding: 1rem; }
+#forgot-modal .modal-card { opacity: 0; transform: translateY(8px) scale(.98); transition: opacity .18s ease, transform .18s ease; }
+#forgot-modal.open .modal-card { opacity: 1; transform: none; }
+#forgot-modal .overlay-bg { opacity: 0; transition: opacity .18s ease; }
+#forgot-modal.open .overlay-bg { opacity: 1; }
+
 /* ==============================
    首頁｜平台導覽：進場動畫與收合
    說明：reveal 進場／is-open 展開詳細內容
