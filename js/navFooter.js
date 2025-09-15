@@ -221,7 +221,6 @@ function renderNavFooter() {
             } else if (page === 'admin.html') {
               // 後台需要以本地 js/data 為來源（非 GAS），因此一併載入三個資料檔
               perPage.push('./js/data/aboutContent.js', './js/data/siteContent.js', './js/auth.js', './js/admin.js');
-              base = base.filter(src => src !== './js/main.js');
             }
 
             const containerId = 'global-script-bundle';
