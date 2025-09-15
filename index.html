@@ -20,10 +20,21 @@
 
     <main class="container mx-auto px-6 py-12">
         <!-- Hero Section -->
-        <section class="text-center">
-            <h1 id="hero-title" class="text-4xl md:text-6xl font-bold mb-4">探索你的未來</h1>
-            <p id="hero-subtitle" class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">在核心生涯探索平台，找到屬於你的道路。</p>
-            <a href="./explore.html" class="bg-orange-400 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition duration-300">開始探索</a>
+        <section id="hero" class="hero-banner relative rounded-xl shadow mb-12">
+          <div class="hero-band">
+            <h1 id="hero-title" class="hero-title">探索你的未來</h1>
+            <p id="hero-subtitle" class="hero-subtitle">在核心生涯探索平台，找到屬於你的道路。</p>
+          </div>
+        </section>
+        <div class="text-center">
+          <a href="./explore.html" class="bg-orange-400 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition duration-300">開始探索</a>
+        </div>
+
+        <!-- Story Section (重點故事) -->
+        <section class="mt-20">
+          <div id="story-section" class="rounded-2xl p-6 md:p-10 bg-gray-900 text-white">
+            <!-- 由 content-render.js 依資料渲染 -->
+          </div>
         </section>
 
         <!-- Platform Introduction -->
@@ -43,6 +54,22 @@
                     <p>記錄你的學習歷程，看見自己的成長與轉變。</p>
                 </div> -->
             </div>
+        </section>
+
+        <!-- Services Section -->
+        <section class="mt-20">
+          <h2 id="services-title" class="text-3xl font-bold text-center mb-10">服務項目</h2>
+          <div id="services-section" class="max-w-6xl md:max-w-7xl mx-auto">
+            <div id="services-list" class="grid md:grid-cols-3 gap-6"></div>
+          </div>
+        </section>
+
+        <!-- Video Section -->
+        <section class="mt-20 bg-gray-900 text-white rounded-2xl py-10">
+          <div class="max-w-5xl mx-auto px-4">
+            <h2 id="video-title" class="text-2xl md:text-3xl font-bold text-center"></h2>
+            <div id="index-video" class="mt-6 aspect-video rounded-lg overflow-hidden bg-black"></div>
+          </div>
         </section>
 
         <!-- Chiayi Map -->

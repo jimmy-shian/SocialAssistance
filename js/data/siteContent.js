@@ -16,8 +16,34 @@
 
 window.siteContent = {
   index: {
+    heroImage: './img/index-bg.png',
     heroTitle: '探索你的未來',
-    heroSubtitle: '在核心生涯探索平台，找到屬於你的道路。',
+    heroSubtitle: '生命自己會長大，重要的是<br>如何幫助他們走在自己想要的道路上。',
+    // 首頁重點故事（標題、內文、圖片陣列）
+    story: {
+      heading: '自立',
+      body: '我們從 2022 年開始，與安置機構青少年一起提供客製化服務與陪伴，盼望能在 18 歲離院與職場過渡期間，提升其自我照顧與獨立生活能力。<br>在這段旅程中，我們與孩子一起探索與嘗試，協助他們看見自己的力量。',
+      images: [
+        './img/_-_.jpg',
+        './img/index-bg.png',
+        'https://picsum.photos/seed/sc-1/1200/800',
+        'https://picsum.photos/seed/sc-2/1200/800'
+      ]
+    },
+    // 服務項目卡片
+    servicesTitle: '服務項目',
+    services: [
+      { title: '職涯探索', image: 'https://picsum.photos/seed/service1/1200/800', link: './explore.html' },
+      { title: '冒險挑戰', image: 'https://picsum.photos/seed/service2/1200/800', link: './explore.html' },
+      { title: '生命設計', image: 'https://picsum.photos/seed/service3/1200/800', link: './explore.html' },
+      { title: '親子課程', image: 'https://picsum.photos/seed/service4/1200/800', link: './explore.html' },
+      { title: '客製化課程', image: 'https://picsum.photos/seed/service5/1200/800', link: './explore.html' }
+    ],
+    // 首頁影片（YouTube/Vimeo/MP4 皆可）
+    video: {
+      title: '讓孩子自己體驗世界｜冒險挑戰 × 生命探索',
+      url: 'https://youtu.be/NlWiSd34mts'
+    },
     platformIntro: [
       { title: '一、問題為何（What）', image: 'https://picsum.photos/seed/what/1200/800', text: '安置機構社工與教師人力有限，難以提供持續、個別化的關懷與多元探索資源，導致弱勢青少年在成長過程中缺乏系統性陪伴與支持。', details: '' },
       { title: '二、影響對象（Who）', image: 'https://picsum.photos/seed/who/1200/800', text: '1) 嘉義縣安仁家園青少年（12-18歲）<br>2) 團體家庭（轉家）青少年', details: '1. 嘉義縣安仁家園青少年（12-18歲）<br>來自功能失調的原生家庭，年滿18歲後依法需離開機構，若家庭支持不足，將面臨獨立生活的種種挑戰，如經濟困難、求學就業障礙、心理適應、人際關係薄弱、缺乏歸屬感等問題。<br><br>2. 團體家庭（轉家）青少年<br>由「希望種子協會」承辦的團體家庭接收多次轉換安置、行為偏差等青少年。他們因缺乏家庭支持且在機構中難以獲得充分關懷，被稱為「難置兒」，需要更多個別化的社會支持。' },

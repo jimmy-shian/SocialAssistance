@@ -4,7 +4,10 @@ function renderNavFooter() {
     const navHTML = `
     <header class="bg-gray-100 dark:bg-gray-800 shadow-md relative z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="主選單">
-            <a href="./index.html" class="text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-purple-500">核心生涯探索平台</a>
+            <a href="./index.html" class="nav-brand text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-purple-500">
+              核心生涯探索平台
+              <img src="./img/soundcore3co-title.png" alt="SoundCore Title" class="brand-title-img" />
+            </a>
             <div class="hidden md:flex items-center space-x-6">
                 <a href="./about.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">關於我們</a>
                 <a href="./explore.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">探索資源平台</a>
@@ -44,13 +47,83 @@ function renderNavFooter() {
         </div>
     </header>`;
 
-    // footer 統一元件
+    // footer 統一元件（使用者提供之聯絡資訊）
     const footerHTML = `
-    <footer class="bg-gray-100 dark:bg-gray-800 mt-12">
-        <div class="container mx-auto px-6 py-4 text-center text-gray-600 dark:text-gray-400">
-            <p>&copy; 2024 核心生涯探索平台. All Rights Reserved.</p>
-        </div>
-    </footer>`;
+    <footer class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 mt-16 px-6 py-10">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-10">
+    
+    <!-- 左側品牌與聯絡資訊 -->
+    <div class="flex-1 min-w-[260px]">
+      <h2 class="text-2xl md:text-3xl font-normal font-[YourCustomFont,'Noto Sans TC',sans-serif] flex items-center gap-2">
+        聽見核心工作室
+        <img 
+          src="/img/soundcore3co-min.png" 
+          alt="Logo Icon"
+          class="w-7 h-7 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
+        />
+      </h2>
+
+      <div class="mt-4 space-y-2 text-sm md:text-base">
+        <p>📞 0988-368-450</p>
+        <p>
+          📧 
+          <a href="mailto:soundcore.3co@gmail.com" class="text-blue-600 dark:text-blue-400 underline">
+            soundcore.3co@gmail.com
+          </a>
+        </p>
+      </div>
+    </div>
+
+    <!-- 右側社群連結 -->
+    <div class="flex flex-col gap-4 justify-start min-w-[200px]">
+      <h3 class="text-lg font-semibold">追蹤我們</h3>
+      <div class="flex items-center gap-5">
+        <!-- Facebook -->
+        <a href="https://www.facebook.com/profile.php?id=61571413520720&locale=zh_TW" target="_blank" aria-label="Facebook">
+          <img 
+            src="https://cdn.simpleicons.org/facebook/1877F2" 
+            alt="Facebook"
+            class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
+          />
+        </a>
+
+
+        <!-- Instagram -->
+        <a href="https://instagram.com/soundcore_2025/" target="_blank" aria-label="Instagram">
+          <img 
+            src="https://cdn.simpleicons.org/instagram/E4405F" 
+            alt="Instagram"
+            class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
+          />
+        </a>
+
+        <!-- Line -->
+        <a href="https://lin.ee/1C3roAfA" target="_blank" aria-label="Line">
+          <img 
+            src="https://cdn.simpleicons.org/line/00C300" 
+            alt="Line"
+            class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
+          />
+        </a>
+
+        <!-- Threads -->
+        <a href="https://www.threads.net/@soundcore_2025?hl=zh-tw" target="_blank" aria-label="Threads">
+          <img 
+            src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/threads.svg" 
+            alt="Threads"
+            class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
+          />
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部版權 -->
+  <div class="mt-8 text-center text-xs text-gray-500 dark:text-gray-400">
+    &copy; 2025 聽見核心工作室 SoundCore 3Co. All rights reserved.
+  </div>
+</footer>`
+;
 
     // 插入到指定的 placeholder
     const navPlaceholder = document.getElementById('nav-placeholder');
@@ -83,24 +156,22 @@ function renderNavFooter() {
         const panel = document.getElementById('mobile-menu');
         if (btn && panel) {
             const openMenu = () => {
-                panel.classList.remove('hidden');
-                panel.setAttribute('aria-hidden', 'false');
-                // force reflow, then add open for transition
-                void panel.offsetHeight;
-                panel.classList.add('open');
-                btn.setAttribute('aria-expanded', 'true');
-                document.documentElement.classList.add('overflow-hidden');
+              panel.classList.remove('hidden');
+              panel.setAttribute('aria-hidden', 'false');
+              // force reflow, then add open for transition
+              void panel.offsetHeight;
+              panel.classList.add('open');
+              btn.setAttribute('aria-expanded', 'true');
             };
             const closeMenu = () => {
-                panel.classList.remove('open');
-                btn.setAttribute('aria-expanded', 'false');
-                panel.setAttribute('aria-hidden', 'true');
-                const hide = () => { panel.classList.add('hidden'); };
-                // wait for transition end, with fallback timeout
-                const onEnd = (e) => { if (e.target === panel) { panel.removeEventListener('transitionend', onEnd); hide(); } };
-                panel.addEventListener('transitionend', onEnd);
-                setTimeout(() => { panel.removeEventListener('transitionend', onEnd); hide(); }, 280);
-                document.documentElement.classList.remove('overflow-hidden');
+              panel.classList.remove('open');
+              btn.setAttribute('aria-expanded', 'false');
+              panel.setAttribute('aria-hidden', 'true');
+              const hide = () => { panel.classList.add('hidden'); };
+              // wait for transition end, with fallback timeout
+              const onEnd = (e) => { if (e.target === panel) { panel.removeEventListener('transitionend', onEnd); hide(); } };
+              panel.addEventListener('transitionend', onEnd);
+              setTimeout(() => { panel.removeEventListener('transitionend', onEnd); hide(); }, 280);
             };
 
             btn.addEventListener('click', () => {

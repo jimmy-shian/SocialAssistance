@@ -36,5 +36,67 @@ window.aboutContent = {
       "text": "榮獲 2023 年 XX 青年發展獎",
       "href": "https://example.com/award"
     }
+  ],
+  "team": [
+    {
+      "name": "黃卓為",
+      "photo": "https://static.wixstatic.com/media/7ddac1_e82e5d5af29743c1ace0608acd4036c1~mv2.jpg/v1/fill/w_806,h_668,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/LINE_ALBUM_%E5%80%8B%E4%BA%BA%E7%85%A7_230928_1_edited.jpg",
+      "roles": ["負責人", "課程設計"],
+      "motto": "成功不是打敗多少人，是能幫助多少人。",
+      "education": [
+        "靜宜大學社會工作與兒童少年福利學系 學士",
+        "中正大學社會福利學系研究所（進修中）"
+      ],
+      "experience": [
+        "高考社會工作師【社工字第0010839號】",
+        "亞洲體驗教育協會助理引導員培訓 結業",
+        "淨零探規劃管理師 - 初級能力鑑定通過",
+        "台灣樹藝暨攀樹運動發展協會 - 丙級攀樹教練"
+      ],
+      "socials": [
+        {"name":"Facebook","href":"https://www.facebook.com/profile.php?id=61571413520720&locale=zh_TW"},
+        {"name":"Instagram","href":"https://instagram.com/soundcore_2025/"},
+        {"name":"Line","href":"https://lin.ee/1C3roAfA"},
+        {"name":"Threads","href":"https://www.threads.net/@soundcore_2025?hl=zh-tw"}
+      ]
+    },
+    {
+      "name": "陳加晏",
+      "photo": "https://static.wixstatic.com/media/7ddac1_fceec975dd18470cb50a1112efd6c2b6~mv2.jpg/v1/fill/w_806,h_668,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/F44843D3-F08A-48C1-82E3-203D5693E59C_edi.jpg",
+      "roles": ["課程設計", "教學引導"],
+      "motto": "做自己的太陽，你就能當別人的光。",
+      "education": [
+        "靜宜大學社會工作與兒童少年福利學系 學士"
+      ],
+      "experience": [
+        "美國瑜珈聯盟 RYT200",
+        "印度瑜珈聯盟 YAI 300",
+        "台灣國際瑜珈協會 100小時瑜珈師資認證",
+        "台灣樹藝暨攀樹運動發展協會 - 丙級攀樹教練"
+      ],
+      "socials": [
+        {"name":"Facebook","href":"https://www.facebook.com/wix"},
+        {"name":"Instagram","href":"https://instagram.com/soundcore_2025/"},
+        {"name":"Threads","href":"https://www.threads.net/@soundcore_2025?hl=zh-tw"}
+      ]
+    },
+    {
+      "name": "陳妍孜",
+      "photo": "https://static.wixstatic.com/media/7ddac1_bee11ec9d3bd454084458096ad28c4fb~mv2.jpg/v1/fill/w_806,h_668,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/677aa541-b5be-42ab-bc40-a225242f352f_edi.jpg",
+      "roles": ["課程設計", "對外關係"],
+      "motto": "你比你想像的更有力量。",
+      "education": [
+        "稻江科技大學老人福祉與社會工作學系 學士"
+      ],
+      "experience": [
+        "嘉義縣安仁家園社工 任職5年",
+        "嘉義縣安仁家園社服組長/特助 任職3年"
+      ],
+      "socials": [
+        {"name":"Facebook","href":"https://www.facebook.com/wix"},
+        {"name":"Instagram","href":"https://instagram.com/soundcore_2025/"},
+        {"name":"Threads","href":"https://www.threads.net/@soundcore_2025?hl=zh-tw"}
+      ]
+    }
   ]
 };

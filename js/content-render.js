@@ -8,12 +8,92 @@
 
     const h1 = document.getElementById('hero-title');
     const p = document.getElementById('hero-subtitle');
+    const hero = document.getElementById('hero');
     if (h1) h1.textContent = data.heroTitle || h1.textContent;
     if (p) {
       const html = data.heroSubtitle || p.textContent;
       // 支援含超連結的 HTML
       p.innerHTML = html;
     }
+    // 首頁 Hero 背景圖（固定背景）
+    try {
+      if (hero) {
+        const url = data.heroImage || '';
+        if (url) hero.style.backgroundImage = `url('${url}')`;
+        // 盡量啟用 fixed，行動裝置不支援時瀏覽器會自動 fallback
+        hero.style.backgroundAttachment = 'fixed';
+      }
+    } catch(e){}
+
+    // 首頁重點故事
+    try {
+      const storySec = document.getElementById('story-section');
+      if (storySec && data.story && (data.story.heading || data.story.body || (data.story.images||[]).length)) {
+        const imgs = Array.isArray(data.story.images) ? data.story.images : [];
+        const html = `
+          <div class="grid md:grid-cols-2 gap-8 items-start">
+            <div class="space-y-4">
+              ${data.story.heading ? `<h2 class="text-3xl md:text-4xl font-extrabold">${data.story.heading}</h2>` : ''}
+              ${data.story.body ? `<div class="prose prose-lg dark:prose-invert max-w-none leading-relaxed">${data.story.body}</div>` : ''}
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              ${(imgs.slice(0,4)).map((u,i)=>`<div class="rounded-lg overflow-hidden shadow"><img src="${u}" alt="story${i+1}" class="w-full h-40 md:h-52 object-cover"></div>`).join('')}
+            </div>
+          </div>`;
+        storySec.innerHTML = html;
+      }
+    } catch(e){}
+
+    // 服務項目
+    try {
+      const svcWrap = document.getElementById('services-section');
+      const svcTitle = document.getElementById('services-title');
+      const svcList = document.getElementById('services-list');
+      if (svcTitle) svcTitle.textContent = data.servicesTitle || '服務項目';
+      if (svcList) {
+        svcList.innerHTML = '';
+        const arr = Array.isArray(data.services) ? data.services : [];
+        arr.forEach(s => {
+          const a = document.createElement(s.link ? 'a' : 'div');
+          if (s.link) { a.href = s.link; a.target = '_self'; a.rel = 'noopener'; }
+          a.className = 'relative h-72 rounded-2xl overflow-hidden shadow-lg group block focus:outline-none focus:ring-2 focus:ring-purple-500';
+          a.innerHTML = `
+            ${s.image ? `<img src="${s.image}" alt="${s.title||''}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+            <div class="absolute bottom-4 left-4"><span class="px-3 py-1 rounded-full bg-white text-gray-900 text-sm font-semibold shadow">${s.title||''}</span></div>`;
+          svcList.appendChild(a);
+        });
+      }
+    } catch(e){}
+
+    // 影片區塊
+    try {
+      const vSec = document.getElementById('video-section');
+      const vTitle = document.getElementById('video-title');
+      const vBox = document.getElementById('index-video');
+      function isYouTube(u){ return /youtube\.com\/watch\?v=|youtu\.be\//.test(u||''); }
+      function ytId(u){ const m=(u||'').match(/[?&]v=([^&]+)|youtu\.be\/([^?&]+)/); return (m && (m[1]||m[2])) || ''; }
+      function isVimeo(u){ return /vimeo\.com\//.test(u||''); }
+      function vimeoId(u){ const m=(u||'').match(/vimeo\.com\/(\d+)/); return (m && m[1]) || ''; }
+      if (vTitle) vTitle.textContent = (data.video && data.video.title) || '';
+      if (vBox) {
+        const url = (data.video && data.video.url) || '';
+        vBox.innerHTML = '';
+        if (!url) {
+          vBox.innerHTML = '<div class="w-full h-full grid place-items-center text-sm text-gray-500 dark:text-gray-400">尚未設定影片</div>';
+        } else if (isYouTube(url)) {
+          const id = ytId(url);
+          vBox.innerHTML = `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${id}" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+        } else if (isVimeo(url)) {
+          const id = vimeoId(url);
+          vBox.innerHTML = `<iframe class="w-full h-full" src="https://player.vimeo.com/video/${id}" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+        } else if (/\.mp4(\?|$)/i.test(url)) {
+          vBox.innerHTML = `<video class="w-full h-full" controls src="${url}"></video>`;
+        } else {
+          vBox.innerHTML = `<a class="link-cta" href="${url}" target="_blank" rel="noopener">前往觀看 <span class="arrow">→</span></a>`;
+        }
+      }
+    } catch(e){}
 
     const intro = document.getElementById('platform-intro');
     if (intro && Array.isArray(data.platformIntro)) {

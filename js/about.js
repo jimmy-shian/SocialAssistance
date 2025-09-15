@@ -141,16 +141,54 @@
         <h2 class="heading-section mb-6">${data.modelTitle || '四階段引導模型'}</h2>
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           ${(data.model||[]).map(m=>{
-            const link = (m && m.href) ? `<a class=\"link-cta small\" href=\"${m.href}\" target=\"_blank\" rel=\"noopener\">${m.linkText || '前往連結'} <span class=\"arrow\">→</span></a>` : '';
-            return `
+              const link = (m && m.href) ? `<a class=\"link-cta small\" href=\"${m.href}\" target=\"_blank\" rel=\"noopener\">${m.linkText || '前往連結'} <span class=\"arrow\">→</span></a>` : '';
+              return `
             <div class=\"about-card p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-150 hover:-translate-y-0.5\">
               <h3 class=\"font-semibold mb-2\">${m.title}</h3>
-              <p class=\"text-gray-700 dark:text-gray-300 text-sm\">${m.desc || ''}</p>
-              ${link ? `<div class=\"mt-3\">${link}</div>` : ''}
-            </div>`;
+                <p class=\"text-gray-700 dark:text-gray-300 text-sm\">${m.desc || ''}</p>
+                ${link ? `<div class=\"mt-3\">${link}</div>` : ''}
+              </div>`;
+            }).join('')}
+          </div>
+      </section>
+
+      ${Array.isArray(data.team) && data.team.length ? `
+      <section class=\"mt-16 team-section rounded-lg\">
+        <h2 class=\"heading-section mb-8 text-center\">Our Team.</h2>
+        <div class=\"grid gap-8 md:grid-cols-2 lg:grid-cols-3\">
+          ${data.team.map(t=>{
+            const roles = (t.roles||[]).map(r=>`<span class=\"inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${r}</span>`).join(' ');
+            const motto = t.motto ? `<blockquote class=\"motto text-gray-800 dark:text-gray-100 text-base italic\">${t.motto}</blockquote>` : '';
+            const edu = (t.education||[]).map(d=>`<li>${d}</li>`).join('');
+            const exp = (t.experience||[]).map(d=>`<li>${d}</li>`).join('');
+            const socials = (t.socials||[]).map(s=>{
+              const key = String(s.name||'').toLowerCase();
+              let icon = s.icon || '';
+              if (key === 'facebook'|| key === 'fb') icon = 'https://cdn.simpleicons.org/facebook/E4405F';
+              else if (key === 'instagram'|| key === 'ig') icon = 'https://cdn.simpleicons.org/instagram/E4405F';
+              else if (key === 'line') icon = 'https://cdn.simpleicons.org/line/E4405F';
+              else if (key === 'threads') icon = 'https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/threads.svg';
+              else if (key === 'youtube' || key === 'yt') icon = 'https://cdn.simpleicons.org/youtube/';
+              return `<a href=\"${s.href}\" target=\"_blank\" rel=\"noopener\" aria-label=\"${s.name||'link'}\"><img src=\"${icon}\" alt=\"${s.name||'link'}\" class=\"team-social-icon\"></a>`;
+            }).join(' ');
+            return `
+            <article class=\"team-card overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900\">
+              ${t.photo ? `<img class=\"w-full h-64 object-cover\" src=\"${t.photo}\" alt=\"${t.name||''}\">` : ''}
+              <div class=\"p-5 space-y-3\">
+                <div class=\"flex items-center gap-2 flex-wrap\">${roles}</div>
+                <h3 class=\"text-xl font-semibold\">${t.name||''}</h3>
+                ${motto}
+                <div class=\"details\">
+                  ${edu ? `<div class=\"mb-3\"><p class=\"text-sm font-semibold mb-1\">學歷</p><ul class=\"list-disc pl-5 space-y-1 text-sm text-gray-700 dark:text-gray-200\">${edu}</ul></div>` : ''}
+                  ${exp ? `<div class=\"mt-2\"><p class=\"text-sm font-semibold mb-1\">經歷</p><ul class=\"list-disc pl-5 space-y-1 text-sm text-gray-700 dark:text-gray-200\">${exp}</ul></div>` : ''}
+                  ${socials ? `<div class=\"mt-4 socials flex items-center gap-4\">${socials}</div>` : ''}
+                </div>
+              </div>
+            </article>`;
           }).join('')}
         </div>
       </section>
+      ` : ''}
 
       <section class="mt-16">
         <h2 class="heading-section mb-6">${data.achievementsTitle || '成就經歷'}</h2>
@@ -189,11 +227,42 @@
 
     // interactions and animations
     attachCardInteractions(root);
-    const toAnimate = Array.from(root.querySelectorAll('.about-card, section:nth-of-type(2) li'));
+    const toAnimate = Array.from(root.querySelectorAll('.about-card, section:nth-of-type(3) li'));
     animateOnView(toAnimate);
 
+    // 進場時重新計算階梯位移（考慮到每張卡片原始高度）
+    function adjustModelStairs(){
+      const container = root.querySelector('.model-steps'); if (!container) return;
+      const steps = Array.from(container.querySelectorAll('.model-step'));
+      if (!steps.length) return;
+      const heights = steps.map(s=> s.getBoundingClientRect().height);
+      const Hmax = Math.max(...heights);
+      const n = steps.length; const step = 14; // 每階小幅度
+      steps.forEach((el, i)=>{
+        const desiredTop = (n - 1 - i) * step;
+        const currentTop = Hmax - heights[i];
+        const delta = desiredTop - currentTop; // 允許負值（往上移）
+        el.style.setProperty('--offset', `${delta}px`);
+      });
+    }
+    // 初次與視窗尺寸變更時重算
+    setTimeout(adjustModelStairs, 0);
+    window.addEventListener('resize', adjustModelStairs);
+
+    // Team：點擊卡片展開/收合（忽略卡片內連結與互動元素）
+    try {
+      const cards = Array.from(root.querySelectorAll('.team-card'));
+      cards.forEach(card => {
+        card.addEventListener('click', (e)=>{
+          if (e.target.closest('a,button,input,textarea,select,label')) return; // 讓互動元素照常運作
+          card.classList.toggle('is-open');
+          console.log('in');
+        });
+      });
+    } catch(e){}
+
     // Start count when section is visible
-    const achSec = root.querySelector('section:nth-of-type(2)');
+    const achSec = root.querySelector('section:nth-of-type(3)');
     if(achSec){
       const io = new IntersectionObserver(es=>{
         es.forEach(e=>{ if(e.isIntersecting){ countUpOnce(achSec); io.disconnect(); } });

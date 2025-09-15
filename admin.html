@@ -16,7 +16,7 @@
   <main class="container mx-auto px-6 py-12">
     <header class="mb-8 text-center">
       <h1 class="text-3xl font-bold">資料管理（GAS）</h1>
-      <p class="text-gray-600 dark:text-gray-300">登入後可編輯以下三個資料集：About、Providers、Site Content。</p>
+      <p id="admin-header-tip" class="text-gray-600 dark:text-gray-300">登入後可編輯以下三個資料集：About、Providers、Site Content。</p>
       <div id="gas-url-warning" class="mt-3 hidden text-sm text-red-600 dark:text-red-400">請先在 <code>js/config.js</code> 設定 <strong>GAS_BASE_URL</strong>，並部署 Apps Script Web App。</div>
     </header>
 
@@ -41,8 +41,8 @@
                 我已了解，進入管理
               </button>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
       <section id="admin-login" class="w-full max-w-md">
         <div class="rounded-lg shadow p-6 bg-white dark:bg-gray-800">
@@ -71,11 +71,23 @@
       <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2">
           <label class="text-sm">資料集：</label>
-          <select id="ds-select" class="rounded border px-2 py-1 bg-white dark:bg-gray-800">
-            <option value="about">About（aboutContent）</option>
-            <option value="providers">Providers（providers）</option>
-            <option value="site">Site Content（siteContent）</option>
-          </select>
+          <div id="ds-dropdown" class="relative">
+            <button id="ds-button" class="px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500" aria-haspopup="true" aria-expanded="false" aria-controls="ds-menu">
+              <span id="ds-button-label">主畫面（siteContent）</span>
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <div id="ds-menu" class="absolute z-10 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg origin-top transition transform duration-150 ease-out scale-95 opacity-0 pointer-events-none">
+              <button type="button" data-value="site" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">主畫面（siteContent）</button>
+              <button type="button" data-value="about" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">關於我們（aboutContent）</button>
+              <button type="button" data-value="providers" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">探索資源平台（providers）</button>
+            </div>
+            <!-- 保留原生 select 供既有 JS 使用（視覺隱藏） -->
+            <select id="ds-select" class="sr-only absolute -left-[9999px]" aria-hidden="true" tabindex="-1">
+              <option value="site">主畫面（siteContent）</option>
+              <option value="about">關於我們（aboutContent）</option>
+              <option value="providers">探索資源平台（providers）</option>
+            </select>
+          </div>
           <span id="ds-version" class="text-sm text-gray-500"></span>
         </div>
         <div class="flex items-center gap-2 flex-wrap">
@@ -128,15 +140,34 @@
           <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">每項可填「文字」即可；若有連結，請一併填入網址。</p>
           <div id="ab-ach-list" class="space-y-3"></div>
         </div>
+
+        <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-semibold">Our Team（team）</h4>
+            <button id="ab-add-team" class="btn-soft btn-green">新增成員</button>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">成員包含：姓名、照片、角色（以逗號或頓號分隔）、座右銘、學歷（每行一條）、經歷（每行一條）以及社群連結。</p>
+          <div id="ab-team-list" class="space-y-3"></div>
+        </div>
       </section>
 
       <!-- Site 視覺化編輯器 -->
       <section id="site-visual" class="mt-8 hidden">
         <header class="mb-3">
           <h3 class="text-lg font-semibold">Site Content（首頁文案）</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">編輯首頁標題、副標題與平台導覽卡片。</p>
+          <p class="text-sm text-gray-600 dark:text-gray-300">編輯首頁標題、副標題、首圖，以及平台導覽卡片。</p>
         </header>
-        <div class="grid md:grid-cols-2 gap-4">
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="md:col-span-1">
+            <label class="text-sm block">首頁首圖（index.heroImage）
+              <input id="sc-hero-image" class="w-full mt-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="https://... 或 gas://image/...">
+            </label>
+            <div class="mt-2 flex items-center gap-2">
+              <label class="btn-soft btn-blue text-xs cursor-pointer">上傳圖片<input id="sc-hero-upload" type="file" class="hidden" accept="image/*"></label>
+              <span id="sc-hero-loading" class="text-xs text-gray-500"></span>
+            </div>
+            <div id="sc-hero-preview" class="mt-2 h-36 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-xs text-gray-500 dark:text-gray-400" aria-label="首圖預覽">尚未選擇</div>
+          </div>
           <label class="text-sm">首頁主標題（index.heroTitle）
             <input id="sc-hero-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
           </label>
@@ -151,6 +182,51 @@
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">每張卡片可填標題、圖片網址、簡述與補充細節。</p>
           <div id="sc-intro-list" class="space-y-3"></div>
+        </div>
+        <!-- 首頁重點故事 -->
+        <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <h4 class="font-semibold mb-2">首頁重點故事（index.story）</h4>
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="text-sm">故事標題（story.heading）
+              <input id="sc-story-heading" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="如：自立">
+            </label>
+            <label class="text-sm">故事圖片（每行一張 URL）
+              <textarea id="sc-story-images" rows="4" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="https://...\nhttps://..."></textarea>
+            </label>
+          </div>
+          <div class="mt-2 flex items-center gap-2">
+            <label class="btn-soft btn-blue text-xs cursor-pointer">上傳圖片<input id="sc-story-upload" type="file" class="hidden" accept="image/*" multiple></label>
+            <span id="sc-story-loading" class="text-xs text-gray-500"></span>
+          </div>
+          <div id="sc-story-list" class="mt-2 grid grid-cols-4 gap-2"></div>
+          <label class="text-sm block mt-3">故事內文（支援自動連結與換行）
+            <textarea id="sc-story-body" rows="5" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="輸入段落文字，可含網址"></textarea>
+          </label>
+        </div>
+
+        <!-- 服務項目 -->
+        <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-semibold">服務項目（index.services）</h4>
+            <button id="sc-add-service" class="btn-soft btn-green">新增服務</button>
+          </div>
+          <label class="text-sm block mb-2">區塊標題（servicesTitle）
+            <input id="sc-services-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="如：服務項目">
+          </label>
+          <div id="sc-service-list" class="space-y-3"></div>
+        </div>
+
+        <!-- 首頁影片 -->
+        <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <h4 class="font-semibold mb-2">首頁影片（index.video）</h4>
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="text-sm">影片標題（video.title）
+              <input id="sc-video-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="如：冒險挑戰 x 生命探索">
+            </label>
+            <label class="text-sm">影片網址（YouTube/Vimeo/MP4）
+              <input id="sc-video-url" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="https://www.youtube.com/watch?v=... 或 MP4">
+            </label>
+          </div>
         </div>
       </section>
 
@@ -168,8 +244,16 @@
         </header>
 
         <div class="mb-4">
-          <label class="text-sm">選擇業者（Provider）</label>
-          <select id="pv-prov-select" class="rounded border px-2 py-1 bg-white dark:bg-gray-800"></select>
+          <label class="text-sm block">選擇業者（Provider）</label>
+          <div id="pv-prov-dropdown" class="relative inline-block">
+            <button id="pv-prov-button" class="px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500" aria-haspopup="true" aria-expanded="false" aria-controls="pv-prov-menu">
+              <span id="pv-prov-button-label">請選擇</span>
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </button>
+            <div id="pv-prov-menu" class="absolute z-10 mt-2 w-[28rem] max-h-72 overflow-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg origin-top transition transform duration-150 ease-out scale-95 opacity-0 pointer-events-none"></div>
+            <!-- 保留原生 select 供既有 JS 使用（視覺隱藏） -->
+            <select id="pv-prov-select" class="sr-only absolute -left-[9999px]" aria-hidden="true" tabindex="-1"></select>
+          </div>
           <span class="text-xs text-gray-500 ml-2">來源：目前資料集內容</span>
         </div>
 
@@ -244,6 +328,52 @@
         </div>
       </section>
     </section>
+
+    <!-- Insert Link Modal -->
+    <div id="link-modal" class="fixed inset-0 z-60 hidden">
+      <div class="overlay-bg fixed inset-0 bg-slate-900/50 dark:bg-slate-900/60"></div>
+      <section class="modal-card relative z-10 w-full max-w-xl mx-auto p-6 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+        <header class="mb-4">
+          <h3 class="text-lg font-semibold">插入連結</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">設定連結網址、顯示文字與基本樣式。</p>
+        </header>
+        <div class="space-y-4">
+          <label class="block text-sm">連結網址（URL）
+            <input id="link-url" type="url" placeholder="https://example.com" class="w-full mt-1 rounded border px-3 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100" />
+          </label>
+          <label class="block text-sm">顯示文字（可選）
+            <input id="link-text" type="text" placeholder="若空白則使用網址" class="w-full mt-1 rounded border px-3 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100" />
+          </label>
+          <div class="grid sm:grid-cols-3 gap-4">
+            <label class="block text-sm">文字顏色
+              <input id="link-color" type="color" class="mt-1 w-full h-10 rounded border bg-white dark:bg-gray-800" />
+            </label>
+            <label class="block text-sm">字體
+              <select id="link-font" class="mt-1 w-full rounded border px-2 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+                <option value="">（跟隨預設）</option>
+                <option value="'Microsoft JhengHei', 'Noto Sans TC', sans-serif">黑體（微軟正黑/Noto Sans TC）</option>
+                <option value="'PMingLiU', 'DFKai-SB', serif">明體／楷體（PMingLiU/DFKai）</option>
+                <option value="Arial, Helvetica, sans-serif">Arial</option>
+                <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                <option value="'Courier New', Courier, monospace">Courier New</option>
+              </select>
+            </label>
+            <label class="block text-sm">字級
+              <select id="link-size" class="mt-1 w-full rounded border px-2 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+                <option value="sm">小</option>
+                <option value="md" selected>中</option>
+                <option value="lg">大</option>
+              </select>
+            </label>
+          </div>
+        </div>
+        <div class="mt-6 flex items-center justify-end gap-2">
+          <button id="link-cancel" type="button" class="btn-soft btn-yellow">取消</button>
+          <button id="link-insert" type="button" class="btn-soft btn-purple">插入</button>
+        </div>
+      </section>
+    </div>
+
   </main>
 
   <div id="footer-placeholder"></div>

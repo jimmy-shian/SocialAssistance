@@ -14,7 +14,7 @@ function _handleConfirmResetGet(e){
   var bodyText = '您好，\n\n您的臨時密碼為：' + tmp + '\n\n請使用此密碼登入後，至個人頁「修改密碼」功能更改為新密碼。';
   var html = '<p>您好，</p><p>您的臨時密碼為：<b>' + tmp + '</b></p><p>請使用此密碼登入後，至個人頁「修改密碼」功能更改為新密碼。</p>';
   try { MailApp.sendEmail({ to: user.email, subject: subject, htmlBody: html, body: bodyText }); } catch(err){}
-  return HtmlService.createHtmlOutput('<html><body>確認成功！已寄送臨時密碼到您的 Email，請查收。</body></html>');
+  return HtmlService.createHtmlOutput('<html><head><style>body{display:flex;justify-content:center;align-items:center;height:100vh;margin:0;font-family:Arial,sans-serif;background-color:#f8f8f8}.message-box{text-align:center;font-size:20px;padding:30px 40px;background:#fff;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);line-height:1.6}.note{font-size:16px;color:#666;margin-top:20px}</style></head><body><div class="message-box">✅ 確認成功！<br><br>已寄送臨時密碼到您的 Email，請查收。<div class="note">登入後請至個人資料頁面修改密碼。</div></div></body></html>');
 }
 
 function _getUserByEmail(email){
