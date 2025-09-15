@@ -79,28 +79,41 @@
     return v; // fallback
   }
 
-  // 讀取 GAS 上的最後更新日期
-  async function readMeta(key){
+  // ---- GAS secure read（回傳完整 JSON：含 hasData/updatedAt/version/data） ----
+  async function postReadRaw(key){
     try {
       const BASE = window.AppConfig?.GAS_BASE_URL || '';
       const EP = window.AppConfig?.endpoints?.read || '';
       const t = window.DataAPI?.token?.() || '';
-      if (!BASE || !EP || !t) return {};
+      if (!BASE || !EP || !t) return null;
       const nonce = Date.now().toString(36);
       const resp = await fetch(BASE + EP, { method:'POST', headers:{ 'Content-Type':'text/plain' }, body: JSON.stringify({ key, token: t, nonce }) });
-      if (!resp.ok) return {};
+      if (!resp.ok) return null;
       const data = await resp.json();
-      return { version: data.version, updatedAt: data.updatedAt };
+      return data || null;
+    } catch(e){ return null; }
+  }
+
+  // 讀取 GAS 上的最後更新日期與 hasData 標記
+  async function readMeta(key){
+    try {
+      const data = await postReadRaw(key);
+      if (!data) return {};
+      return { version: data.version, updatedAt: data.updatedAt, hasData: !!data.hasData };
     } catch(e){ return {}; }
   }
   function fmtTime(d){ try{ const dt = (d instanceof Date) ? d : new Date(d); if (isNaN(+dt)) return '-'; const pad=n=>String(n).padStart(2,'0'); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`; }catch(e){ return '-'; } }
   async function updateVersionLabel(){
     const key = keyFromSelect();
     const el = qs('#ds-version'); if (!el) return;
-    text(el, '最後更新：讀取中…');
+    el.textContent = '最後更新：讀取中…';
     const meta = await readMeta(key);
-    if (meta && meta.updatedAt) { text(el, `最後更新：${fmtTime(meta.updatedAt)}`); }
-    else { text(el, '最後更新：-'); }
+    if (meta && (meta.updatedAt || meta.hasData)) {
+      const time = meta.updatedAt ? fmtTime(meta.updatedAt) : '-';
+      el.innerHTML = `最後更新：${time}${meta.hasData ? ' <span class="text-rose-600">(暫存檔案)</span>' : ''}`;
+    } else {
+      el.textContent = '最後更新：-';
+    }
   }
 
   function pretty(jsonStr){
@@ -214,16 +227,63 @@
   function isProvidersSelected(){ return (qs('#ds-select')?.value) === 'providers'; }
   function isAboutSelected(){ return (qs('#ds-select')?.value) === 'about'; }
   function isSiteSelected(){ return (qs('#ds-select')?.value) === 'site'; }
+  // 平滑展開/收合區塊
+  let __curSectionId = null;
+  function currentSectionId(){ if (isProvidersSelected()) return 'providers-visual'; if (isAboutSelected()) return 'about-visual'; if (isSiteSelected()) return 'site-visual'; return null; }
+  function asEl(id){ return id ? qs('#'+id) : null; }
+  function ensureCollapsible(el){ if (!el) return; el.classList.add('admin-collapsible'); }
   function toggleSections(){
-    qs('#providers-visual')?.classList.toggle('hidden', !isProvidersSelected());
-    qs('#about-visual')?.classList.toggle('hidden', !isAboutSelected());
-    qs('#site-visual')?.classList.toggle('hidden', !isSiteSelected());
+    const ids = ['providers-visual','about-visual','site-visual'];
+    ids.forEach(id=> ensureCollapsible(asEl(id)));
+    const nextId = currentSectionId();
+    if (__curSectionId === nextId) {
+      const cur = asEl(nextId); if (cur && cur.classList.contains('hidden')) { cur.classList.remove('hidden'); requestAnimationFrame(()=> cur.classList.add('open')); }
+      return;
+    }
+    const prev = asEl(__curSectionId);
+    const next = asEl(nextId);
+    if (prev) {
+      prev.classList.remove('open');
+      const onEnd = (e)=>{ if (e.target === prev) { prev.classList.add('hidden'); prev.removeEventListener('transitionend', onEnd); } };
+      prev.addEventListener('transitionend', onEnd);
+      setTimeout(()=>{ prev.classList.add('hidden'); }, 260);
+    }
+    if (next) {
+      next.classList.remove('hidden');
+      void next.offsetHeight; // reflow
+      next.classList.add('open');
+    }
+    __curSectionId = nextId;
   }
   function getEditorJSON(){ try{ return JSON.parse(qs('#ds-editor')?.value || '{}'); } catch(e){ alert('內部狀態解析失敗'); return {}; } }
   function setEditor(obj){ const ed = qs('#ds-editor'); if (ed) ed.value = JSON.stringify(obj||{}, null, 2); }
 
+  // 載入資料：優先使用 Google Sheet 暫存（若存在），同時顯示 skeleton 動畫
+  function buildSkeleton(){
+    const sk = [];
+    for (let i=0;i<3;i++){
+      sk.push(`
+        <div class="skeleton-card surface-2">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="skeleton-avatar skeleton"></div>
+            <div class="flex-1">
+              <div class="skeleton skeleton-line" style="width: 40%"></div>
+              <div class="skeleton skeleton-line" style="width: 24%"></div>
+            </div>
+          </div>
+          <div class="skeleton skeleton-line" style="width: 92%"></div>
+          <div class="skeleton skeleton-line" style="width: 76%"></div>
+          <div class="skeleton skeleton-line" style="width: 64%"></div>
+        </div>`);
+    }
+    return sk.join('');
+  }
+  function showLoading(){ const box = qs('#admin-loading'); if (!box) return; box.innerHTML = buildSkeleton(); box.classList.remove('hidden'); }
+  function hideLoading(){ const box = qs('#admin-loading'); if (!box) return; box.classList.add('hidden'); box.innerHTML = ''; }
+
   async function loadDatasetAndRender(){
     const key = keyFromSelect();
+    showLoading();
     // 先載入「目前網站的本地資料」
     let payload = (function(){
       if (key === DS.about) return window.aboutContent || {};
@@ -231,7 +291,20 @@
       if (key === DS.site) return window.siteContent || {};
       return {};
     })();
+    // 若已登入，向 GAS 讀取；若 hasData=true 則優先使用暫存資料
+    try {
+      if (window.DataAPI && window.DataAPI.token()) {
+        const res = await postReadRaw(key);
+        if (res && res.ok) {
+          const useTemp = !!res.hasData && res.data && typeof res.data === 'object' && Object.keys(res.data).length > 0;
+          if (useTemp) payload = res.data;
+        }
+      }
+    } catch(e) { /* ignore */ }
+
+    // 寫入內部編輯器狀態
     setEditor(payload);
+    // 渲染對應視覺化介面
     if (isProvidersSelected()) {
       fillProviderSelect(payload);
       const firstKey = Object.keys(payload||{})[0];
@@ -247,14 +320,7 @@
     } else if (isSiteSelected()) {
       renderSiteEditor(payload || {});
     }
-    // 若已登入，嘗試背景向 GAS 讀取（但不強制覆蓋 UI）
-    try {
-      if (window.DataAPI && window.DataAPI.token()) {
-        const remote = await window.DataAPI.secureRead(key);
-        // 更新內部 editor 供後續儲存使用，但不強制覆蓋當前表單
-        setEditor(remote || payload);
-      }
-    } catch(e) { /* ignore */ }
+    hideLoading();
   }
 
   function fillProviderSelect(map){

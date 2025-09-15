@@ -103,8 +103,10 @@ function _handleSavePublish(e){
       var processed = (k === 'providers') ? _processImagesForPublish(conf, dsObj) : { data: dsObj, files: [] };
       // 發佈資料集（使用處理後的資料）
       var pub = _publishOneWithData(conf, k, processed.data);
-      // 將處理後的資料也寫回資料表，確保占位被替換為最終 img 路徑
-      try { _setDataset(k, processed.data); } catch(writeErr){}
+      // 發佈成功後清空暫存資料（datasets 表），以便下次預設為空
+      if (pub && pub.ok) {
+        try { _clearDataset(k); } catch(clearErr){}
+      }
       results.push(pub);
     } catch(err){ results.push({ ok:false, key:k, message:String(err) }); }
   }
@@ -206,6 +208,19 @@ function _setDataset(key, obj){
   version++;
   sh.getRange(r, 2, 1, 3).setValues([[ JSON.stringify(obj||{}), version, now ]]);
   return { key: key, version: version };
+}
+
+// Clear dataset content (used after successful publish) — set json to '{}' and version to 0
+function _clearDataset(key){
+  var sh = _ensureSpreadsheet();
+  var r = _findRow(sh, key);
+  var now = new Date();
+  if (r < 0) {
+    sh.appendRow([key, '{}', 0, now]);
+    return { key: key, cleared: true };
+  }
+  sh.getRange(r, 2, 1, 3).setValues([[ '{}', 0, now ]]);
+  return { key: key, cleared: true };
 }
 
 function _getAllVersions(){
@@ -405,7 +420,8 @@ function _handleRead(e){
   var key = body.key || '';
   if (!key || !ALLOWED_KEYS[key]) return _badRequest('不允許的 key');
   var ds = _getDataset(key);
-  return _jsonOutput({ ok:true, key: key, version: ds.version, updatedAt: ds.updatedAt, data: ds.data });
+  var hasData = false; try { hasData = ds && ds.data && typeof ds.data === 'object' && Object.keys(ds.data).length > 0; } catch(err) { hasData = false; }
+  return _jsonOutput({ ok:true, key: key, version: ds.version, updatedAt: ds.updatedAt, data: ds.data, hasData: hasData });
 }
 
 function _handleUpdate(e){
@@ -441,7 +457,12 @@ function _handlePublish(e){
   var keys = body && body.keys; if (!Array.isArray(keys) || !keys.length) keys = Object.keys(ALLOWED_KEYS);
   var results = [];
   for (var i=0;i<keys.length;i++){
-    try { results.push(_publishOne(conf, String(keys[i]))); } catch(err){ results.push({ ok:false, key: String(keys[i]), message: String(err) }); }
+    try {
+      var k = String(keys[i]);
+      var r = _publishOne(conf, k);
+      if (r && r.ok) { try { _clearDataset(k); } catch(clearErr){} }
+      results.push(r);
+    } catch(err){ results.push({ ok:false, key: String(keys[i]), message: String(err) }); }
   }
   var ok = results.every(function(r){ return r && r.ok; });
   return _jsonOutput({ ok: ok, results: results });

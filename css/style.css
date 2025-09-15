@@ -326,6 +326,13 @@ html.dark .font-size-btn { border-color: #374151; background: radial-gradient(ci
 .fade-appear { opacity: 0; transform: translateY(6px); transition: opacity .25s ease, transform .25s ease; }
 .fade-appear.show { opacity: 1; transform: none; }
 
+/* Admin panel: smooth expand/collapse sections */
+.admin-collapsible { opacity: 0; transform: translateY(8px); transition: opacity .24s ease, transform .24s ease; }
+.admin-collapsible.open { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .admin-collapsible { transition: none; }
+}
+
 /* Inputs global focus enhancement */
 input[type="text"], input[type="password"], input[type="email"], input[type="tel"], select, textarea {
   outline: none;

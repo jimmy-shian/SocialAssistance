@@ -114,8 +114,8 @@
           if (!input) return;
           if (!window.Auth || !window.Auth.forgot) { alert('忘記密碼功能尚未載入'); return; }
           const r = await window.Auth.forgot(input.trim());
-          if (window.Toast && window.Toast.show) window.Toast.show(r && r.message ? r.message : '已發送重設指示（模擬）', 'info', 3000);
-          else alert(r && r.message ? r.message : '已發送重設指示（模擬）');
+          if (window.Toast && window.Toast.show) window.Toast.show(r && r.message ? r.message : '已發送重設指示', 'info', 3000);
+          else alert(r && r.message ? r.message : '已發送重設指示');
         } catch(err){ alert('操作失敗：' + err.message); }
       });
     }

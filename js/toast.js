@@ -12,10 +12,10 @@
   }
   function clazz(type){
     // type: success | error | warning | info
-    if (type === 'error') return 'bg-rose-600 text-white dark:bg-rose-500';
-    if (type === 'warning') return 'bg-amber-500 text-white dark:bg-amber-400';
-    if (type === 'info') return 'bg-sky-600 text-white dark:bg-sky-500';
-    return 'bg-green-600 text-white dark:bg-green-500';
+    if (type === 'error') return 'bg-rose-300 text-white dark:bg-rose-500';
+    if (type === 'warning') return 'bg-amber-300 text-white dark:bg-amber-400';
+    if (type === 'info') return 'bg-sky-300 text-white dark:bg-sky-500';
+    return 'bg-green-300 text-white dark:bg-green-500';
   }
   function show(message, type='success', duration=3000){
     const box = document.createElement('div');
