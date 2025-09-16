@@ -57,7 +57,7 @@ function renderNavFooter() {
       <h2 class="text-2xl md:text-3xl font-normal font-[YourCustomFont,'Noto Sans TC',sans-serif] flex items-center gap-2">
         聽見核心工作室
         <img 
-          src="/img/soundcore3co-min.png" 
+          src="./img/soundcore3co-min.png" 
           alt="Logo Icon"
           class="w-7 h-7 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
         />
