@@ -69,7 +69,7 @@ window.providersData = {
         "video": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
       },
       {
-        "id": "case-3",
+        "id": "",
         "title": "在地菜市場企劃",
         "summary": "純文字說明的案例，無圖無影片"
       }

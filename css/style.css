@@ -24,12 +24,14 @@ html.dark .bg-white { background-color: #272f41 !important; }
 html.dark .bg-white-card { background-color: #3e3460 !important; }
 html.dark .bg-gray-50 { background-color: #1f2937 !important; }
 html.dark .bg-gray-100 { background-color: #1f2937 !important; }
-html.dark .text-gray-700 { color: #e5e7eb !important; }
-html.dark .text-gray-600 { color: #d1d5db !important; }
-html.dark .text-gray-500 { color: #d1d5db !important; }
+html.dark .dark\:bg-gray-300 { background-color: #384a5f !important; }
+html.dark .hover\:bg-gray-100:hover { background-color: #384a5f !important; }
 html.dark .text-gray-400 { color: #e5e7eb !important; }
-html.dark .text-gray-900 { color: #f3f4f6 !important; }
+html.dark .text-gray-500 { color: #d1d5db !important; }
+html.dark .text-gray-600 { color: #d1d5db !important; }
+html.dark .text-gray-700 { color: #e5e7eb !important; }
 html.dark .text-gray-800 { color: #e5e7eb !important; }
+html.dark .text-gray-900 { color: #f3f4f6 !important; }
 html.dark .text-black { color: #f9fafb !important; }
 html.dark .border-gray-200 { border-color: #374151 !important; }
 html.dark .border-gray-300 { border-color: #4b5563 !important; }
@@ -43,6 +45,7 @@ html.dark .border-gray-300 { border-color: #4b5563 !important; }
 .dark .dark\:text-gray-600 { color: #d1d5db !important; }
 .dark .dark\:text-gray-200 { color: #f3f4f6 !important; }
 .dark .dark\:text-gray-100 { color: #f9fafb !important; }
+.dark .dark\:text-gray-300 { color: #393d44 !important; }
 
 /* *******************************
    Flowing background (blobs)
@@ -610,6 +613,40 @@ input:focus, select:focus, textarea:focus {
 #forgot-modal .overlay-bg { opacity: 0; transition: opacity .18s ease; }
 #forgot-modal.open .overlay-bg { opacity: 1; }
 
+/* Admin｜即時預覽視窗尺寸 */
+#live-preview-viewport { max-width: 100%; }
+.pvw-mobile  { width: 360px; }
+.pvw-tablet  { width: 768px; }
+.pvw-desktop { width: 1024px; }
+
+/* ==============================
+   Admin｜Grid 韌性調校與預覽框
+   - 讓 grid 子項可縮小（min-width:0），避免「還有空間卻換行」
+   - 自動列高避免內容被遮住或重疊
+   - 統一預覽框背景填滿顯示
+============================== */
+.admin-grid { align-items: start; grid-auto-rows: minmax(48px, auto); }
+.admin-grid > * { min-width: 0; }
+.admin-grid label { display: block; }
+.admin-grid input,
+.admin-grid textarea,
+.admin-grid select { min-width: 0; width: 100%; }
+.admin-grid .flex { min-width: 0; }
+.admin-grid .btn-soft { white-space: nowrap; flex-shrink: 0; }
+.tm-photo-preview,
+.sc-intro-preview,
+.sc-svc-preview {
+  min-height: 3.5rem; /* ~h-14 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+@media (min-width: 768px) {
+  .tm-photo-preview,
+  .sc-intro-preview,
+  .sc-svc-preview { min-height: 4rem; /* ~h-16 */ }
+}
+
 /* ==============================
    首頁｜平台導覽：進場動畫與收合
    說明：reveal 進場／is-open 展開詳細內容
@@ -720,6 +757,23 @@ input:focus, select:focus, textarea:focus {
   animation: spin .8s linear infinite; z-index: 1;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Drag & Drop visual helpers */
+.dragging { opacity: .75; outline: 2px dashed #a78bfa; outline-offset: -2px; }
+.drag-over { box-shadow: 0 0 0 2px #f59e0b inset; }
+.dropzone-hover { outline: 2px dashed #60a5fa; outline-offset: -6px; background-color: rgba(59,130,246,.06); }
+.dark .dropzone-hover { background-color: rgba(96,165,250,.1); }
+.drag-transition { transition: outline .12s ease, box-shadow .12s ease, background-color .12s ease, opacity .12s ease; }
+
+/* Make provider image list droppable even when empty */
+.pv-img-list { position: relative; min-height: 84px; }
+.pv-img-list:empty::after { content: '拖放圖片到這裡'; position: absolute; inset: 0; display: grid; place-items: center; color: #6b7280; font-size: 12px; border: 2px dashed #93c5fd; border-radius: .5rem; background: rgba(59,130,246,.04); }
+.dark .pv-img-list:empty::after { color: #9ca3af; background: rgba(96,165,250,.08); border-color: #60a5fa; }
+
+/* Make story list droppable when empty */
+#sc-story-list { position: relative; min-height: 96px; }
+#sc-story-list:empty::after { content: '拖放圖片到這裡'; position: absolute; inset: 0; display: grid; place-items: center; color: #6b7280; font-size: 12px; border: 2px dashed #93c5fd; border-radius: .5rem; background: rgba(59,130,246,.04); }
+.dark #sc-story-list:empty::after { color: #9ca3af; background: rgba(96,165,250,.08); border-color: #60a5fa; }
 
 /* ==============================
    Nav｜品牌文字 hover 顯示圖片

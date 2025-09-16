@@ -157,7 +157,7 @@
         <h2 class=\"heading-section mb-8 text-center\">Our Team.</h2>
         <div class=\"grid gap-8 md:grid-cols-2 lg:grid-cols-3\">
           ${data.team.map(t=>{
-            const roles = (t.roles||[]).map(r=>`<span class=\"inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200\">${r}</span>`).join(' ');
+            const roles = (t.roles||[]).map(r=>`<span class=\"inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 dark:text-gray-300\">${r}</span>`).join(' ');
             const motto = t.motto ? `<blockquote class=\"motto text-gray-800 dark:text-gray-100 text-base italic\">${t.motto}</blockquote>` : '';
             const edu = (t.education||[]).map(d=>`<li>${d}</li>`).join('');
             const exp = (t.experience||[]).map(d=>`<li>${d}</li>`).join('');

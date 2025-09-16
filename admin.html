@@ -90,14 +90,31 @@
           </div>
           <span id="ds-version" class="text-sm text-gray-500"></span>
         </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button id="btn-insert-link" class="btn-soft btn-blue" title="在目前游標位置插入連結">插入連結</button>
-          <button id="btn-save-only" class="btn-soft btn-yellow">僅儲存（GAS）</button>
-          <button id="btn-save-publish" class="btn-soft btn-purple">儲存至 GAS 並同步到 GitHub</button>
-          <span id="publish-status" class="text-sm text-gray-500"></span>
-          <button id="btn-logout" class="px-3 py-2 rounded bg-rose-600 text-white hover:bg-rose-700">登出</button>
+        <div class="flex items-center gap-3 flex-wrap">
+          <div class="inline-flex items-center gap-2" role="group" aria-label="文字編輯">
+            <button id="btn-insert-link" class="btn-soft btn-blue" title="在目前游標位置插入連結">插入連結</button>
+            <button id="btn-toggle-preview" type="button" class="btn-soft btn-yellow" aria-pressed="false" title="切換顯示即時預覽">預覽</button>
+          </div>
+          <div class="inline-flex items-center gap-2 border-l pl-3" role="group" aria-label="儲存與發佈">
+            <button id="btn-save-only" class="btn-soft btn-yellow" title="僅儲存至 GAS（不發佈網站）">暫存</button>
+            <button id="btn-save-publish" class="btn-soft btn-purple" title="儲存至 GAS 並同步到 GitHub">更新網站</button>
+            <span id="publish-status" class="text-sm text-gray-500"></span>
+          </div>
+          <div class="inline-flex items-center gap-2 border-l pl-3" role="group" aria-label="使用者">
+            <button id="btn-logout" class="px-3 py-2 rounded bg-rose-600 text-white hover:bg-rose-700">登出</button>
+          </div>
         </div>
       </div>
+      <!-- Live Preview Panel -->
+      <section id="preview-panel" class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hidden">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <h3 class="font-semibold">即時預覽（不含導覽與頁尾）</h3>
+        </div>
+        <div id="live-preview-shell" class="mt-3 overflow-x-auto">
+          <div id="live-preview-viewport" class="mx-auto bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow min-h-[240px] p-4"></div>
+        </div>
+      </section>
+
       <!-- 載入中 skeleton 容器（切換資料集或登入後讀取時顯示） -->
       <div id="admin-loading" class="hidden space-y-4"></div>
       <!-- 隱藏的 JSON 編輯器（僅供內部狀態存放，不對外顯示） -->
@@ -110,7 +127,7 @@
           <p class="text-sm text-gray-600 dark:text-gray-300">編輯關於頁的標題、導語、模型卡片與成就清單。</p>
         </header>
 
-        <div class="grid md:grid-cols-2 gap-4">
+        <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
           <label class="text-sm">主標題（heroTitle）
             <input id="ab-hero-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
           </label>
@@ -128,7 +145,7 @@
         </div>
 
         <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
-          <div class="grid md:grid-cols-2 gap-4 mb-2">
+          <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4 mb-2">
             <label class="text-sm">成就區塊標題（achievementsTitle）
               <input id="ab-ach-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
             </label>
@@ -157,7 +174,7 @@
           <h3 class="text-lg font-semibold">Site Content（首頁文案）</h3>
           <p class="text-sm text-gray-600 dark:text-gray-300">編輯首頁標題、副標題、首圖，以及平台導覽卡片。</p>
         </header>
-        <div class="grid md:grid-cols-3 gap-4">
+        <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div class="md:col-span-1">
             <label class="text-sm block">首頁首圖（index.heroImage）
               <input id="sc-hero-image" class="w-full mt-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="https://... 或 gas://image/...">
@@ -172,6 +189,7 @@
             <input id="sc-hero-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
           </label>
           <label class="text-sm">首頁副標題（index.heroSubtitle）
+{{ ... }}
             <textarea id="sc-hero-subtitle" rows="2" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
           </label>
         </div>
@@ -186,7 +204,7 @@
         <!-- 首頁重點故事 -->
         <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
           <h4 class="font-semibold mb-2">首頁重點故事（index.story）</h4>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
             <label class="text-sm">故事標題（story.heading）
               <input id="sc-story-heading" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="如：自立">
             </label>
@@ -198,7 +216,7 @@
             <label class="btn-soft btn-blue text-xs cursor-pointer">上傳圖片<input id="sc-story-upload" type="file" class="hidden" accept="image/*" multiple></label>
             <span id="sc-story-loading" class="text-xs text-gray-500"></span>
           </div>
-          <div id="sc-story-list" class="mt-2 grid grid-cols-4 gap-2"></div>
+          <div id="sc-story-list" class="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"></div>
           <label class="text-sm block mt-3">故事內文（支援自動連結與換行）
             <textarea id="sc-story-body" rows="5" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="輸入段落文字，可含網址"></textarea>
           </label>
@@ -219,7 +237,7 @@
         <!-- 首頁影片 -->
         <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
           <h4 class="font-semibold mb-2">首頁影片（index.video）</h4>
-          <div class="grid md:grid-cols-2 gap-4">
+          <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-4">
             <label class="text-sm">影片標題（video.title）
               <input id="sc-video-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="如：冒險挑戰 x 生命探索">
             </label>
@@ -258,7 +276,7 @@
         </div>
 
         <!-- 基本資料 -->
-        <div id="pv-basic" class="grid md:grid-cols-2 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+        <div id="pv-basic" class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
           <div>
             <label class="text-sm">name（顯示名稱）
               <input id="pv-name" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
@@ -289,7 +307,7 @@
               <input id="pv-gmap" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
             </label>
           </div>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-3">
             <label class="text-sm">coords.lat
               <input id="pv-lat" type="number" step="0.000001" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
             </label>
@@ -297,7 +315,14 @@
               <input id="pv-lng" type="number" step="0.000001" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
             </label>
           </div>
-          <div class="md:col-span-2">
+          <div class="flex items-center gap-2">
+            <label class="text-sm inline-flex items-center gap-2 cursor-pointer">
+              <input id="pv-featured" type="checkbox" class="rounded border">
+              首頁精選（featuredOnIndex）
+            </label>
+            <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">勾選後，該業者會出現在首頁「精選案例」區塊。</p>
+          </div>
+          <div class="sm:col-span-2">
             <label class="text-sm">description（簡介）
               <textarea id="pv-desc" rows="3" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
             </label>
@@ -344,7 +369,7 @@
           <label class="block text-sm">顯示文字（可選）
             <input id="link-text" type="text" placeholder="若空白則使用網址" class="w-full mt-1 rounded border px-3 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100" />
           </label>
-          <div class="grid sm:grid-cols-3 gap-4">
+          <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-3 gap-4">
             <label class="block text-sm">文字顏色
               <input id="link-color" type="color" class="mt-1 w-full h-10 rounded border bg-white dark:bg-gray-800" />
             </label>

@@ -108,7 +108,8 @@
     imgs.forEach((url,i)=>{
       const isGas = /^gas:\/\/image\//.test(url); const preview = isGas ? previewCache[url] : null;
       const cell = document.createElement('div');
-      cell.className = 'relative h-24 md:h-28 rounded overflow-hidden border border-gray-300 dark:border-gray-700';
+      cell.className = 'sc-story-cell drag-transition relative h-24 md:h-28 rounded overflow-hidden border border-gray-300 dark:border-gray-700 cursor-move';
+      cell.draggable = true;
       cell.dataset.index = String(i);
       cell.innerHTML = preview
         ? `<img src="${preview}" alt="story${i+1}" class="w-full h-full object-cover opacity-90">
@@ -131,6 +132,28 @@
   function updateTeamPreview(item){
     try {
       const pv = item.querySelector('.tm-photo-preview'); const input = item.querySelector('.ab-team-photo');
+      if (!pv || !input) return;
+      const val = (input.value||'').trim();
+      if (!val){ pv.style.backgroundImage='none'; pv.textContent='尚未選擇'; return; }
+      let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
+      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+    } catch(e){}
+  }
+
+  // 預覽：Site 平台導覽/服務 圖片
+  function updateIntroPreview(item){
+    try {
+      const pv = item.querySelector('.sc-intro-preview'); const input = item.querySelector('.sc-intro-image');
+      if (!pv || !input) return;
+      const val = (input.value||'').trim();
+      if (!val){ pv.style.backgroundImage='none'; pv.textContent='尚未選擇'; return; }
+      let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
+      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+    } catch(e){}
+  }
+  function updateServicePreview(item){
+    try {
+      const pv = item.querySelector('.sc-svc-preview'); const input = item.querySelector('.sc-svc-image');
       if (!pv || !input) return;
       const val = (input.value||'').trim();
       if (!val){ pv.style.backgroundImage='none'; pv.textContent='尚未選擇'; return; }
@@ -203,10 +226,22 @@
     // Overlay: warning must dismiss on click/Enter/Escape
     const overlay = qs('#admin-warning-overlay');
     const overlayBtn = qs('#admin-warning-dismiss');
-    function dismissOverlay(){
+    function dismissOverlay() {
       if (!overlay) return;
       overlay.classList.add('hidden');
-      overlay.setAttribute('aria-hidden','true');
+      overlay.setAttribute('aria-hidden', 'true');
+    
+      // 儲存今天的日期到 localStorage
+      const today = new Date().toISOString().slice(0, 10); // '2025-09-16'
+      localStorage.setItem('admin-warning-dismissed-date', today);
+      console.log('dismissed today', today);
+    }
+    
+    function shouldShowOverlayToday() {
+      const today = new Date().toISOString().slice(0, 10);
+      const dismissedDate = localStorage.getItem('admin-warning-dismissed-date');
+      if (dismissedDate !== today) return console.log('should show overlay today'), true;
+      return console.log('should not show overlay today'), false;
     }
     // if (overlay) {
     //   overlay.setAttribute('aria-hidden','false');
@@ -218,6 +253,13 @@
     //     }
     //   });
     // }
+    if (overlay && shouldShowOverlayToday()) {
+      overlay.classList.remove('hidden');
+      overlay.setAttribute('aria-hidden', 'false');
+    }else{
+      overlay.classList.add('hidden');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
     if (overlayBtn) overlayBtn.addEventListener('click', (e)=>{ e.stopPropagation(); dismissOverlay(); });
 
     const token = (window.DataAPI && window.DataAPI.token && window.DataAPI.token()) || '';
@@ -423,6 +465,7 @@
       renderSiteEditor(payload || {});
     }
     hideLoading();
+    try { renderLivePreview(); } catch(e){}
   }
 
   function fillProviderSelect(map){
@@ -463,25 +506,32 @@
 
   // ===== Provider 基本欄位 =====
   function fillBasicFields(p = {}) {
-    const s = (id) => qs(id); // 假設 qs 是 document.querySelector
+  const s = (id) => qs(id); // 假設 qs 是 document.querySelector
 
-    const fields = [
-      ['#pv-name', p.name],
-      ['#pv-category', p.category],
-      ['#pv-schedule', p.schedule],
-      ['#pv-location', p.location],
-      ['#pv-address', p.address],
-      ['#pv-gmap', p.gmapUrl],
-      ['#pv-lat', (p.coords && typeof p.coords.lat === 'number') ? p.coords.lat : ''],
-      ['#pv-lng', (p.coords && typeof p.coords.lng === 'number') ? p.coords.lng : ''],
-      ['#pv-desc', toPlainText(p.description)]
-    ];
-  
-    for (const [selector, value] of fields) {
-      const el = s(selector);
-      if (el) el.value = value || '';
+  const fields = [
+    ['#pv-name', p.name],
+    ['#pv-category', p.category],
+    ['#pv-schedule', p.schedule],
+    ['#pv-location', p.location],
+    ['#pv-address', p.address],
+    ['#pv-gmap', p.gmapUrl],
+    ['#pv-lat', (p.coords && typeof p.coords.lat === 'number') ? p.coords.lat : ''],
+    ['#pv-lng', (p.coords && typeof p.coords.lng === 'number') ? p.coords.lng : ''],
+    ['#pv-desc', toPlainText(p.description)],
+    ['#pv-featured', p.featuredOnIndex]
+  ];
+
+  for (const [selector, value] of fields) {
+    const el = s(selector);
+    if (el) {
+      if (selector === '#pv-featured') {
+        el.checked = !!value;
+      } else {
+        el.value = value || '';
+      }
     }
   }
+}
   
   function collectBasicFields(){
     const s = (id)=>qs(id);
@@ -497,18 +547,19 @@
       gmapUrl: s('#pv-gmap')?.value?.trim() || undefined,
       coords,
       // 描述改為可含連結與跳行
-      description: linkifyHtml(s('#pv-desc')?.value || '')
+      description: linkifyHtml(s('#pv-desc')?.value || ''),
+      featuredOnIndex: !!s('#pv-featured')?.checked
     };
   }
 
   // ===== Timeline 編輯 =====
   function buildTlItem(row={}, idx=0){
     const wrap = document.createElement('div');
-    wrap.className = 'p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="flex items-center justify-between gap-3">
-        <div class="grid grid-cols-3 gap-2 flex-1">
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-2 flex-1">
           <input class="pv-tl-time rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="time" value="${row.time||''}">
           <input class="pv-tl-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
           <textarea class="pv-tl-detail rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="detail">${toPlainText(row.detail)||''}</textarea>
@@ -559,9 +610,9 @@
           <button type="button" class="btn-soft btn-purple pv-del">刪除</button>
         </div>
       </div>
-      <div class="grid md:grid-cols-2 gap-3 mt-3">
+      <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-3 mt-3">
         <label class="text-sm">id（唯一）
-          <input class="pv-id w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${c.id||''}">
+          <input class="pv-id w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${c.id||''}" placeholder="不需填寫">
         </label>
         <label class="text-sm">title（題名）
           <input class="pv-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${c.title||''}">
@@ -570,7 +621,7 @@
       <label class="block text-sm mt-2">summary（摘要）
         <textarea class="pv-summary w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(c.summary)||''}</textarea>
       </label>
-      <div class="grid md:grid-cols-2 gap-3 mt-2">
+      <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-3 mt-2">
         <label class="text-sm">images（每行一個 URL）
           <textarea class="pv-images w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${(Array.isArray(c.images)?c.images:[]).join('\n')}</textarea>
           <div class="pv-imgmgr mt-2">
@@ -604,7 +655,8 @@
 
   function collectCasesFromUI(){
     const list = qs('#pv-cases-list'); if (!list) return [];
-    return Array.from(list.children).map(el=>{
+    // 先讀取所有欄位
+    const items = Array.from(list.children).map(el=>{
       const get = sel => el.querySelector(sel);
       const imagesText = (get('.pv-images')?.value || '').split(/\n+/).map(s=>s.trim()).filter(Boolean);
       return {
@@ -616,6 +668,18 @@
         video: get('.pv-video')?.value?.trim() || undefined,
       };
     });
+    // 自動產生缺漏的 id，避免重複
+    const used = new Set();
+    const slugify = (s)=> (s||'').toLowerCase().replace(/[^a-z0-9\-\s]+/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'');
+    items.forEach((it, i)=>{
+      let id = (it.id||'').trim();
+      if (!id) { id = slugify(it.title) || `case-${i+1}`; }
+      let base = id; let n = 2;
+      while (used.has(id)) { id = `${base}-${n++}`; }
+      used.add(id);
+      it.id = id;
+    });
+    return items;
   }
 
   function currentProvidersRef(){
@@ -634,6 +698,7 @@
     renderTimelineEditor(p);
     refreshCasePreviews();
     try { updatePvProvButtonLabelFromSelect(); } catch(e){}
+    try { renderLivePreview(); } catch(e){}
   });
 
   // Add case
@@ -709,7 +774,7 @@
     list.innerHTML = '';
     imgs.forEach((url, i)=>{
       const cell = document.createElement('div');
-      cell.className = 'pv-img-cell relative w-20 h-20 rounded overflow-hidden border border-gray-300 dark:border-gray-700';
+      cell.className = 'pv-img-cell drag-transition relative w-20 h-20 rounded overflow-hidden border border-gray-300 dark:border-gray-700';
       cell.draggable = true;
       cell.dataset.index = String(i);
       const isGas = /^gas:\/\/image\//.test(url);
@@ -718,38 +783,65 @@
         cell.innerHTML = `
           <img src="${preview}" alt="pending" class="w-full h-full object-cover opacity-90">
           <span class="absolute left-1 bottom-1 text-[10px] px-1 rounded bg-amber-500 text-white">待發佈</span>
-          <button type="button" class="pv-img-del absolute -top-1 -right-1 bg-rose-600 text-white rounded-full w-5 h-5 text-xs">×</button>
+          <div class="absolute top-1 right-1 flex gap-1">
+            <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
+            <button type="button" class="pv-img-down bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↓</button>
+            <button type="button" class="pv-img-del bg-rose-600 hover:bg-rose-700 text-white rounded px-1 text-xs">×</button>
+          </div>
         `;
       } else if (isGas) {
         cell.innerHTML = `
           <div class="w-full h-full grid place-items-center bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300">待發佈圖片</div>
-          <button type="button" class="pv-img-del absolute -top-1 -right-1 bg-rose-600 text-white rounded-full w-5 h-5 text-xs">×</button>
+          <div class="absolute top-1 right-1 flex gap-1">
+            <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
+            <button type="button" class="pv-img-down bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↓</button>
+            <button type="button" class="pv-img-del bg-rose-600 hover:bg-rose-700 text-white rounded px-1 text-xs">×</button>
+          </div>
         `;
       } else {
         cell.innerHTML = `
           <img src="${url}" alt="img${i+1}" class="w-full h-full object-cover">
-          <button type="button" class="pv-img-del absolute -top-1 -right-1 bg-rose-600 text-white rounded-full w-5 h-5 text-xs">×</button>
+          <div class="absolute top-1 right-1 flex gap-1">
+            <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
+            <button type="button" class="pv-img-down bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↓</button>
+            <button type="button" class="pv-img-del bg-rose-600 hover:bg-rose-700 text-white rounded px-1 text-xs">×</button>
+          </div>
         `;
       }
       list.appendChild(cell);
     });
   }
   function attachImgManagerEvents(root){
-    // Delete
+    // Delete / Up / Down
     root.addEventListener('click', (e)=>{
-      const btn = e.target.closest('.pv-img-del'); if (!btn) return;
+      const del = e.target.closest('.pv-img-del');
+      const up = e.target.closest('.pv-img-up');
+      const down = e.target.closest('.pv-img-down');
+      if (!del && !up && !down) return;
       const item = e.target.closest('.pv-img-cell'); if (!item) return;
-      const caseEl = btn.closest('.pv-imgmgr')?.closest('div[data-index]');
+      const caseEl = item.closest('.pv-imgmgr')?.closest('div[data-index]');
       const idx = parseInt(item.dataset.index||'0',10);
       const imgs = parseImagesFrom(caseEl);
-      const removed = imgs.splice(idx,1)[0];
-      if (removed && previewCache[removed]) delete previewCache[removed];
+      if (del){
+        const removed = imgs.splice(idx,1)[0];
+        if (removed && previewCache[removed]) delete previewCache[removed];
+      } else if (up && idx>0){
+        const [m] = imgs.splice(idx,1); imgs.splice(idx-1,0,m);
+      } else if (down && idx<imgs.length-1){
+        const [m] = imgs.splice(idx,1); imgs.splice(idx+1,0,m);
+      } else { return; }
       writeImagesTo(caseEl, imgs); renderImgList(caseEl);
     });
     // Drag re-order
     let dragSrc = null;
-    root.addEventListener('dragstart', (e)=>{ const cell = e.target.closest('.pv-img-cell'); if (!cell) return; dragSrc = cell; e.dataTransfer.effectAllowed='move'; });
-    root.addEventListener('dragover', (e)=>{ if (e.target.closest('.pv-img-cell')) { e.preventDefault(); e.dataTransfer.dropEffect='move'; } });
+    root.addEventListener('dragstart', (e)=>{ const cell = e.target.closest('.pv-img-cell'); if (!cell) return; dragSrc = cell; e.dataTransfer.effectAllowed='move'; cell.classList.add('drag-transition','dragging'); });
+    root.addEventListener('dragenter', (e)=>{ const c = e.target.closest('.pv-img-cell'); if (c) c.classList.add('drag-over'); });
+    root.addEventListener('dragleave', (e)=>{ const c = e.target.closest('.pv-img-cell'); if (c) c.classList.remove('drag-over'); const l = e.target.closest('.pv-img-list'); if (l) l.classList.remove('dropzone-hover'); });
+    root.addEventListener('dragover', (e)=>{
+      const cell = e.target.closest('.pv-img-cell'); const list = e.target.closest('.pv-img-list');
+      if (cell) { e.preventDefault(); e.dataTransfer.dropEffect='move'; }
+      if (list) { e.preventDefault(); list.classList.add('dropzone-hover'); }
+    });
     root.addEventListener('drop', (e)=>{
       const dst = e.target.closest('.pv-img-cell'); if (!dst || !dragSrc) return;
       e.preventDefault();
@@ -760,6 +852,15 @@
       if (a===b) return;
       const [m] = imgs.splice(a,1); imgs.splice(b,0,m);
       writeImagesTo(caseEl, imgs); renderImgList(caseEl);
+      dragSrc.classList.remove('dragging'); dst.classList.remove('drag-over');
+      const list = e.target.closest('.pv-img-list'); if (list) list.classList.remove('dropzone-hover');
+      // 阻止後續的 drop 處理（避免被當成上傳再次觸發）
+      e.stopImmediatePropagation();
+    });
+    root.addEventListener('dragend', (e)=>{
+      const list = e.target.closest('.pv-imgmgr');
+      list?.querySelectorAll('.pv-img-cell.dragging,.pv-img-cell.drag-over')?.forEach(el=> el.classList.remove('dragging','drag-over'));
+      list?.querySelector('.pv-img-list')?.classList.remove('dropzone-hover');
     });
     // Upload via GAS (stores to Sheet, returns placeholder gas://image/<id>/<filename>)
     async function uploadFileAndGetPlaceholder(file){
@@ -778,12 +879,14 @@
     }
     root.addEventListener('change', async (e)=>{
       const up = e.target.closest('.pv-img-upload'); if (!up) return;
-      const caseEl = up.closest('.pv-imgmgr')?.closest('div[data-index]'); if (!caseEl) return;
+      const mgr = up.closest('.pv-imgmgr');
+      const caseEl = mgr?.closest('div[data-index]'); if (!caseEl) return;
       const files = up.files || [];
       if (!files.length) return;
       up.disabled = true;
       const imgs = parseImagesFrom(caseEl);
       try {
+        if (mgr) mgr.classList.add('is-uploading');
         for (const f of Array.from(files)){
           try {
             const ph = await uploadFileAndGetPlaceholder(f);
@@ -792,25 +895,38 @@
         }
         writeImagesTo(caseEl, imgs); renderImgList(caseEl);
         if (window.Toast) Toast.show('圖片已上傳（待發佈）', 'success', 2500);
-      } finally { up.value=''; up.disabled=false; }
+      } finally { up.value=''; up.disabled=false; if (mgr) mgr.classList.remove('is-uploading'); }
     });
     // Drop URL or files to list area
-    root.addEventListener('dragover', (e)=>{ if (e.target.closest('.pv-img-list')) { e.preventDefault(); } });
+    root.addEventListener('dragover', (e)=>{ 
+      const list = e.target.closest('.pv-img-list'); if (!list) return; 
+      e.preventDefault(); 
+      const dt = e.dataTransfer; if (dt) { const types = Array.from(dt.types||[]); dt.dropEffect = types.includes('Files') ? 'copy' : 'link'; }
+      list.classList.add('dropzone-hover'); 
+    });
     root.addEventListener('drop', async (e)=>{
       const list = e.target.closest('.pv-img-list'); if (!list) return;
+      // 若是內部拖曳排序，避免進入上傳流程
+      if (dragSrc) { e.preventDefault(); list.classList.remove('dropzone-hover'); return; }
       e.preventDefault();
-      const caseEl = list.closest('.pv-imgmgr')?.closest('div[data-index]');
+      const mgr = list.closest('.pv-imgmgr');
+      const caseEl = mgr?.closest('div[data-index]');
       const imgs = parseImagesFrom(caseEl);
       const dt = e.dataTransfer;
       if (dt && dt.files && dt.files.length){
-        for (const f of Array.from(dt.files)){
-          try { const ph = await uploadFileAndGetPlaceholder(f); imgs.push(ph); }
-          catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
-        }
-        writeImagesTo(caseEl, imgs); renderImgList(caseEl); if (window.Toast) Toast.show('圖片已上傳（待發佈）', 'success', 2500);
+        if (mgr) mgr.classList.add('is-uploading');
+        try {
+          for (const f of Array.from(dt.files)){
+            try { const ph = await uploadFileAndGetPlaceholder(f); imgs.push(ph); }
+            catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
+          }
+          writeImagesTo(caseEl, imgs); renderImgList(caseEl); if (window.Toast) Toast.show('圖片已上傳（待發佈）', 'success', 2500);
+        } finally { if (mgr) mgr.classList.remove('is-uploading'); list.classList.remove('dropzone-hover'); }
       } else if (dt && dt.getData){
-        const text = dt.getData('text') || '';
-        if (text) { imgs.push(text.trim()); writeImagesTo(caseEl, imgs); renderImgList(caseEl); }
+        let text = '';
+        try { text = (dt.getData('text/uri-list') || dt.getData('text/plain') || dt.getData('text') || '').trim(); } catch(err){}
+        if (text) { imgs.push(text); writeImagesTo(caseEl, imgs); renderImgList(caseEl); }
+        list.classList.remove('dropzone-hover');
       }
     });
   }
@@ -832,7 +948,7 @@
     if (!id) return;
     id = id.trim();
     if (obj[id]) { alert('此 ID 已存在'); return; }
-    obj[id] = { name:'', category:'', location:'', address:'', description:'', coords: undefined, cases: [], timeline: [] };
+    obj[id] = { name:'', category:'', location:'', address:'', description:'', coords: undefined, cases: [], timeline: [], featuredOnIndex: false };
     setEditor(obj);
     fillProviderSelect(obj);
     qs('#pv-prov-select').value = id;
@@ -916,10 +1032,10 @@
   // ===== About 視覺化 =====
   function buildModelItem(row={}, idx=0){
     const wrap = document.createElement('div');
-    wrap.className = 'p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
-      <div class="grid md:grid-cols-4 gap-2">
+      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
         <input class="ab-model-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
         <textarea class="ab-model-desc rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="desc">${toPlainText(row.desc)||''}</textarea>
         <input class="ab-model-href rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="href (可選)" value="${row.href||''}">
@@ -958,7 +1074,7 @@
     const teamList = qs('#ab-team-list'); if (teamList) {
       teamList.innerHTML = '';
       const arr = Array.isArray(data.team) ? data.team : [];
-      arr.forEach((t,i)=> teamList.appendChild(buildTeamItem(t,i)));
+      arr.forEach((t,i)=> { const node = buildTeamItem(t,i); teamList.appendChild(node); try { updateTeamPreview(node); } catch(e){} });
     }
   }
   function addBlankModel(afterIndex){
@@ -1003,10 +1119,10 @@
   function buildAchItem(row, idx){
     const isObj = row && typeof row === 'object';
     const wrap = document.createElement('div');
-    wrap.className = 'p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
-      <div class="grid md:grid-cols-3 gap-2 items-center">
+      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 items-center">
         <textarea class="ab-ach-text rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="文字">${isObj ? (row.text||'') : (row||'')}</textarea>
         <input class="ab-ach-href rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結（可選）" value="${isObj ? (row.href||'') : ''}">
         <div class="flex items-center gap-2 flex-wrap">
@@ -1020,43 +1136,43 @@
   }
   function buildTeamItem(row={}, idx=0){
     const wrap = document.createElement('div');
-    wrap.className = 'p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
-      <div class="grid md:grid-cols-5 gap-2 items-center">
+      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 items-center">
         <input class="ab-team-name rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="姓名" value="${row.name||''}">
-        <div class="flex items-center gap-2">
-          <input class="ab-team-photo rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="照片連結或 gas://image/..." value="${row.photo||''}">
-          <label class="btn-soft btn-blue text-xs cursor-pointer">上傳<input type="file" class="hidden tm-photo-upload" accept="image/*"></label>
+        <div class="flex items-center gap-2 min-w-0 sm:col-span-2 md:col-span-2">
+          <input class="ab-team-photo flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="照片連結或 gas://image/..." value="${row.photo||''}">
+          <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden tm-photo-upload" accept="image/*"></label>
         </div>
-        <div class="tm-photo-preview h-10 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+        <div class="tm-photo-preview min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
         <input class="ab-team-roles rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="角色（可複數，頓號或逗號分隔）" value="${Array.isArray(row.roles)?row.roles.join('、'):''}">
         <textarea class="ab-team-motto rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="座右銘">${toPlainText(row.motto)||''}</textarea>
       </div>
-      <div class="grid md:grid-cols-2 gap-2 mt-2">
+      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 mt-2">
         <div class="flex flex-col gap-2">
           <label class="text-sm">教育背景</label>
           <textarea class="ab-team-edu rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4" placeholder="每行一筆">${(row.education||[]).join('\n')}</textarea>
         </div>
         <div class="flex flex-col gap-2">
-          <label class="text-sm">工作經歷</label>
+          <label class="text-sm">經歷</label>
           <textarea class="ab-team-exp rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4" placeholder="每行一筆">${(row.experience||[]).join('\n')}</textarea>
         </div>
       </div>
       <div class="mt-2">
-        <div class="flex items-center justify-between mb-1">
-          <label class="text-sm">社群連結</label>
+        <label class="text-sm block">社群連結（可多筆）</label>
+        <div class="ab-team-socials space-y-2">
           <button type="button" class="btn-soft btn-green ab-social-add">新增社群連結</button>
         </div>
         <div class="ab-team-socials flex flex-col gap-2">
           ${Array.isArray(row.socials) ? row.socials.map((s,i)=>`
-            <div class="ab-social-row flex gap-2 items-center" data-index="${i}">
-              <input class="ab-social-name rounded border px-2 py-1 bg-white dark:bg-gray-800 flex-1" placeholder="名稱 (Facebook/Instagram/Line/Threads/YouTube)" value="${s.name||''}">
-              <input class="ab-social-href rounded border px-2 py-1 bg-white dark:bg-gray-800 flex-1" placeholder="連結 https://..." value="${s.href||''}">
-              <button type="button" class="btn-soft btn-yellow ab-social-up">上移</button>
-              <button type="button" class="btn-soft btn-yellow ab-social-down">下移</button>
-              <button type="button" class="btn-soft btn-orange ab-social-dup">複製</button>
-              <button type="button" class="btn-soft btn-purple ab-social-del">刪除</button>
+            <div class="ab-social-row flex flex-wrap gap-2 items-center min-w-0" data-index="${i}">
+              <input class="ab-social-name flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱 (Facebook/Instagram/Line/Threads/YouTube)" value="${s.name||''}">
+              <input class="ab-social-href flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結 https://..." value="${s.href||''}">
+              <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0">上移</button>
+              <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0">下移</button>
+              <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0">複製</button>
+              <button type="button" class="btn-soft btn-purple ab-social-del shrink-0">刪除</button>
             </div>
           `).join('') : ''}
         </div>
@@ -1109,6 +1225,25 @@
     if (btn.classList.contains('ab-team-down') && idx<list.children.length-1) { list.insertBefore(list.children[idx+1], item); play(); flash(item); return; }
     if (btn.classList.contains('ab-team-dup')) { const clone = item.cloneNode(true); list.insertBefore(clone, list.children[idx+1]); play(); flash(clone); return; }
   });
+  // About｜Team 照片預覽/上傳
+  qs('#ab-team-list')?.addEventListener('input', (e)=>{
+    const inp = e.target.closest('.ab-team-photo'); if (!inp) return;
+    const item = inp.closest('div[data-index]'); if (item) updateTeamPreview(item);
+  });
+  qs('#ab-team-list')?.addEventListener('change', async (e)=>{
+    const up = e.target.closest('.tm-photo-upload'); if (!up) return;
+    const item = up.closest('div[data-index]'); if (!item) return;
+    const file = up.files?.[0]; if (!file) return;
+    up.disabled = true;
+    try {
+      const pv = item.querySelector('.tm-photo-preview'); if (pv) pv.classList.add('is-uploading');
+      const ph = await uploadFileAndGetPlaceholder(file);
+      const input = item.querySelector('.ab-team-photo'); if (input) input.value = ph;
+      updateTeamPreview(item);
+      if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
+    } catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
+    finally { up.value=''; up.disabled=false; const pv = item.querySelector('.tm-photo-preview'); if (pv) pv.classList.remove('is-uploading'); }
+  });
   qs('#ab-team-list')?.addEventListener('click', (e)=>{
     const btn = e.target.closest('button'); if (!btn) return;
     const list = qs('#ab-team-list'); const item = e.target.closest('div[data-index]'); if (!list||!item) return;
@@ -1126,14 +1261,15 @@
     if (btn.classList.contains('ab-social-add')) {
       const socialList = item.querySelector('.ab-team-socials'); if (!socialList) return;
       const node = document.createElement('div');
-      node.className = 'ab-social-row flex gap-2 items-center';
+      node.className = 'ab-social-row flex flex-wrap gap-2 items-center min-w-0';
       node.innerHTML = `
-        <input class="ab-social-name rounded border px-2 py-1 bg-white dark:bg-gray-800 flex-1" placeholder="名稱">
-        <input class="ab-social-href rounded border px-2 py-1 bg-white dark:bg-gray-800 flex-1" placeholder="連結">
-        <button type="button" class="btn-soft btn-yellow ab-social-up">上移</button>
-        <button type="button" class="btn-soft btn-yellow ab-social-down">下移</button>
-        <button type="button" class="btn-soft btn-orange ab-social-dup">複製</button>
-        <button type="button" class="btn-soft btn-purple ab-social-del">刪除</button>`;
+        <input class="ab-social-name flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱">
+        <input class="ab-social-href flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結">
+        <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0">上移</button>
+        <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0">下移</button>
+        <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0">複製</button>
+        <button type="button" class="btn-soft btn-purple ab-social-del shrink-0">刪除</button>
+      `;
       socialList.appendChild(node); flash(node);
     }
   });
@@ -1141,12 +1277,18 @@
   // ===== Site 視覺化 =====
   function buildIntroItem(row={}, idx=0){
     const wrap = document.createElement('div');
-    wrap.className = 'p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
-      <div class="grid md:grid-cols-5 gap-2 items-center">
+      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 items-center">
         <input class="sc-intro-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
-        <input class="sc-intro-image rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image||''}">
+        <div class="flex flex-col gap-1 min-w-0 sm:col-span-2 md:col-span-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <input class="sc-intro-image flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image||''}">
+            <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-intro-upload" accept="image/*"></label>
+          </div>
+          <div class="sc-intro-preview min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+        </div>
         <textarea class="sc-intro-text rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="text">${toPlainText(row.text)||''}</textarea>
         <textarea class="sc-intro-details rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="details (可選)">${toPlainText(row.details)||''}</textarea>
         <div class="flex items-center gap-2 flex-wrap">
@@ -1160,12 +1302,18 @@
   }
   function buildServiceItem(row={}, idx=0){
     const wrap = document.createElement('div');
-    wrap.className = 'p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
-      <div class="grid md:grid-cols-4 gap-2 items-center">
+      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 items-center">
         <input class="sc-svc-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
-        <input class="sc-svc-image rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image||''}">
+        <div class="flex flex-col gap-1 min-w-0 sm:col-span-2 md:col-span-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <input class="sc-svc-image flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image||''}">
+            <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
+          </div>
+          <div class="sc-svc-preview min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+        </div>
         <input class="sc-svc-link rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="link" value="${row.link||''}">
         <div class="flex items-center gap-2 flex-wrap">
           <button type="button" class="btn-soft btn-yellow sc-svc-up">上移</button>
@@ -1188,7 +1336,9 @@
       arr.forEach((it,i)=> {
         // 將 HTML 欄位還原成可編輯文字
         const row = { ...it, text: toPlainText(it.text), details: toPlainText(it.details) };
-        list.appendChild(buildIntroItem(row,i));
+        const node = buildIntroItem(row,i);
+        list.appendChild(node);
+        try { updateIntroPreview(node); } catch(e){}
       });
     }
     // Story
@@ -1205,7 +1355,7 @@
       const sl = qs('#sc-service-list'); if (sl) {
         sl.innerHTML = '';
         const arr = Array.isArray(idx.services) ? idx.services : [];
-        arr.forEach((s,i)=> sl.appendChild(buildServiceItem(s,i)));
+        arr.forEach((s,i)=> { const node = buildServiceItem(s,i); sl.appendChild(node); try { updateServicePreview(node); } catch(e){} });
       }
     } catch(e){}
     // Video
@@ -1267,6 +1417,25 @@
     if (btn.classList.contains('sc-intro-down') && idx<list.children.length-1) { list.insertBefore(list.children[idx+1], item); play(); flash(item); return; }
     if (btn.classList.contains('sc-intro-dup')) { const clone = item.cloneNode(true); list.insertBefore(clone, list.children[idx+1]); play(); flash(clone); return; }
   });
+  // Site｜平台導覽 圖片預覽/上傳
+  qs('#sc-intro-list')?.addEventListener('input', (e)=>{
+    const inp = e.target.closest('.sc-intro-image'); if (!inp) return;
+    const item = inp.closest('div[data-index]'); if (item) updateIntroPreview(item);
+  });
+  qs('#sc-intro-list')?.addEventListener('change', async (e)=>{
+    const up = e.target.closest('.sc-intro-upload'); if (!up) return;
+    const item = up.closest('div[data-index]'); if (!item) return;
+    const file = up.files?.[0]; if (!file) return;
+    up.disabled = true;
+    try {
+      const pv = item.querySelector('.sc-intro-preview'); if (pv) pv.classList.add('is-uploading');
+      const ph = await uploadFileAndGetPlaceholder(file);
+      const input = item.querySelector('.sc-intro-image'); if (input) input.value = ph;
+      updateIntroPreview(item);
+      if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
+    } catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
+    finally { up.value=''; up.disabled=false; const pv = item.querySelector('.sc-intro-preview'); if (pv) pv.classList.remove('is-uploading'); }
+  });
 
   // Site｜服務項目事件
   qs('#sc-add-service')?.addEventListener('click', ()=> addBlankService());
@@ -1280,12 +1449,32 @@
     if (btn.classList.contains('sc-svc-down') && idx<list.children.length-1) { list.insertBefore(list.children[idx+1], item); play(); flash(item); return; }
     if (btn.classList.contains('sc-svc-dup')) { const clone = item.cloneNode(true); list.insertBefore(clone, list.children[idx+1]); play(); flash(clone); return; }
   });
+  // Site｜服務 圖片預覽/上傳
+  qs('#sc-service-list')?.addEventListener('input', (e)=>{
+    const inp = e.target.closest('.sc-svc-image'); if (!inp) return;
+    const item = inp.closest('div[data-index]'); if (item) updateServicePreview(item);
+  });
+  qs('#sc-service-list')?.addEventListener('change', async (e)=>{
+    const up = e.target.closest('.sc-svc-upload'); if (!up) return;
+    const item = up.closest('div[data-index]'); if (!item) return;
+    const file = up.files?.[0]; if (!file) return;
+    up.disabled = true;
+    try {
+      const pv = item.querySelector('.sc-svc-preview'); if (pv) pv.classList.add('is-uploading');
+      const ph = await uploadFileAndGetPlaceholder(file);
+      const input = item.querySelector('.sc-svc-image'); if (input) input.value = ph;
+      updateServicePreview(item);
+      if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
+    } catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
+    finally { up.value=''; up.disabled=false; const pv = item.querySelector('.sc-svc-preview'); if (pv) pv.classList.remove('is-uploading'); }
+  });
 
   // Site｜Story 圖片：上傳、刪除、上下移、即時預覽
   qs('#sc-story-upload')?.addEventListener('change', async (e)=>{
     try {
       const files = Array.from(e.target?.files || []); if (!files.length) return;
       const tip = qs('#sc-story-loading'); if (tip) tip.textContent = '上傳中…';
+      const list = qs('#sc-story-list'); if (list) list.classList.add('is-uploading');
       const arr = parseStoryImages();
       for (const f of files){
         const ph = await uploadFileAndGetPlaceholder(f);
@@ -1296,6 +1485,7 @@
       setTimeout(()=>{ if (tip) tip.textContent = ''; }, 1200);
       e.target.value = '';
     } catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
+    finally { const list = qs('#sc-story-list'); if (list) list.classList.remove('is-uploading'); }
   });
   qs('#sc-story-images')?.addEventListener('input', ()=> renderStoryList());
   qs('#sc-story-list')?.addEventListener('click', (e)=>{
@@ -1318,6 +1508,64 @@
       const [m] = imgs.splice(idx,1); imgs.splice(idx+1,0,m);
       writeStoryImages(imgs); renderStoryList(); play(); return;
     }
+  });
+
+  // Story 圖片清單：拖曳排序與拖放上傳
+  let __scStoryDragSrc = null;
+  qs('#sc-story-list')?.addEventListener('dragstart', (e)=>{
+    const cell = e.target.closest('.sc-story-cell'); if (!cell) return;
+    __scStoryDragSrc = cell; if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+    cell.classList.add('drag-transition','dragging');
+  });
+  qs('#sc-story-list')?.addEventListener('dragover', (e)=>{
+    const dt = e.dataTransfer; if (!dt) return;
+    const types = Array.from(dt.types||[]);
+    const isFiles = types.includes('Files');
+    const isText = types.includes('text/uri-list') || types.includes('text/plain');
+    if (isFiles || isText || e.target.closest('.sc-story-cell')) { e.preventDefault(); dt.dropEffect = isFiles ? 'copy' : (e.target.closest('.sc-story-cell') ? 'move' : 'link'); }
+    const list = qs('#sc-story-list'); if ((isFiles || isText) && list) list.classList.add('dropzone-hover');
+  });
+  qs('#sc-story-list')?.addEventListener('dragenter', (e)=>{
+    const cell = e.target.closest('.sc-story-cell'); if (cell) cell.classList.add('drag-over');
+  });
+  qs('#sc-story-list')?.addEventListener('dragleave', (e)=>{
+    const cell = e.target.closest('.sc-story-cell'); if (cell) cell.classList.remove('drag-over');
+  });
+  qs('#sc-story-list')?.addEventListener('drop', async (e)=>{
+    const list = qs('#sc-story-list'); if (!list) return; const dt = e.dataTransfer; if (!dt) return;
+    // 檔案拖放上傳
+    if (dt.files && dt.files.length){ e.preventDefault();
+      const tip = qs('#sc-story-loading'); if (tip) tip.textContent = '上傳中…';
+      list.classList.add('is-uploading');
+      const arr = parseStoryImages();
+      try {
+        let i=0; const total = dt.files.length;
+        for (const f of Array.from(dt.files)){
+          i++; if (tip) tip.textContent = `上傳中… (${i}/${total})`;
+          try { const ph = await uploadFileAndGetPlaceholder(f); arr.push(ph); }
+          catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
+        }
+        writeStoryImages(arr); renderStoryList(); if (tip) tip.textContent = '已加入（待發佈）'; setTimeout(()=>{ if (tip) tip.textContent=''; }, 1200);
+      } finally { list.classList.remove('is-uploading'); list.classList.remove('dropzone-hover'); }
+      return;
+    }
+    // 純文字/URL 拖放
+    let text = '';
+    try { text = (dt.getData('text/uri-list') || dt.getData('text/plain') || dt.getData('text') || '').trim(); } catch(e){}
+    if (text){ e.preventDefault(); const arr = parseStoryImages(); arr.push(text); writeStoryImages(arr); renderStoryList(); list.classList.remove('dropzone-hover'); return; }
+    // 內部拖曳排序
+    const dst = e.target.closest('.sc-story-cell'); if (!dst || !__scStoryDragSrc) return; e.preventDefault();
+    const imgs = parseStoryImages();
+    const a = parseInt(__scStoryDragSrc.dataset.index||'0',10);
+    const b = parseInt(dst.dataset.index||'0',10);
+    if (a!==b){ const [m] = imgs.splice(a,1); imgs.splice(b,0,m); writeStoryImages(imgs); renderStoryList(); }
+    __scStoryDragSrc.classList.remove('dragging'); dst.classList.remove('drag-over');
+    __scStoryDragSrc = null; list.classList.remove('dropzone-hover');
+  });
+  qs('#sc-story-list')?.addEventListener('dragend', ()=>{
+    const list = qs('#sc-story-list');
+    list?.querySelectorAll('.sc-story-cell.dragging,.sc-story-cell.drag-over')?.forEach(el=> el.classList.remove('dragging','drag-over'));
+    list?.classList.remove('dropzone-hover');
   });
 
   // Site｜首頁首圖欄位與上傳事件
@@ -1462,7 +1710,266 @@
     document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeLinkModal(); });
   }
 
-  // 綁定自訂下拉與連結 Modal（確保在 DOM 準備之後）
-  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', ()=>{ bindDropdowns(); bindLinkModal(); }); }
-  else { bindDropdowns(); bindLinkModal(); }
+  // ==============================
+  // Live Preview (Site/About/Provider)
+  // ==============================
+  function debounce(fn, wait){ let t=null; return function(...args){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), wait); }; }
+  function pvwRoot(){ return qs('#live-preview-viewport'); }
+  function setPreviewSize(mode){
+    const vp = pvwRoot(); if (!vp) return;
+    vp.classList.remove('pvw-mobile','pvw-tablet','pvw-desktop');
+    vp.classList.add('pvw-' + (mode||'desktop'));
+    const ids = ['pvw-mobile','pvw-tablet','pvw-desktop'];
+    ids.forEach(id=>{ const b=qs('#'+id); if (b){ const on = id.endsWith(mode); b.setAttribute('aria-pressed', on?'true':'false'); }});
+  }
+  function bindPreviewControls(){
+    // Toggle preview panel visibility
+    const tgl = qs('#btn-toggle-preview');
+    const panel = qs('#preview-panel');
+    if (tgl && panel) {
+      tgl.addEventListener('click', ()=>{
+        const isHidden = panel.classList.contains('hidden');
+        show(panel, isHidden);
+        tgl.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+        if (isHidden) { try { renderLivePreview(); } catch(e){} }
+      });
+    }
+
+    // Device size controls (optional). If not present, keep responsive width.
+    const hasControls = qs('#pvw-mobile') || qs('#pvw-tablet') || qs('#pvw-desktop');
+    if (hasControls) {
+      qs('#pvw-mobile')?.addEventListener('click', ()=> setPreviewSize('mobile'));
+      qs('#pvw-tablet')?.addEventListener('click', ()=> setPreviewSize('tablet'));
+      qs('#pvw-desktop')?.addEventListener('click', ()=> setPreviewSize('desktop'));
+      setPreviewSize('desktop');
+    } else {
+      const vp = pvwRoot(); if (vp) vp.classList.remove('pvw-mobile','pvw-tablet','pvw-desktop');
+    }
+  }
+
+  // 解析 GAS 佔位符為可預覽的 dataURL（若有）
+  function resolveImage(u){
+    if (!u) return '';
+    if (/^gas:\/\/image\//.test(u) && previewCache && previewCache[u]) return previewCache[u];
+    return u;
+  }
+
+  function renderPreviewSite(siteObj){
+    const vp = pvwRoot(); if (!vp) return;
+    const d = siteObj && siteObj.index || {};
+    const heroUrl = resolveImage(d.heroImage||'').replace(/\"/g,'&quot;');
+    function esc(s){ return (s==null?'':String(s)); }
+    function isYT(u){ return /youtube\.com\/watch\?v=|youtu\.be\//.test(u||''); }
+    function ytId(u){ const m=(u||'').match(/[?&]v=([^&]+)|youtu\.be\/([^?&]+)/); return (m && (m[1]||m[2])) || ''; }
+    function isVimeo(u){ return /vimeo\.com\//.test(u||''); }
+    function vimeoId(u){ const m=(u||'').match(/vimeo\.com\/(\d+)/); return (m && m[1]) || ''; }
+    const svc = Array.isArray(d.services)? d.services : [];
+    const intro = Array.isArray(d.platformIntro)? d.platformIntro : [];
+    const imgs = Array.isArray(d.story?.images)? d.story.images : [];
+    vp.innerHTML = `
+      <div class="space-y-10">
+        <section>
+          <div id="hero" class="hero-banner" style="${heroUrl?`background-image:url('${heroUrl}')`:''}">
+            <div class="hero-band">
+              <h1 id="hero-title" class="hero-title">${esc(d.heroTitle||'')}</h1>
+              <p id="hero-subtitle" class="hero-subtitle">${d.heroSubtitle||''}</p>
+            </div>
+          </div>
+        </section>
+
+        ${(d.story && (d.story.heading||d.story.body||imgs.length))?`
+        <section id="story-section">
+          <div class="grid md:grid-cols-2 gap-8 items-start">
+            <div class="space-y-4">
+              ${d.story.heading?`<h2 class="text-3xl md:text-4xl font-extrabold">${esc(d.story.heading)}</h2>`:''}
+              ${d.story.body?`<div class="prose prose-lg dark:prose-invert max-w-none leading-relaxed">${d.story.body}</div>`:''}
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              ${imgs.slice(0,4).map((u,i)=>{ const src = resolveImage(u); return `<div class=\"rounded-lg overflow-hidden shadow\"><img src=\"${src}\" alt=\"story${i+1}\" class=\"w-full h-40 md:h-52 object-cover\"></div>`; }).join('')}
+            </div>
+          </div>
+        </section>`:''}
+
+        <section id="platform-intro" class="space-y-8">
+          ${intro.map((it,idx)=>{
+            const left = (idx%2===0);
+            const url = resolveImage(it.image || `https://picsum.photos/seed/intro${idx+1}/1200/800`);
+            return `
+            <div class="intro-row grid md:grid-cols-2 gap-8 items-center">
+              <div class="${left?'md:order-1':'md:order-2'} order-1">
+                <div class="intro-imgwrap ${left?'zig-right':'zig-left'} shadow-lg">
+                  <img src="${url}" alt="${esc(it.title||'')}" class="w-full h-64 md:h-80 object-cover" />
+                </div>
+              </div>
+              <div class="${left?'md:order-2':'md:order-1'} order-2">
+                <div class="pl-8 p-2 md:p-3">
+                  <h3 class="text-2xl font-bold mb-2">${esc(it.title||'')}</h3>
+                  <p class="text-lg text-gray-700 dark:text-gray-300">${it.text||''}</p>
+                  ${it.details?`<div class="collapse-content mt-3"><p class="text-base md:text-lg text-gray-700 dark:text-gray-200">${it.details}</p></div>`:''}
+                </div>
+              </div>
+            </div>`;
+          }).join('')}
+        </section>
+
+        <section>
+          <h3 id="services-title" class="text-xl font-semibold mb-3">${esc(d.servicesTitle||'服務項目')}</h3>
+          <div id="services-list" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${svc.map(s=>{
+              const img = resolveImage(s.image||'');
+              return `
+              <div class="relative h-72 rounded-2xl overflow-hidden shadow-lg group">
+                ${img?`<img src="${img}" alt="${esc(s.title||'')}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">`:''}
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                <div class="absolute bottom-4 left-4"><span class="px-3 py-1 rounded-full bg-white text-gray-900 text-sm font-semibold shadow">${esc(s.title||'')}</span></div>
+              </div>`; }).join('')}
+          </div>
+        </section>
+
+        <section id="video-section">
+          ${d.video?.title?`<div id="video-title" class="text-xl font-semibold mb-3">${esc(d.video.title)}</div>`:''}
+          <div id="index-video" class="aspect-video rounded overflow-hidden bg-gray-200 dark:bg-gray-700 grid place-items-center">
+            ${(()=>{ const url=d.video?.url||''; if(!url) return '<div class="text-sm text-gray-500 dark:text-gray-300">尚未設定影片</div>';
+              if(isYT(url)) return `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${ytId(url)}" allowfullscreen></iframe>`;
+              if(isVimeo(url)) return `<iframe class="w-full h-full" src="https://player.vimeo.com/video/${vimeoId(url)}" allowfullscreen></iframe>`;
+              if(/\.mp4(\?|$)/i.test(url)) return `<video class="w-full h-full" controls src="${url}"></video>`;
+              return `<a class="link-cta" href="${url}" target="_blank" rel="noopener">前往觀看 <span class="arrow">→</span></a>`; })()}
+          </div>
+        </section>
+      </div>`;
+  }
+
+  function renderPreviewAbout(obj){
+    const vp = pvwRoot(); if (!vp) return;
+    const data = obj || {};
+    const team = Array.isArray(data.team)? data.team : [];
+    vp.innerHTML = `
+      <div class="space-y-10">
+        <header class="text-center">
+          <h1 class="heading-display">${(data.heroTitle||'關於我們')}</h1>
+          <p class="mt-3 lead-text text-gray-700 dark:text-gray-300">${data.lead||''}</p>
+        </header>
+        <section>
+          <h2 class="heading-section mb-6">${data.modelTitle||'四階段引導模型'}</h2>
+          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            ${(Array.isArray(data.model)?data.model:[]).map(m=>`
+              <div class="p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800">
+                <h3 class="font-semibold mb-2">${m.title||''}</h3>
+                <p class="text-gray-700 dark:text-gray-300 text-sm">${m.desc||''}</p>
+                ${m.href?`<div class="mt-3"><a class="link-cta small" href="${m.href}" target="_blank" rel="noopener">${m.linkText||'前往連結'} <span class="arrow">→</span></a></div>`:''}
+              </div>`).join('')}
+          </div>
+        </section>
+        ${team.length?`
+        <section>
+          <h2 class="heading-section mb-6 text-center">Our Team.</h2>
+          <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            ${team.map(t=>`
+              <article class="overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900">
+                ${t.photo?`<img class=\"w-full h-64 object-cover\" src=\"${resolveImage(t.photo)}\" alt=\"${t.name||''}\">`:''}
+                <div class="p-5 space-y-3">
+                  <div class="flex items-center gap-2 flex-wrap">${(t.roles||[]).map(r=>`<span class='inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>${r}</span>`).join('')}</div>
+                  <h3 class="text-xl font-semibold">${t.name||''}</h3>
+                  ${t.motto?`<blockquote class="text-gray-800 dark:text-gray-100 text-base italic">${t.motto}</blockquote>`:''}
+                </div>
+              </article>`).join('')}
+          </div>
+        </section>`:''}
+        <section>
+          <h2 class="heading-section mb-6">${data.achievementsTitle||'成就經歷'}</h2>
+          <ul class="space-y-2 text-lg text-gray-700 dark:text-gray-300">
+            ${(Array.isArray(data.achievements)?data.achievements:[]).map(a=>{
+              if(typeof a==='string'){ return `<li>${a}</li>`; }
+              if(a && a.href){ return `<li><a class='link-cta outcard' href='${a.href}' target='_blank' rel='noopener'>${a.text||''} <span class='arrow'>→</span></a></li>`; }
+              const t=a && (a.text||a.title)||''; return `<li>${t}</li>`; }).join('')}
+          </ul>
+        </section>
+      </div>`;
+  }
+
+  function renderPreviewProvider(p){
+    const vp = pvwRoot(); if (!vp) return;
+    const cases = Array.isArray(p.cases)? p.cases : [];
+    const textOnly = cases.filter(c=> !(c && ((Array.isArray(c.images)&&c.images.length) || c.video)) );
+    const withMedia = cases.filter(c=> !textOnly.includes(c));
+    function mediaBlock(c){
+      if (Array.isArray(c.images) && c.images.length){
+        const src = resolveImage(c.images[0]);
+        return `<div class='rounded-lg overflow-hidden'><img src='${src}' alt='${c.title||''}' class='w-full h-56 object-cover'/></div>`;
+      }
+      if (c.video){ return `<div class='w-full aspect-video rounded-lg overflow-hidden bg-black text-white grid place-items-center'><span class='text-sm'>影片</span></div>`; }
+      return '';
+    }
+    vp.innerHTML = `
+      <div class="space-y-10">
+        <header>
+          <h1 class="text-3xl md:text-4xl font-bold">${p.name||''}</h1>
+          ${p.category?`<div class="mt-2 inline-block bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200 text-sm px-2 py-1 rounded">${p.category}</div>`:''}
+          ${p.description?`<p class="mt-4 text-gray-700 dark:text-gray-300">${p.description}</p>`:''}
+        </header>
+        <section class="grid md:grid-cols-3 gap-6">
+          <div class="p-6 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+            <div class="text-gray-500 text-sm">課程時間</div>
+            <div class="font-semibold mt-1">${p.schedule||'-'}</div>
+          </div>
+          <div class="p-6 rounded-lg bg-gray-50 dark:bg-gray-800 shadow md:col-span-2">
+            <div class="text-gray-500 text-sm">地點</div>
+            <div class="font-semibold mt-1">${[p.location||'', p.address||''].filter(Boolean).join(' ')||'-'}</div>
+          </div>
+        </section>
+        ${Array.isArray(p.timeline)&&p.timeline.length?`
+        <section>
+          <h2 class="text-2xl font-bold mb-4">課程安排（時間軸）</h2>
+          <div class="space-y-3">
+            ${p.timeline.map(t=>`<div><div class='text-sm text-gray-500'>${t.time||''}</div><div class='font-semibold'>${t.title||''}</div><div class='text-gray-600 dark:text-gray-300'>${t.detail||''}</div></div>`).join('')}
+          </div>
+        </section>`:''}
+        ${(withMedia.length||textOnly.length)?`
+        <section>
+          <h2 class="text-2xl font-bold mb-4">精選案例</h2>
+          ${withMedia.length?`<div class='grid sm:grid-cols-2 lg:grid-cols-3 gap-4'>${withMedia.map(c=>`<article class='p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow'>${mediaBlock(c)}<h3 class='mt-3 font-semibold'>${c.title||''}</h3>${c.summary?`<p class='text-gray-600 dark:text-gray-300 text-sm'>${c.summary}</p>`:''}</article>`).join('')}</div>`:''}
+          ${textOnly.length?`<ul class='mt-6 space-y-3'>${textOnly.map(c=>`<li class='p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow'><div class='font-semibold'>${c.title||''}</div>${c.summary?`<div class='text-gray-600 dark:text-gray-300'>${c.summary}</div>`:''}</li>`).join('')}</ul>`:''}
+        </section>`:''}
+      </div>`;
+  }
+
+  function renderLivePreview(){
+    const vp = pvwRoot(); if (!vp) return;
+    const sel = qs('#ds-select')?.value || 'about';
+    if (sel === 'site') {
+      const obj = collectSiteFromUI();
+      renderPreviewSite(obj);
+    } else if (sel === 'about') {
+      const obj = collectAboutFromUI();
+      renderPreviewAbout(obj);
+    } else if (sel === 'providers') {
+      const root = getEditorJSON();
+      const id = qs('#pv-prov-select')?.value;
+      if (!id) { vp.innerHTML = '<div class="text-gray-500">請先選擇業者</div>'; return; }
+      const base = root[id] || {};
+      const merged = { ...base, ...collectBasicFields() };
+      merged.timeline = collectTimeline();
+      merged.cases = collectCasesFromUI();
+      renderPreviewProvider(merged);
+    }
+  }
+
+  function bindPreviewLive(){
+    const deb = debounce(renderLivePreview, 120);
+    const panel = qs('#admin-panel');
+    panel?.addEventListener('input', (e)=>{ const t=e.target; if (t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT')) deb(); });
+    panel?.addEventListener('change', ()=> deb());
+    panel?.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button'); if (!btn) return;
+      // 結構變動（新增/刪除/排序）後也更新預覽
+      setTimeout(deb, 0);
+    });
+  }
+
+  // 綁定自訂下拉、連結 Modal、預覽控制（確保在 DOM 準備之後）
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ()=>{ bindDropdowns(); bindLinkModal(); bindPreviewControls(); bindPreviewLive(); try{ renderLivePreview(); }catch(e){} });
+  } else {
+    bindDropdowns(); bindLinkModal(); bindPreviewControls(); bindPreviewLive(); try{ renderLivePreview(); }catch(e){}
+  }
 })();

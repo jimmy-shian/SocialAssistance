@@ -49,7 +49,7 @@ function renderNavFooter() {
 
     // footer 統一元件（使用者提供之聯絡資訊）
     const footerHTML = `
-    <footer class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 mt-16 px-6 py-10">
+    <footer class="bg-gray-100 dark:bg-gray-300 text-gray-800 dark:text-gray-100 mt-16 px-6 py-10">
   <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-10">
     
     <!-- 左側品牌與聯絡資訊 -->
@@ -81,7 +81,7 @@ function renderNavFooter() {
         <!-- Facebook -->
         <a href="https://www.facebook.com/profile.php?id=61571413520720&locale=zh_TW" target="_blank" aria-label="Facebook">
           <img 
-            src="https://cdn.simpleicons.org/facebook/1877F2" 
+            src="https://cdn.simpleicons.org/facebook" 
             alt="Facebook"
             class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
           />
@@ -91,7 +91,7 @@ function renderNavFooter() {
         <!-- Instagram -->
         <a href="https://instagram.com/soundcore_2025/" target="_blank" aria-label="Instagram">
           <img 
-            src="https://cdn.simpleicons.org/instagram/E4405F" 
+            src="https://cdn.simpleicons.org/instagram" 
             alt="Instagram"
             class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
           />
@@ -100,7 +100,7 @@ function renderNavFooter() {
         <!-- Line -->
         <a href="https://lin.ee/1C3roAfA" target="_blank" aria-label="Line">
           <img 
-            src="https://cdn.simpleicons.org/line/00C300" 
+            src="https://cdn.simpleicons.org/line" 
             alt="Line"
             class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
           />
