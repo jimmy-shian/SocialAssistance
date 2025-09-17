@@ -86,33 +86,35 @@ function _handleSavePublish(e){
   var conf = _ghConf();
   var results = [];
   if (!conf.ok) {
-    // 未設定 GitHub，也視為成功，但附上 publish 錯誤資訊
     results = keys.map(function(k){ return { ok:false, key:String(k), message: 'GitHub 未設定：' + (conf.message || '缺少設定') }; });
     return _jsonOutput({ ok: true, update: updated, results: results, publishOk: false });
   }
   // 有 GitHub 設定：對 providers 的圖片占位（gas://image/<id>/<filename>）進行處理後再發佈
   for (var i=0;i<keys.length;i++){
-    var k = String(keys[i]);
     try {
-      var dsObj;
-      if (k === key && body && typeof body.data !== 'undefined') {
-        dsObj = body.data; // 直接用這次傳入的最新版
-      } else {
-        var ds = _getDataset(k); dsObj = ds.data;
-      }
+      var k = String(keys[i]);
+      var dsObj = _getDataset(k).data;
       var processed = _processImagesForPublish(conf, dsObj);
       // 發佈資料集（使用處理後的資料）
       var pub = _publishOneWithData(conf, k, processed.data);
-      // 發佈成功後清空暫存資料（datasets 表），以便下次預設為空
-      if (pub && pub.ok) {
-        try { _clearDataset(k); } catch(clearErr){}
+      // 組合結果：若有任一圖片失敗，視為此次發佈未完全成功
+      var result = pub || { ok:false, key:k, message:'unknown publish error' };
+      if (processed && processed.errors && processed.errors.length){
+        result.ok = false; // 強制標示為未完全成功
+        result.imageErrors = processed.errors;
+        result.imageReplaced = processed.replaced || 0;
+      } else {
+        result.imageReplaced = processed && processed.replaced || 0;
       }
-      results.push(pub);
+      // 完全成功：將處理後 JSON 回寫到 datasets，讓路徑從 gas:// 改成 img/
+      if (result && result.ok) {
+        try { _setDataset(k, processed.data); } catch(writeErr){}
+      }
+      results.push(result);
     } catch(err){ results.push({ ok:false, key:k, message:String(err) }); }
   }
   var publishOk = results.every(function(r){ return r && r.ok; });
   return _jsonOutput({ ok: true, update: updated, results: results, publishOk: publishOk });
-}
 // GET  ?action=data&key=<dataset-key>   -> { ok:true, key, version, data }
 // POST ?action=login    body: { username, password }       -> { ok:true, token, exp }
 // POST ?action=update   body: { token, key, data }          -> { ok:true, key, version }
@@ -302,7 +304,11 @@ function _ghConf(){
   return { ok:true, token: tok, owner: owner, repo: repo, branch: branch, prefix: prefix };
 }
 function _ghHeaders(tok){
-  return { 'Authorization': 'token ' + tok, 'Accept': 'application/vnd.github+json' };
+  return {
+    'Authorization': 'Bearer ' + tok,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
 }
 function _ghApi(path){ return 'https://api.github.com' + path; }
 function _ghGetContent(conf, filepath){
@@ -462,8 +468,16 @@ function _handlePublish(e){
       var ds = _getDataset(k);
       var processed = _processImagesForPublish(conf, ds.data);
       var r = _publishOneWithData(conf, k, processed.data);
-      if (r && r.ok) { try { _clearDataset(k); } catch(clearErr){} }
-      results.push(r);
+      var result = r || { ok:false, key:k, message:'unknown publish error' };
+      if (processed && processed.errors && processed.errors.length){
+        result.ok = false;
+        result.imageErrors = processed.errors;
+        result.imageReplaced = processed.replaced || 0;
+      } else {
+        result.imageReplaced = processed && processed.replaced || 0;
+      }
+      if (result && result.ok) { try { _setDataset(k, processed.data); } catch(writeErr){} }
+      results.push(result);
     } catch(err){ results.push({ ok:false, key: String(keys[i]), message: String(err) }); }
   }
   var ok = results.every(function(r){ return r && r.ok; });
@@ -795,6 +809,8 @@ function _handleUploadImage(e){
 function _processImagesForPublish(conf, obj){
   // 深拷貝
   var data = JSON.parse(JSON.stringify(obj || {}));
+  var errors = [];
+  var replaced = 0;
   // 走訪任何物件/陣列，將字串中的 gas://image/<id>/<filename> 轉為 repo 中的 img/ 路徑
   function walk(node){
     if (Array.isArray(node)){
@@ -810,7 +826,8 @@ function _processImagesForPublish(conf, obj){
       return node;
     }
     if (typeof node === 'string'){
-      var m = String(node||'').match(/^gas:\/\/image\/([A-Za-z0-9\-]+)\/(.+)$/);
+      var s = String(node||'').trim();
+      var m = s.match(/^gas:\/\/image\/([A-Za-z0-9\-]+)\/(.+)$/);
       if (m){
         var rec = _getImageById(m[1]);
         if (rec){
@@ -825,7 +842,11 @@ function _processImagesForPublish(conf, obj){
             var put = _ghPutBinary(conf, path, outBytes, 'feat(image): upload '+hashedName);
             if (put && put.ok){
               _markImageCommitted(rec.row, path, (put.data && put.data.content && put.data.content.sha) || '');
+              replaced++;
               return path;
+            } else {
+              try { Logger.log('Image upload failed for id %s: %s', rec.id||m[1], put && put.message); } catch(e){}
+              errors.push({ id: rec.id || m[1], filename: rec.filename, message: (put && put.message) || 'upload failed' });
             }
           }
         }
@@ -834,7 +855,7 @@ function _processImagesForPublish(conf, obj){
     return node;
   }
   data = walk(data);
-  return { data: data, files: [] };
+  return { data: data, files: [], errors: errors, replaced: replaced };
 }
 function _publishOneWithData(conf, key, dataObj){
   if (!ALLOWED_KEYS[key]) return { ok:false, key:key, message:'不允許的 key' };
