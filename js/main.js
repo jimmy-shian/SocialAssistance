@@ -351,3 +351,19 @@ document.addEventListener('nav-footer-rendered', bindFontSizeButton);
 
   window.addEventListener('pointerdown', onPointerDown, {passive:true});
 })();
+
+// ==============================
+// Service Worker: cache images/js data for 7 days
+// ==============================
+(function(){
+  if ('serviceWorker' in navigator) {
+    const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (isSecure) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch((err)=>{
+          console.warn('SW register failed:', err);
+        });
+      });
+    }
+  }
+})();

@@ -100,7 +100,7 @@ function _handleSavePublish(e){
       } else {
         var ds = _getDataset(k); dsObj = ds.data;
       }
-      var processed = (k === 'providers') ? _processImagesForPublish(conf, dsObj) : { data: dsObj, files: [] };
+      var processed = _processImagesForPublish(conf, dsObj);
       // 發佈資料集（使用處理後的資料）
       var pub = _publishOneWithData(conf, k, processed.data);
       // 發佈成功後清空暫存資料（datasets 表），以便下次預設為空
@@ -459,7 +459,9 @@ function _handlePublish(e){
   for (var i=0;i<keys.length;i++){
     try {
       var k = String(keys[i]);
-      var r = _publishOne(conf, k);
+      var ds = _getDataset(k);
+      var processed = _processImagesForPublish(conf, ds.data);
+      var r = _publishOneWithData(conf, k, processed.data);
       if (r && r.ok) { try { _clearDataset(k); } catch(clearErr){} }
       results.push(r);
     } catch(err){ results.push({ ok:false, key: String(keys[i]), message: String(err) }); }
@@ -720,6 +722,44 @@ function _uniqueImagePath(conf, filename){
   }
   return path;
 }
+
+// 以位元組計算十六進位摘要（預設 MD5），用於檔名指紋
+function _hexDigest(bytes, algo){
+  var raw = Utilities.computeDigest(algo || Utilities.DigestAlgorithm.MD5, bytes);
+  var s = '';
+  for (var i=0;i<raw.length;i++){ s += ('0' + (raw[i] & 0xFF).toString(16)).slice(-2); }
+  return s;
+}
+function _nameWithHash(original, ext, bytes){
+  var parts = String(original||'').split('.');
+  if (parts.length>1) parts.pop();
+  var stem = parts.join('.') || 'img_' + Date.now();
+  var hash = _hexDigest(bytes, Utilities.DigestAlgorithm.MD5).slice(0,10);
+  return stem + '_' + hash + '.' + (ext||'jpg');
+}
+
+// 將影像等比例縮到最長邊不超過 maxPx，並轉成 JPEG，回傳 bytes
+function _shrinkToJpegBytes(inBytes, mime, maxPx){
+  try {
+    var blob = Utilities.newBlob(inBytes, mime || 'application/octet-stream', 'in');
+    var img = ImagesService.open(blob);
+    var w = img.getWidth(); var h = img.getHeight();
+    var maxSide = Math.max(w, h);
+    if (maxSide > (maxPx||1600)){
+      var scale = (maxPx||1600) / maxSide;
+      var nw = Math.max(1, Math.round(w*scale));
+      var nh = Math.max(1, Math.round(h*scale));
+      img = img.resize(nw, nh);
+    }
+    var outBlob = img.getBlob().setContentType('image/jpeg');
+    return outBlob.getBytes();
+  } catch(err){
+    // 後備：僅轉檔
+    var b = Utilities.newBlob(inBytes, mime || 'application/octet-stream', 'in');
+    try { b = b.getAs('image/jpeg'); } catch(e) {}
+    return b.getBytes();
+  }
+}
 function _ghPutBinary(conf, filepath, bytes, message, prevSha){
   var url = _ghApi('/repos/' + conf.owner + '/' + conf.repo + '/contents/' + encodeURI(filepath));
   var payload = {
@@ -755,35 +795,45 @@ function _handleUploadImage(e){
 function _processImagesForPublish(conf, obj){
   // 深拷貝
   var data = JSON.parse(JSON.stringify(obj || {}));
-  function replaceInProvider(p){
-    // cases[].images
-    if (Array.isArray(p.cases)){
-      for (var i=0;i<p.cases.length;i++){
-        var c = p.cases[i];
-        if (Array.isArray(c.images)){
-          for (var j=0;j<c.images.length;j++){
-            var url = String(c.images[j]||'');
-            var m = url.match(/^gas:\/\/image\/([A-Za-z0-9\-]+)\/(.+)$/);
-            if (m){
-              var img = _getImageById(m[1]);
-              if (img && img.base64){
-                var bytes = Utilities.base64Decode(img.base64);
-                var path = _uniqueImagePath(conf, img.filename);
-                var put = _ghPutBinary(conf, path, bytes, 'feat(image): upload '+img.filename);
-                if (put && put.ok){
-                  c.images[j] = path; _markImageCommitted(img.row, path, (put.data && put.data.content && put.data.content.sha) || '');
-                }
-              }
+  // 走訪任何物件/陣列，將字串中的 gas://image/<id>/<filename> 轉為 repo 中的 img/ 路徑
+  function walk(node){
+    if (Array.isArray(node)){
+      for (var i=0;i<node.length;i++){ node[i] = walk(node[i]); }
+      return node;
+    }
+    if (node && typeof node === 'object'){
+      var keys = Object.keys(node);
+      for (var k=0;k<keys.length;k++){
+        var key = keys[k];
+        node[key] = walk(node[key]);
+      }
+      return node;
+    }
+    if (typeof node === 'string'){
+      var m = String(node||'').match(/^gas:\/\/image\/([A-Za-z0-9\-]+)\/(.+)$/);
+      if (m){
+        var rec = _getImageById(m[1]);
+        if (rec){
+          // 若已提交過，直接重用路徑；否則提交
+          if (rec.committed && rec.path){ return rec.path; }
+          if (rec.base64){
+            var bytes = Utilities.base64Decode(rec.base64);
+            // 縮圖並轉為 JPEG
+            var outBytes = _shrinkToJpegBytes(bytes, rec.mimetype, 1600);
+            var hashedName = _nameWithHash(rec.filename || 'image', 'jpg', outBytes);
+            var path = _uniqueImagePath(conf, hashedName);
+            var put = _ghPutBinary(conf, path, outBytes, 'feat(image): upload '+hashedName);
+            if (put && put.ok){
+              _markImageCommitted(rec.row, path, (put.data && put.data.content && put.data.content.sha) || '');
+              return path;
             }
           }
         }
       }
     }
-    return p;
+    return node;
   }
-  if (data && typeof data === 'object'){
-    Object.keys(data).forEach(function(id){ data[id] = replaceInProvider(data[id]||{}); });
-  }
+  data = walk(data);
   return { data: data, files: [] };
 }
 function _publishOneWithData(conf, key, dataObj){
