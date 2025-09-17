@@ -115,6 +115,7 @@ function _handleSavePublish(e){
   }
   var publishOk = results.every(function(r){ return r && r.ok; });
   return _jsonOutput({ ok: true, update: updated, results: results, publishOk: publishOk });
+}
 // GET  ?action=data&key=<dataset-key>   -> { ok:true, key, version, data }
 // POST ?action=login    body: { username, password }       -> { ok:true, token, exp }
 // POST ?action=update   body: { token, key, data }          -> { ok:true, key, version }
@@ -755,25 +756,36 @@ function _nameWithHash(original, ext, bytes){
 // 將影像等比例縮到最長邊不超過 maxPx，並轉成 JPEG，回傳 bytes
 function _shrinkToJpegBytes(inBytes, mime, maxPx){
   try {
-    var blob = Utilities.newBlob(inBytes, mime || 'application/octet-stream', 'in');
-    var img = ImagesService.open(blob);
-    var w = img.getWidth(); var h = img.getHeight();
-    var maxSide = Math.max(w, h);
-    if (maxSide > (maxPx||1600)){
-      var scale = (maxPx||1600) / maxSide;
-      var nw = Math.max(1, Math.round(w*scale));
-      var nh = Math.max(1, Math.round(h*scale));
-      img = img.resize(nw, nh);
+    const blob = Utilities.newBlob(inBytes, mime || 'application/octet-stream', 'in');
+
+    // 嘗試用 ImagesService 處理（有支援才進行 resize）
+    try {
+      const img = ImagesService.open(blob);
+      let w = img.getWidth(), h = img.getHeight();
+      const maxSide = Math.max(w, h);
+      if (maxSide > (maxPx || 1600)) {
+        const scale = (maxPx || 1600) / maxSide;
+        const nw = Math.max(1, Math.round(w * scale));
+        const nh = Math.max(1, Math.round(h * scale));
+        img = img.resize(nw, nh);
+      }
+      const outBlob = img.getBlob().setContentType('image/jpeg');
+      return outBlob.getBytes();
+    } catch (resizeErr) {
+      // fallback：僅轉檔
+      try {
+        const jpegBlob = blob.getAs('image/jpeg');
+        if (!jpegBlob) throw new Error('轉換失敗');
+        return jpegBlob.getBytes();
+      } catch(fallbackErr) {
+        throw new Error('圖片無法轉為 JPEG，可能格式錯誤或已損毀');
+      }
     }
-    var outBlob = img.getBlob().setContentType('image/jpeg');
-    return outBlob.getBytes();
-  } catch(err){
-    // 後備：僅轉檔
-    var b = Utilities.newBlob(inBytes, mime || 'application/octet-stream', 'in');
-    try { b = b.getAs('image/jpeg'); } catch(e) {}
-    return b.getBytes();
+  } catch (err) {
+    throw new Error('處理圖片失敗：' + err.message);
   }
 }
+
 function _ghPutBinary(conf, filepath, bytes, message, prevSha){
   var url = _ghApi('/repos/' + conf.owner + '/' + conf.repo + '/contents/' + encodeURI(filepath));
   var payload = {
