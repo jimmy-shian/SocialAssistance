@@ -849,9 +849,22 @@ function _processImagesForPublish(conf, obj){
           if (rec.committed && rec.path){ return rec.path; }
           if (rec.base64){
             var bytes = Utilities.base64Decode(rec.base64);
-            // 縮圖並轉為 JPEG
-            var outBytes = _shrinkToJpegBytes(bytes, rec.mimetype, 1600);
-            var hashedName = _nameWithHash(rec.filename || 'image', 'jpg', outBytes);
+            // 不轉檔：依檔名或 mimetype 判斷副檔名，直接上傳原始位元組
+            var ext = (function(fn, mt){
+              try {
+                var parts = String(fn||'').split('.');
+                if (parts.length>1) { return (parts.pop()||'').toLowerCase(); }
+              } catch(e){}
+              mt = String(mt||'').toLowerCase();
+              if (mt==='image/jpeg' || mt==='image/jpg') return 'jpg';
+              if (mt==='image/png') return 'png';
+              if (mt==='image/webp') return 'webp';
+              if (mt==='image/gif') return 'gif';
+              if (mt==='image/svg+xml') return 'svg';
+              return 'jpg';
+            })(rec.filename, rec.mimetype);
+            var outBytes = bytes;
+            var hashedName = _nameWithHash(rec.filename || 'image', ext, outBytes);
             var path = _uniqueImagePath(conf, hashedName);
             var put = _ghPutBinary(conf, path, outBytes, 'feat(image): upload '+hashedName);
             if (put && put.ok){

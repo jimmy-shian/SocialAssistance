@@ -1003,8 +1003,32 @@
         // 退回為僅儲存（無 GitHub）
         try { res = await window.DataAPI.update(key, payload); } catch(err){}
       }
-      if (st) st.textContent = (res && res.ok) ? '已完成（儲存' + (res.update?'+同步':'') + '）' : ('失敗：' + (res && res.message || '未知錯誤'));
-      if (window.Toast) Toast.show((res && res.ok) ? '已完成儲存' + ((res && res.publishOk===false)?'（發佈未完成）':'') : ('儲存/發佈失敗：' + (res && res.message || '未知錯誤')), (res && res.ok) ? ((res.publishOk===false)?'warning':'success') : 'error', 3500);
+      // 判斷發佈是否失敗（即便存檔成功）
+      const hasPublishErrors = !!(res && Array.isArray(res.results) && res.results.some(r=>!r || r.ok===false));
+      const firstErr = hasPublishErrors ? (res.results.find(r=>!r || r.ok===false) || {}) : null;
+      // 調整狀態文字與樣式
+      if (st) {
+        st.classList.remove('text-rose-600','dark:text-rose-400','font-semibold');
+        if (res && res.ok && !hasPublishErrors) {
+          st.textContent = '已完成（儲存' + (res.update?'+同步':'') + '）';
+        } else if (res && res.ok && hasPublishErrors) {
+          const msg = (firstErr && (firstErr.message || firstErr.key)) || '發佈失敗';
+          st.textContent = '已儲存，但發佈失敗：' + msg;
+          st.classList.add('text-rose-600','dark:text-rose-400','font-semibold');
+        } else {
+          st.textContent = '失敗：' + ((res && res.message) || '未知錯誤');
+          st.classList.add('text-rose-600','dark:text-rose-400','font-semibold');
+        }
+      }
+      if (window.Toast) {
+        if (res && res.ok && !hasPublishErrors) {
+          Toast.show('已完成儲存' + (res.update? '（含同步）':'') , 'success', 3500);
+        } else if (res && res.ok && hasPublishErrors) {
+          Toast.show('已儲存，但發佈未完成', 'warning', 3500);
+        } else {
+          Toast.show('儲存/發佈失敗：' + ((res && res.message) || '未知錯誤'), 'error', 3500);
+        }
+      }
       updateVersionLabel();
     } catch(e){ if (st) st.textContent = '錯誤：' + e.message; if (window.Toast) Toast.show('儲存錯誤：' + e.message, 'error', 3000); }
     finally { setBtnLoading(qs('#btn-save-publish'), false); }
