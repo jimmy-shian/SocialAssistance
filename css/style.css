@@ -1,7 +1,25 @@
 /* Global baseline styles and smooth transitions */
 html { color-scheme: light dark; }
 html, body { transition: background-color 0.2s ease, color 0.2s ease; }
-body { font-family: sans-serif; margin: 0; }
+/* Local fonts */
+@font-face {
+  font-family: 'SourceHanSerifTC';
+  src: url('../assets/font/SourceHanSerifTC-VF.otf') format('opentype');
+  font-weight: 1 999;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'ChenYuluoyan';
+  src: url('../assets/font/ChenYuluoyan-2.0-Thin.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+body {
+  font-family: 'SourceHanSerifTC', 'Noto Serif TC', 'Noto Sans TC', 'Microsoft JhengHei', PingFangTC, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, serif;
+  margin: 0;
+}
 
 /* Improve interaction feedback */
 a, button, input, select, textarea {
@@ -345,6 +363,14 @@ input:focus, select:focus, textarea:focus {
   transform: translateY(-1px);
 }
 
+/* Admin｜動態補上的欄位小標題 */
+.field-caption {
+  font-size: 12px;
+  color: #6b7280; /* gray-500 */
+  margin: 2px 0 4px 2px;
+}
+.dark .field-caption { color: #9ca3af; /* gray-400 */ }
+
 /* Do not nudge password input that has a toggle button to avoid overlap */
 .has-toggle:focus { transform: none; }
 
@@ -368,10 +394,16 @@ input:focus, select:focus, textarea:focus {
   border: 1px solid rgba(167,139,250,.25);
   overflow: auto;
 }
-.dark .intro-card .collapse-content { background-color: rgba(17,24,39,.95); border-color: rgba(167,139,250,.25); }
+.dark .intro-imgwrap .collapse-content { background-color: rgba(17,24,39,.95); border-color: rgba(167,139,250,.25); }
 .intro-card.is-open { border-top-color: #a78bfa; /* purple-400 */ }
 .intro-card.is-open { z-index: 50; }
 .intro-card.is-open .collapse-content { opacity: 1; visibility: visible; transform: scale(1); transition-delay: 0s; pointer-events: auto; }
+
+/* Admin Live Preview｜強制展開 hover 內容（預覽時就直接看到） */
+#live-preview-viewport .intro-row .collapse-content { max-height: 1200px; opacity: 1; }
+#live-preview-viewport .intro-card .collapse-content { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; pointer-events: auto; }
+#live-preview-viewport .team-card .details { max-height: 480px; opacity: 1; }
+#live-preview-viewport .team-card .motto { opacity: 0; max-height: 0; margin: 0; }
 
 /* ==============================
    首頁｜地區跑馬燈輕微動效
@@ -636,15 +668,33 @@ input:focus, select:focus, textarea:focus {
 .tm-photo-preview,
 .sc-intro-preview,
 .sc-svc-preview {
-  min-height: 3.5rem; /* ~h-14 */
+  min-height: 12rem; /* 預設高度較大，避免看起來過矮 */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  transition: height .22s ease; /* JS 計算高度時平滑過度 */
 }
 @media (min-width: 768px) {
   .tm-photo-preview,
   .sc-intro-preview,
-  .sc-svc-preview { min-height: 4rem; /* ~h-16 */ }
+  .sc-svc-preview { min-height: 14rem; }
+}
+
+/* Admin｜英雄圖預覽高度與過度 */
+#sc-hero-preview { min-height: 14rem; transition: height .22s ease; }
+
+/* Admin｜預覽面板顯示/隱藏動畫（配合 JS 的 hidden/open 切換） */
+#preview-panel { opacity: 0; transform: translateY(-8px); transition: opacity .22s ease, transform .22s ease; }
+#preview-panel.open { opacity: 1; transform: none; }
+
+/* Admin｜開啟預覽時隱藏編輯區塊（平滑） */
+#admin-panel.preview-edit-hidden .admin-collapsible {
+  opacity: 0;
+  transform: translateY(8px);
+  max-height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease, max-height .22s ease;
 }
 
 /* ==============================
@@ -738,6 +788,11 @@ input:focus, select:focus, textarea:focus {
 .dark .hero-band { background: rgba(17,24,39,.72); border-color: rgba(255,255,255,.08); }
 .hero-title { font-weight: 800; letter-spacing: .02em; font-size: clamp(28px, 5vw, 52px); line-height: 1.2; margin: 0; }
 .hero-subtitle { margin-top: .35rem; font-weight: 500; font-size: clamp(16px, 2.5vw, 22px); line-height: 1.7; }
+
+/* Index｜Hero 特別字體 */
+#hero-title, #hero-subtitle {
+  font-family: 'ChenYuluoyan', 'SourceHanSerifTC', 'Noto Serif TC', 'Noto Sans TC', 'Microsoft JhengHei', PingFangTC, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, serif;
+}
 
 /* ==============================
    Admin｜圖片上傳遮罩/動畫

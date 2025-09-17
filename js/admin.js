@@ -87,6 +87,62 @@
     return (tmp.textContent || '').replace(/\u00A0/g,' ').replace(/\n+$/,'').trim();
   }
 
+  // Helper: 根據原圖比例計算預覽高度（約為原圖在目前寬度下高度的 70%）
+  function setPreviewHeightFromImage(pv, url, factor){
+    try {
+      if (!pv || !url) return;
+      factor = factor || 0.7;
+      const img = new Image();
+      img.onload = function(){
+        const ar = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 0.5625;
+        pv.dataset.ar = String(ar);
+        const w = pv.clientWidth || pv.offsetWidth || 300;
+        pv.style.height = Math.round(w * ar * factor) + 'px';
+      };
+      img.onerror = function(){ pv.style.height = ''; pv.style.minHeight = '12rem'; };
+      img.src = url;
+    } catch(e){}
+  }
+  function recalcPreviewHeights(){
+    try {
+      const boxes = document.querySelectorAll('.tm-photo-preview,.sc-intro-preview,.sc-svc-preview,#sc-hero-preview,.sc-story-cell');
+      boxes.forEach(pv=>{
+        const ar = parseFloat(pv.dataset.ar||'');
+        if (!isFinite(ar) || !ar) return;
+        const w = pv.clientWidth || pv.offsetWidth || 300;
+        pv.style.height = Math.round(w * ar * 0.7) + 'px';
+      });
+    } catch(e){}
+  }
+  window.addEventListener('resize', ()=>{ try{ recalcPreviewHeights(); }catch(e){} });
+
+  // Admin｜自動為未包在 <label> 的欄位生成小標題（以 placeholder 或 aria-label 為文案）
+  function ensureFieldCaptions(root){
+    try {
+      const panel = qs('#admin-panel'); if (!panel) return;
+      const scope = root || panel;
+      const nodes = scope.querySelectorAll('input, textarea, select');
+      nodes.forEach(el => {
+        if (!(el instanceof HTMLElement)) return;
+        const tag = el.tagName.toLowerCase();
+        if (tag === 'input') {
+          const t = (el.getAttribute('type')||'text').toLowerCase();
+          if (t === 'hidden' || t === 'file' || t === 'checkbox' || t === 'radio') return;
+        }
+        if (el.classList.contains('sr-only')) return;
+        if (el.closest('label')) return; // 已有標籤
+        // 避免重複插入
+        const prev = el.previousElementSibling;
+        if (prev && prev.classList && prev.classList.contains('field-caption')) return;
+        const txt = el.getAttribute('aria-label') || el.getAttribute('placeholder') || el.getAttribute('name') || el.id || '輸入內容';
+        const cap = document.createElement('div');
+        cap.className = 'field-caption';
+        cap.textContent = txt;
+        el.parentNode && el.parentNode.insertBefore(cap, el);
+      });
+    } catch(e){}
+  }
+
   // 預覽：首頁英雄圖（site.index.heroImage）
   function updateHeroPreview(){
     const pv = qs('#sc-hero-preview'); const input = qs('#sc-hero-image'); if (!pv || !input) return;
@@ -96,6 +152,7 @@
     if (/^gas:\/\/image\//.test(val)) { const p = previewCache[val]; if (p) url = p; }
     pv.style.backgroundImage = `url('${url}')`;
     pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+    setPreviewHeightFromImage(pv, url, 0.7);
   }
 
   // ===== Site：Story 多圖預覽與上傳 =====
@@ -108,7 +165,7 @@
     imgs.forEach((url,i)=>{
       const isGas = /^gas:\/\/image\//.test(url); const preview = isGas ? previewCache[url] : null;
       const cell = document.createElement('div');
-      cell.className = 'sc-story-cell drag-transition relative h-24 md:h-28 rounded overflow-hidden border border-gray-300 dark:border-gray-700 cursor-move';
+      cell.className = 'sc-story-cell drag-transition relative h-40 md:h-52 rounded overflow-hidden border border-gray-300 dark:border-gray-700 cursor-move';
       cell.draggable = true;
       cell.dataset.index = String(i);
       cell.innerHTML = preview
@@ -125,6 +182,9 @@
         <button type="button" class="sc-story-del bg-rose-600 hover:bg-rose-700 text-white rounded px-1 text-xs">×</button>`;
       cell.appendChild(ctrls);
       list.appendChild(cell);
+      // 動態依原圖比例設定高度（約 70%）
+      const calcSrc = preview || url;
+      if (calcSrc) setPreviewHeightFromImage(cell, calcSrc, 0.7);
     });
   }
 
@@ -137,6 +197,7 @@
       if (!val){ pv.style.backgroundImage='none'; pv.textContent='尚未選擇'; return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
       pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      setPreviewHeightFromImage(pv, url, 0.7);
     } catch(e){}
   }
 
@@ -149,6 +210,7 @@
       if (!val){ pv.style.backgroundImage='none'; pv.textContent='尚未選擇'; return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
       pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      setPreviewHeightFromImage(pv, url, 0.7);
     } catch(e){}
   }
   function updateServicePreview(item){
@@ -159,6 +221,7 @@
       if (!val){ pv.style.backgroundImage='none'; pv.textContent='尚未選擇'; return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
       pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      setPreviewHeightFromImage(pv, url, 0.7);
     } catch(e){}
   }
 
@@ -269,6 +332,11 @@
     if (logged) { try { const tip = qs('#admin-header-tip'); if (tip) tip.textContent = '已登入：請從上方資料集下拉選單選擇 About / Providers / Site Content 並開始編輯。'; } catch(e){} }
 
     updateVersionLabel();
+    // 若已登入且是直接刷新頁面，主動載入並渲染目前所選資料集
+    if (logged) {
+      try { toggleSections(); } catch(e){}
+      try { await loadDatasetAndRender(); } catch(e){}
+    }
 
     const admUsr = qs('#adm-usr');
     const admPwd = qs('#adm-pwd');
@@ -1030,6 +1098,7 @@
         }
       }
       updateVersionLabel();
+      
     } catch(e){ if (st) st.textContent = '錯誤：' + e.message; if (window.Toast) Toast.show('儲存錯誤：' + e.message, 'error', 3000); }
     finally { setBtnLoading(qs('#btn-save-publish'), false); }
   }
@@ -1191,8 +1260,8 @@
         <div class="ab-team-socials flex flex-col gap-2">
           ${Array.isArray(row.socials) ? row.socials.map((s,i)=>`
             <div class="ab-social-row flex flex-wrap gap-2 items-center min-w-0" data-index="${i}">
-              <input class="ab-social-name flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱 (Facebook/Instagram/Line/Threads/YouTube)" value="${s.name||''}">
-              <input class="ab-social-href flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結 https://..." value="${s.href||''}">
+              <input class="ab-social-name flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱 (Facebook/Instagram/Line/Threads/YouTube)" value="${s.name||''}">
+              <input class="ab-social-href flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結 https://..." value="${s.href||''}">
               <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0">上移</button>
               <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0">下移</button>
               <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0">複製</button>
@@ -1287,8 +1356,8 @@
       const node = document.createElement('div');
       node.className = 'ab-social-row flex flex-wrap gap-2 items-center min-w-0';
       node.innerHTML = `
-        <input class="ab-social-name flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱">
-        <input class="ab-social-href flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結">
+        <input class="ab-social-name flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱">
+        <input class="ab-social-href flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結">
         <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0">上移</button>
         <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0">下移</button>
         <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0">複製</button>
@@ -1609,6 +1678,15 @@
 
   // 初次進入頁面時依下拉狀態顯示/隱藏
   toggleSections();
+  // 首次與後續 DOM 變動時補齊欄位小標題
+  try {
+    const panelRoot = qs('#admin-panel');
+    if (panelRoot) {
+      ensureFieldCaptions(panelRoot);
+      const mo = new MutationObserver(() => { ensureFieldCaptions(panelRoot); });
+      mo.observe(panelRoot, { childList: true, subtree: true });
+    }
+  } catch(e){}
 
   // ===== 自訂下拉（資料集與 Provider）與插入連結 Modal =====
   function updateDsButtonLabelFromSelect(){
@@ -1751,11 +1829,34 @@
     const tgl = qs('#btn-toggle-preview');
     const panel = qs('#preview-panel');
     if (tgl && panel) {
+      const adminPanel = qs('#admin-panel');
+      function openPanel(){
+        panel.classList.remove('hidden');
+        void panel.offsetHeight;
+        panel.classList.add('open');
+        // 隱藏編輯區（含 About/Providers/Site 視覺化）
+        if (adminPanel) adminPanel.classList.add('preview-edit-hidden');
+      }
+      function closePanel(){
+        panel.classList.remove('open');
+        const onEnd=(e)=>{ if(e.target===panel){ panel.classList.add('hidden'); panel.removeEventListener('transitionend', onEnd);} };
+        panel.addEventListener('transitionend', onEnd);
+        setTimeout(()=>{ panel.removeEventListener('transitionend', onEnd); panel.classList.add('hidden'); }, 260);
+        // 顯示編輯區
+        if (adminPanel) adminPanel.classList.remove('preview-edit-hidden');
+      }
       tgl.addEventListener('click', ()=>{
-        const isHidden = panel.classList.contains('hidden');
-        show(panel, isHidden);
-        tgl.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
-        if (isHidden) { try { renderLivePreview(); } catch(e){} }
+        const willOpen = panel.classList.contains('hidden') || !panel.classList.contains('open');
+        if (willOpen) {
+          openPanel();
+          tgl.textContent = '編結內容';
+          tgl.setAttribute('aria-pressed','true');
+          try { renderLivePreview(); } catch(e){}
+        } else {
+          closePanel();
+          tgl.textContent = '預覽';
+          tgl.setAttribute('aria-pressed','false');
+        }
       });
     }
 

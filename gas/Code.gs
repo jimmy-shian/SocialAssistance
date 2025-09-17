@@ -110,6 +110,10 @@ function _handleSavePublish(e){
       if (result && result.ok) {
         try { _setDataset(k, processed.data); } catch(writeErr){}
       }
+      // 發佈成功後清空暫存資料（datasets 表），以便下次預設為空
+      if (pub && pub.ok) {
+        try { _clearDataset(k); } catch(clearErr){}
+      }
       results.push(result);
     } catch(err){ results.push({ ok:false, key:k, message:String(err) }); }
   }
