@@ -754,35 +754,37 @@ function _nameWithHash(original, ext, bytes){
 }
 
 // 將影像等比例縮到最長邊不超過 maxPx，並轉成 JPEG，回傳 bytes
-function _shrinkToJpegBytes(inBytes, mime, maxPx){
-  try {
-    const blob = Utilities.newBlob(inBytes, mime || 'application/octet-stream', 'in');
+function _shrinkToJpegBytes(inBytes, mime, maxPx) {
+  // 建立原始 blob
+  const blob = Utilities.newBlob(inBytes, mime || 'application/octet-stream', 'upload.png');
 
-    // 嘗試用 ImagesService 處理（有支援才進行 resize）
-    try {
-      const img = ImagesService.open(blob);
-      let w = img.getWidth(), h = img.getHeight();
-      const maxSide = Math.max(w, h);
-      if (maxSide > (maxPx || 1600)) {
-        const scale = (maxPx || 1600) / maxSide;
-        const nw = Math.max(1, Math.round(w * scale));
-        const nh = Math.max(1, Math.round(h * scale));
-        img = img.resize(nw, nh);
-      }
-      const outBlob = img.getBlob().setContentType('image/jpeg');
-      return outBlob.getBytes();
-    } catch (resizeErr) {
-      // fallback：僅轉檔
-      try {
-        const jpegBlob = blob.getAs('image/jpeg');
-        if (!jpegBlob) throw new Error('轉換失敗');
-        return jpegBlob.getBytes();
-      } catch(fallbackErr) {
-        throw new Error('圖片無法轉為 JPEG，可能格式錯誤或已損毀');
-      }
-    }
-  } catch (err) {
-    throw new Error('處理圖片失敗：' + err.message);
+  // 用 Drive 建立臨時檔案
+  const file = DriveApp.createFile(blob);
+
+  // 嘗試轉換為 JPEG
+  let jpegBlob;
+  try {
+    jpegBlob = file.getBlob().getAs('image/jpeg');
+  } catch (e) {
+    file.setTrashed(true); // 清除
+    throw new Error('無法將圖片轉為 JPEG，可能格式不支援');
+  }
+
+  // 刪除臨時檔
+  file.setTrashed(true);
+
+  // 對圖片大小進行壓縮
+  const img = ImagesService.open(jpegBlob);
+  let w = img.getWidth(), h = img.getHeight();
+  const maxSide = Math.max(w, h);
+  if (maxSide > (maxPx || 1600)) {
+    const scale = (maxPx || 1600) / maxSide;
+    const nw = Math.max(1, Math.round(w * scale));
+    const nh = Math.max(1, Math.round(h * scale));
+    const resized = img.resize(nw, nh);
+    return resized.getBlob().getBytes();
+  } else {
+    return jpegBlob.getBytes();
   }
 }
 
