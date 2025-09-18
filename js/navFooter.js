@@ -221,7 +221,10 @@ function renderNavFooter() {
             } else if (page === 'admin.html') {
               // 後台需要以本地 js/data 為來源（非 GAS），因此一併載入三個資料檔
               perPage.push('./js/data/aboutContent.js', './js/data/siteContent.js', './js/auth.js', './js/admin.js');
-            } else if (page === 'member-admin.html') {
+            } else if (page === 'member-profile.html'){
+              perPage.push('./js/member-profile.js', './js/auth.js', './js/member-data.js');
+            }
+             else if (page === 'member-admin.html') {
               perPage.push('./js/auth.js', './js/member-admin.js');
             }
 
@@ -233,13 +236,15 @@ function renderNavFooter() {
               (footerPlaceholder || document.body).appendChild(bundle);
             }
 
+            function resolveAbs(u){ try { return new URL(u, document.baseURI).href; } catch { return u; } }
             function addScriptOnce(src) {
-              const already = [...document.scripts].some(s => {
-                const cur = s.src || '';
-                return cur === src || cur.endsWith(src) || cur.includes(src.replace('https://','').replace('http://',''));
+              const target = resolveAbs(src);
+              const already = Array.from(document.scripts).some(s => {
+                const cur = s.src ? resolveAbs(s.src) : '';
+                return cur === target;
               });
               if (already) return Promise.resolve();
-              return new Promise((resolve, reject) => {
+              return new Promise((resolve) => {
                 const s = document.createElement('script');
                 s.src = src; s.defer = false; s.async = false;
                 s.onload = () => resolve();

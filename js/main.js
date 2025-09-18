@@ -75,7 +75,9 @@ document.addEventListener('nav-footer-rendered', () => {
 });
 
 // Font size switcher logic (rotary knob)
-const root = document.documentElement;
+// Use var to avoid redeclaration error if the script is loaded twice accidentally.
+var root = window.__sc_root__ || document.documentElement;
+window.__sc_root__ = root;
 
 const applyFontSize = (size) => {
     root.classList.remove('text-sm', 'text-base', 'text-lg');

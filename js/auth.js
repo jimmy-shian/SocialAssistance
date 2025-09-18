@@ -76,9 +76,21 @@
           headers: { 'Content-Type': 'text/plain' },
           body: JSON.stringify({ username, password })
         });
-        if (!resp.ok) return { ok: false, message: '登入失敗，請確認帳密' };
-        const data = await resp.json();
-        if (!data || !data.token) return { ok: false, message: '登入失敗：缺少 token' };
+        let data = null;
+        try { data = await resp.json(); } catch {}
+        if (!resp.ok) {
+          const msg = (data && (data.message || data.error)) || '帳號或密碼錯誤';
+          return { ok: false, message: msg };
+        }
+        // 後端可能以 200 回傳但 ok:false 或未帶 token，優先顯示後端訊息
+        if (data && data.ok === false) {
+          const msg = data.message || '帳號或密碼錯誤';
+          return { ok: false, message: msg };
+        }
+        if (!data || !data.token) {
+          const msg = (data && (data.message || data.error)) || '帳號或密碼錯誤';
+          return { ok: false, message: msg };
+        }
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('auth_user', username);
         if (data.role) localStorage.setItem('auth_role', data.role); else localStorage.setItem('auth_role', localStorage.getItem('auth_role') || 'member');
