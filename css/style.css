@@ -22,7 +22,7 @@ body {
 }
 
 /* Improve interaction feedback */
-a, button, input, select, textarea {
+a, button, input, select, textarea, button:hover {
   transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
@@ -786,8 +786,8 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 8px 24px rgba(0,0,0,.12);
 }
 .dark .hero-band { background: rgba(17,24,39,.72); border-color: rgba(255,255,255,.08); }
-.hero-title { font-weight: 800; letter-spacing: .02em; font-size: clamp(28px, 5vw, 52px); line-height: 1.2; margin: 0; }
-.hero-subtitle { margin-top: .35rem; font-weight: 500; font-size: clamp(16px, 2.5vw, 22px); line-height: 1.7; }
+.hero-title { font-weight: 800; letter-spacing: .02em; font-size: clamp(36px, 5vw, 52px); line-height: 1.2; margin: 0; }
+.hero-subtitle { margin-top: .35rem; font-weight: 500; font-size: clamp(24px, 2.5vw, 36px); line-height: 1.7; }
 
 /* Index｜Hero 特別字體 */
 #hero-title, #hero-subtitle {

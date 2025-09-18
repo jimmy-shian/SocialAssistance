@@ -28,18 +28,27 @@
     return { score, label, color, max, rules: { length8, length12, mixcase, digit, symbol } };
   }
 
-  async function register(username, email, password) {
+  async function register(username, email, password, options) {
     if (!username || !email || !password) return { ok: false, message: '請完整填寫資料' };
     const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
     if (base) {
       try {
         const ep = (AppConfig.endpoints && AppConfig.endpoints.memberRegister) || '/memberRegister';
-        const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ username, email, password }) });
+        const payload = { username, email, password };
+        if (options && (options.isAdmin || options.adminCode)) {
+          if (typeof options.isAdmin !== 'undefined') payload.isAdmin = !!options.isAdmin;
+          if (options.adminCode) payload.adminCode = String(options.adminCode);
+        }
+        const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) });
         if (!resp.ok) return { ok: false, message: '註冊失敗' };
         const data = await resp.json();
         if (!data || !data.ok) return { ok: false, message: data && data.message || '註冊失敗' };
-        if (data.token) { localStorage.setItem('auth_token', data.token); localStorage.setItem('auth_user', username); }
-        return { ok: true };
+        if (data.token) {
+          localStorage.setItem('auth_token', data.token);
+          localStorage.setItem('auth_user', username);
+          localStorage.setItem('auth_role', data.role || 'member');
+        }
+        return { ok: true, role: data.role || 'member' };
       } catch(e) {
         return { ok:false, message: '註冊錯誤：' + e.message };
       }
@@ -52,7 +61,8 @@
     localStorage.setItem(key, JSON.stringify(list));
     localStorage.setItem('auth_token', 'demo-token');
     localStorage.setItem('auth_user', username);
-    return { ok:true };
+    localStorage.setItem('auth_role', (options && options.isAdmin) ? 'admin' : 'member');
+    return { ok:true, role: localStorage.getItem('auth_role') || 'member' };
   }
 
   async function login(username, password) {
@@ -71,7 +81,8 @@
         if (!data || !data.token) return { ok: false, message: '登入失敗：缺少 token' };
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('auth_user', username);
-        return { ok: true, token: data.token };
+        if (data.role) localStorage.setItem('auth_role', data.role); else localStorage.setItem('auth_role', localStorage.getItem('auth_role') || 'member');
+        return { ok: true, token: data.token, role: data.role || localStorage.getItem('auth_role') || 'member' };
       } catch (e) {
         return { ok: false, message: '登入錯誤：' + e.message };
       }
@@ -81,7 +92,8 @@
       const token = 'demo-token';
       localStorage.setItem('auth_token', token);
       localStorage.setItem('auth_user', username);
-      return { ok: true, token };
+      localStorage.setItem('auth_role', 'member');
+      return { ok: true, token, role: 'member' };
     }
     return { ok: false, message: '密碼長度不足' };
   }
@@ -89,6 +101,7 @@
   function logout() {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
+    localStorage.removeItem('auth_role');
   }
 
   async function forgot(usernameOrEmail){
@@ -116,5 +129,8 @@
     } catch(e){ return { ok:false, message: '修改密碼錯誤：' + e.message }; }
   }
 
-  window.Auth = { evaluatePasswordStrength, login, register, logout, forgot, changePassword };
+  function getRole(){ return localStorage.getItem('auth_role') || 'member'; }
+  function isAdmin(){ return getRole() === 'admin'; }
+
+  window.Auth = { evaluatePasswordStrength, login, register, logout, forgot, changePassword, getRole, isAdmin };
 })();

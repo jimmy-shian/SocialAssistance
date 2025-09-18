@@ -87,6 +87,22 @@
     return (tmp.textContent || '').replace(/\u00A0/g,' ').replace(/\n+$/,'').trim();
   }
 
+  // Ensure Font Awesome (for icon-only control buttons)
+  function ensureFontAwesome(){
+    try {
+      const href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css';
+      const ok = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).some(l=>{
+        const u = l.href || '';
+        return u.includes('font-awesome') || u.includes('/all.min.css') || u.includes('cdnjs.cloudflare.com/ajax/libs/font-awesome');
+      });
+      if (!ok){
+        const link = document.createElement('link');
+        link.rel = 'stylesheet'; link.href = href;
+        document.head.appendChild(link);
+      }
+    } catch(e){}
+  }
+
   // Helper: 根據原圖比例計算預覽高度（約為原圖在目前寬度下高度的 70%）
   function setPreviewHeightFromImage(pv, url, factor){
     try {
@@ -116,32 +132,7 @@
   }
   window.addEventListener('resize', ()=>{ try{ recalcPreviewHeights(); }catch(e){} });
 
-  // Admin｜自動為未包在 <label> 的欄位生成小標題（以 placeholder 或 aria-label 為文案）
-  function ensureFieldCaptions(root){
-    try {
-      const panel = qs('#admin-panel'); if (!panel) return;
-      const scope = root || panel;
-      const nodes = scope.querySelectorAll('input, textarea, select');
-      nodes.forEach(el => {
-        if (!(el instanceof HTMLElement)) return;
-        const tag = el.tagName.toLowerCase();
-        if (tag === 'input') {
-          const t = (el.getAttribute('type')||'text').toLowerCase();
-          if (t === 'hidden' || t === 'file' || t === 'checkbox' || t === 'radio') return;
-        }
-        if (el.classList.contains('sr-only')) return;
-        if (el.closest('label')) return; // 已有標籤
-        // 避免重複插入
-        const prev = el.previousElementSibling;
-        if (prev && prev.classList && prev.classList.contains('field-caption')) return;
-        const txt = el.getAttribute('aria-label') || el.getAttribute('placeholder') || el.getAttribute('name') || el.id || '輸入內容';
-        const cap = document.createElement('div');
-        cap.className = 'field-caption';
-        cap.textContent = txt;
-        el.parentNode && el.parentNode.insertBefore(cap, el);
-      });
-    } catch(e){}
-  }
+  // 已移除：欄位說明改以 <label> 包裹，不再需要自動插入 caption。
 
   // 預覽：首頁英雄圖（site.index.heroImage）
   function updateHeroPreview(){
@@ -257,7 +248,7 @@
     try {
       const data = await postReadRaw(key);
       if (!data) return {};
-      return { version: data.version, updatedAt: data.updatedAt, hasData: !!data.hasData };
+      return { version: data.version, updatedAt: data.updatedAt, hasData: !!data.hasData, message: data.message };
     } catch(e){ return {}; }
   }
   function fmtTime(d){ try{ const dt = (d instanceof Date) ? d : new Date(d); if (isNaN(+dt)) return '-'; const pad=n=>String(n).padStart(2,'0'); return `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`; }catch(e){ return '-'; } }
@@ -272,7 +263,11 @@
     if (meta && (meta.updatedAt || meta.hasData)) {
       const time = meta.updatedAt ? fmtTime(meta.updatedAt) : '-';
       el.innerHTML = `最後更新：${time}${meta.hasData ? ' <span class="text-rose-600">(暫存檔案)</span>' : ''}`;
-    } else {
+    }
+    else if(meta.message == "token 已過期"){
+      el.textContent = '最後更新：-（請重登入）';
+    }
+    else {
       el.textContent = '最後更新：-';
     }
   }
@@ -331,6 +326,19 @@
     show(qs('#admin-panel'), logged);
     if (logged) { try { const tip = qs('#admin-header-tip'); if (tip) tip.textContent = '已登入：請從上方資料集下拉選單選擇 About / Providers / Site Content 並開始編輯。'; } catch(e){} }
 
+    // Inject Font Awesome for icon buttons
+    ensureFontAwesome();
+
+    // 還原上次選擇的資料集
+    try {
+      const sel = qs('#ds-select');
+      const saved = localStorage.getItem('admin_ds_selected');
+      if (sel && saved) {
+        const values = Array.from(sel.options).map(o=>o.value);
+        if (values.includes(saved)) { sel.value = saved; try{ updateDsButtonLabelFromSelect(); }catch(e){} }
+      }
+    } catch(e){}
+
     updateVersionLabel();
     // 若已登入且是直接刷新頁面，主動載入並渲染目前所選資料集
     if (logged) {
@@ -369,6 +377,7 @@
 
     // 切換資料集：自動載入並顯示對應可視化介面
     qs('#ds-select')?.addEventListener('change', async ()=>{
+      try { const v = qs('#ds-select')?.value || ''; localStorage.setItem('admin_ds_selected', v); } catch(e){}
       updateVersionLabel();
       toggleSections();
       try { await loadDatasetAndRender(); } catch(e){}
@@ -627,16 +636,22 @@
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="flex items-center justify-between gap-3">
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-2 flex-1">
-          <input class="pv-tl-time rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="time" value="${row.time||''}">
-          <input class="pv-tl-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
-          <textarea class="pv-tl-detail rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="detail">${toPlainText(row.detail)||''}</textarea>
+        <div class="flex flex-wrap gap-2">
+          <label class="text-sm">時間
+            <input class="min-w-[250px] pv-tl-time w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="time" value="${row.time||''}">
+          </label>
+          <label class="text-sm">標題
+            <input class="min-w-[250px] pv-tl-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
+          </label>
+          <label class="text-sm">內容
+            <textarea class="min-w-[250px] pv-tl-detail w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="detail">${toPlainText(row.detail)||''}</textarea>
+          </label>
         </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button type="button" class="btn-soft btn-yellow pv-tl-up">上移</button>
-          <button type="button" class="btn-soft btn-yellow pv-tl-down">下移</button>
-          <button type="button" class="btn-soft btn-orange pv-tl-dup">複製</button>
-          <button type="button" class="btn-soft btn-purple pv-tl-del">刪除</button>
+        <div class="flex items-center gap-2 flex-wrap ml-auto">
+          <button type="button" class="btn-soft btn-yellow pv-tl-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+          <button type="button" class="btn-soft btn-yellow pv-tl-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+          <button type="button" class="btn-soft btn-orange pv-tl-dup" title="複製"><i class="fas fa-copy"></i></button>
+          <button type="button" class="btn-soft btn-purple pv-tl-del" title="刪除"><i class="fas fa-trash"></i></button>
         </div>
       </div>`;
     return wrap;
@@ -670,12 +685,12 @@
     wrap.innerHTML = `
       <div class="flex items-center justify-between flex-wrap gap-2">
         <div class="font-semibold">案例 #<span class="case-idx">${idx+1}</span></div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button type="button" class="btn-soft btn-yellow pv-move-up">上移</button>
-          <button type="button" class="btn-soft btn-yellow pv-move-down">下移</button>
-          <button type="button" class="btn-soft btn-orange pv-dup">複製</button>
-          <button type="button" class="btn-soft btn-green pv-insert-after">插入</button>
-          <button type="button" class="btn-soft btn-purple pv-del">刪除</button>
+        <div class="flex items-center gap-2 flex-wrap ml-auto">
+          <button type="button" class="btn-soft btn-yellow pv-move-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+          <button type="button" class="btn-soft btn-yellow pv-move-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+          <button type="button" class="btn-soft btn-orange pv-dup" title="複製"><i class="fas fa-copy"></i></button>
+          <!-- <button type="button" class="btn-soft btn-green pv-insert-after" title="插入"><i class="fas fa-plus"></i></button> -->
+          <button type="button" class="btn-soft btn-purple pv-del" title="刪除"><i class="fas fa-trash"></i></button>
         </div>
       </div>
       <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-3 mt-3">
@@ -1128,20 +1143,25 @@
     wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
+      <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
+        <button type="button" class="btn-soft btn-yellow ab-model-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+        <button type="button" class="btn-soft btn-yellow ab-model-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+        <button type="button" class="btn-soft btn-orange ab-model-dup" title="複製"><i class="fas fa-copy"></i></button>
+        <button type="button" class="btn-soft btn-purple ab-model-del" title="刪除"><i class="fas fa-trash"></i></button>
+      </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
-        <input class="ab-model-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
-        <textarea class="ab-model-desc rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="desc">${toPlainText(row.desc)||''}</textarea>
-        <input class="ab-model-href rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="href (可選)" value="${row.href||''}">
-        <div class="flex items-center gap-2 flex-wrap">
-          <input class="ab-model-linktext rounded border px-2 py-1 bg-white dark:bg-gray-800 flex-1" placeholder="linkText (可選)" value="${row.linkText||''}">
-          <!-- 按鈕區：橫向排列 -->
-          <div class="flex gap-2 flex-wrap">
-            <button type="button" class="btn-soft btn-yellow ab-model-up">上移</button>
-            <button type="button" class="btn-soft btn-yellow ab-model-down">下移</button>
-            <button type="button" class="btn-soft btn-orange ab-model-dup">複製</button>
-            <button type="button" class="btn-soft btn-purple ab-model-del">刪除</button>
-          </div>
-        </div>
+        <label class="text-sm">標題
+          <input class="ab-model-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.title||''}">
+        </label>
+        <label class="text-sm">描述
+          <textarea class="ab-model-desc w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.desc)||''}</textarea>
+        </label>
+        <label class="text-sm">連結（可選）
+          <input class="ab-model-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.href||''}">
+        </label>
+        <label class="text-sm flex-1">連結文字（可選）
+          <input class="ab-model-linktext w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.linkText||''}">
+        </label>
       </div>`;
     return wrap;
   }
@@ -1185,7 +1205,7 @@
       desc: linkifyHtml(el.querySelector('.ab-model-desc')?.value || ''),
       href: el.querySelector('.ab-model-href')?.value?.trim() || undefined,
       linkText: el.querySelector('.ab-model-linktext')?.value?.trim() || undefined
-    })).filter(x=> x.title || x.desc || x.href);
+    })).filter(x => x.title || x.desc || x.href);
     obj.achievementsTitle = qs('#ab-ach-title')?.value?.trim() || '';
     obj.achievements = Array.from(qs('#ab-ach-list')?.children || []).map(el=>{
       const text = el.querySelector('.ab-ach-text')?.value?.trim() || '';
@@ -1212,45 +1232,63 @@
   function buildAchItem(row, idx){
     const isObj = row && typeof row === 'object';
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-col';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
+      <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
+        <button type="button" class="btn-soft btn-yellow ab-ach-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+        <button type="button" class="btn-soft btn-yellow ab-ach-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+        <button type="button" class="btn-soft btn-orange ab-ach-dup" title="複製"><i class="fas fa-copy"></i></button>
+        <button type="button" class="btn-soft btn-purple ab-ach-del" title="刪除"><i class="fas fa-trash"></i></button>
+      </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 items-center">
-        <textarea class="ab-ach-text rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="文字">${isObj ? (row.text||'') : (row||'')}</textarea>
-        <input class="ab-ach-href rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結（可選）" value="${isObj ? (row.href||'') : ''}">
-        <div class="flex items-center gap-2 flex-wrap">
-          <button type="button" class="btn-soft btn-yellow ab-ach-up">上移</button>
-          <button type="button" class="btn-soft btn-yellow ab-ach-down">下移</button>
-          <button type="button" class="btn-soft btn-orange ab-ach-dup">複製</button>
-          <button type="button" class="btn-soft btn-purple ab-ach-del">刪除</button>
-        </div>
+        <label class="text-sm">文字
+          <textarea class="ab-ach-text w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${isObj ? (row.text||'') : (row||'')}</textarea>
+        </label>
+        <label class="text-sm">連結（可選）
+          <input class="ab-ach-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${isObj ? (row.href||'') : ''}">
+        </label>
       </div>`;
     return wrap;
   }
   function buildTeamItem(row={}, idx=0){
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'ab-team-item flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
+    <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
+      <button type="button" class="btn-soft btn-yellow ab-team-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+      <button type="button" class="btn-soft btn-yellow ab-team-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+      <button type="button" class="btn-soft btn-orange ab-team-dup" title="複製"><i class="fas fa-copy"></i></button>
+      <button type="button" class="btn-soft btn-purple ab-team-del" title="刪除"><i class="fas fa-trash"></i></button>
+    </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 items-center">
-        <input class="ab-team-name rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="姓名" value="${row.name||''}">
-        <div class="flex items-center gap-2 min-w-0 sm:col-span-2 md:col-span-2">
-          <input class="ab-team-photo flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="照片連結或 gas://image/..." value="${row.photo||''}">
-          <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden tm-photo-upload" accept="image/*"></label>
+        <label class="text-sm">姓名
+          <input class="ab-team-name w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.name||''}">
+        </label>
+        <div class="min-w-0 sm:col-span-2 md:col-span-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <label class="text-sm flex-1 min-w-0">照片
+              <input class="ab-team-photo flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="照片連結或 gas://image/..." value="${row.photo||''}">
+            </label>
+            <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden tm-photo-upload" accept="image/*"></label>
+          </div>
+          <div class="tm-photo-preview mt-2 min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
         </div>
-        <div class="tm-photo-preview min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
-        <input class="ab-team-roles rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="角色（可複數，頓號或逗號分隔）" value="${Array.isArray(row.roles)?row.roles.join('、'):''}">
-        <textarea class="ab-team-motto rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="座右銘">${toPlainText(row.motto)||''}</textarea>
+        <label class="text-sm">角色
+          <input class="ab-team-roles w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${Array.isArray(row.roles)?row.roles.join('、'):''}">
+        </label>
+        <label class="text-sm">座右銘
+          <textarea class="ab-team-motto w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.motto)||''}</textarea>
+        </label>
       </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 mt-2">
-        <div class="flex flex-col gap-2">
-          <label class="text-sm">教育背景</label>
-          <textarea class="ab-team-edu rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4" placeholder="每行一筆">${(row.education||[]).join('\n')}</textarea>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label class="text-sm">經歷</label>
-          <textarea class="ab-team-exp rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4" placeholder="每行一筆">${(row.experience||[]).join('\n')}</textarea>
-        </div>
+        <label class="text-sm flex flex-col gap-2">教育背景
+          <textarea class="ab-team-edu w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${(row.education||[]).join('\n')}</textarea>
+        </label>
+        <label class="text-sm flex flex-col gap-2">經歷
+          <textarea class="ab-team-exp w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${(row.experience||[]).join('\n')}</textarea>
+        </label>
       </div>
       <div class="mt-2">
         <label class="text-sm block">社群連結（可多筆）</label>
@@ -1260,20 +1298,18 @@
         <div class="ab-team-socials flex flex-col gap-2">
           ${Array.isArray(row.socials) ? row.socials.map((s,i)=>`
             <div class="ab-social-row flex flex-wrap gap-2 items-center min-w-0" data-index="${i}">
-              <input class="ab-social-name flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱 (Facebook/Instagram/Line/Threads/YouTube)" value="${s.name||''}">
-              <input class="ab-social-href flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結 https://..." value="${s.href||''}">
-              <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0">上移</button>
-              <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0">下移</button>
-              <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0">複製</button>
-              <button type="button" class="btn-soft btn-purple ab-social-del shrink-0">刪除</button>
+              <label class="text-sm flex-1 min-w-[200px]">名稱
+                <input class="ab-social-name w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${s.name||''}">
+              </label>
+              <label class="text-sm flex-1 min-w-[200px]">連結
+                <input class="ab-social-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${s.href||''}">
+              </label>
+              <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0" title="上移"><i class="fas fa-arrow-up"></i></button>
+              <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0" title="下移"><i class="fas fa-arrow-down"></i></button>
+              <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0" title="複製"><i class="fas fa-copy"></i></button>
+              <button type="button" class="btn-soft btn-purple ab-social-del shrink-0" title="刪除"><i class="fas fa-trash"></i></button>
             </div>
           `).join('') : ''}
-        </div>
-        <div class="mt-2 flex items-center gap-2 flex-wrap">
-          <button type="button" class="btn-soft btn-yellow ab-team-up">上移</button>
-          <button type="button" class="btn-soft btn-yellow ab-team-down">下移</button>
-          <button type="button" class="btn-soft btn-orange ab-team-dup">複製</button>
-          <button type="button" class="btn-soft btn-purple ab-team-del">刪除</button>
         </div>
       </div>
     `;
@@ -1310,7 +1346,7 @@
   });
   qs('#ab-team-list')?.addEventListener('click', (e)=>{
     const btn = e.target.closest('button'); if (!btn) return;
-    const list = qs('#ab-team-list'); const item = e.target.closest('div[data-index]'); if (!list||!item) return;
+    const list = qs('#ab-team-list'); const item = e.target.closest('.ab-team-item'); if (!list||!item) return;
     const idx = Array.from(list.children).indexOf(item);
     const play = captureListAnimation(list);
     if (btn.classList.contains('ab-team-del')) { item.remove(); play(); return; }
@@ -1321,11 +1357,11 @@
   // About｜Team 照片預覽/上傳
   qs('#ab-team-list')?.addEventListener('input', (e)=>{
     const inp = e.target.closest('.ab-team-photo'); if (!inp) return;
-    const item = inp.closest('div[data-index]'); if (item) updateTeamPreview(item);
+    const item = inp.closest('.ab-team-item'); if (item) updateTeamPreview(item);
   });
   qs('#ab-team-list')?.addEventListener('change', async (e)=>{
     const up = e.target.closest('.tm-photo-upload'); if (!up) return;
-    const item = up.closest('div[data-index]'); if (!item) return;
+    const item = up.closest('.ab-team-item'); if (!item) return;
     const file = up.files?.[0]; if (!file) return;
     up.disabled = true;
     try {
@@ -1337,33 +1373,43 @@
     } catch(err){ if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
     finally { up.value=''; up.disabled=false; const pv = item.querySelector('.tm-photo-preview'); if (pv) pv.classList.remove('is-uploading'); }
   });
+  // 重新編號社群列（維持 data-index 與視覺順序一致）
+  function renumberSocialRows(list){
+    try {
+      if (!list) return;
+      Array.from(list.querySelectorAll('.ab-social-row')).forEach((el, i)=>{ el.dataset.index = String(i); });
+    } catch(e){}
+  }
   qs('#ab-team-list')?.addEventListener('click', (e)=>{
     const btn = e.target.closest('button'); if (!btn) return;
-    const list = qs('#ab-team-list'); const item = e.target.closest('div[data-index]'); if (!list||!item) return;
-    const socialList = item.querySelector('.ab-team-socials'); if (!socialList) return;
+    const list = qs('#ab-team-list'); const item = e.target.closest('.ab-team-item'); if (!list||!item) return;
+    const socialList = item.querySelector('.ab-team-socials.flex'); if (!socialList) return;
     const row = e.target.closest('.ab-social-row');
-    const idx = row ? Array.from(socialList.children).indexOf(row) : -1;
-    if (btn.classList.contains('ab-social-del') && row) { row.remove(); return; }
-    if (btn.classList.contains('ab-social-up') && row && idx>0) { socialList.insertBefore(row, socialList.children[idx-1]); flash(row); return; }
-    if (btn.classList.contains('ab-social-down') && row && idx<socialList.children.length-1) { socialList.insertBefore(socialList.children[idx+1], row); flash(row); return; }
-    if (btn.classList.contains('ab-social-dup') && row) { const clone = row.cloneNode(true); socialList.insertBefore(clone, socialList.children[idx+1]); flash(clone); return; }
+    if (btn.classList.contains('ab-social-del') && row) { row.remove(); renumberSocialRows(socialList); return; }
+    if (btn.classList.contains('ab-social-up') && row && row.previousElementSibling) { socialList.insertBefore(row, row.previousElementSibling); renumberSocialRows(socialList); flash(row); return; }
+    if (btn.classList.contains('ab-social-down') && row && row.nextElementSibling) { socialList.insertBefore(row.nextElementSibling, row); renumberSocialRows(socialList); flash(row); return; }
+    if (btn.classList.contains('ab-social-dup') && row) { const clone = row.cloneNode(true); socialList.insertBefore(clone, row.nextElementSibling); renumberSocialRows(socialList); flash(clone); return; }
   });
   qs('#ab-team-list')?.addEventListener('click', (e)=>{
     const btn = e.target.closest('button'); if (!btn) return;
-    const item = e.target.closest('div[data-index]'); if (!item) return;
+    const item = e.target.closest('.ab-team-item'); if (!item) return;
     if (btn.classList.contains('ab-social-add')) {
-      const socialList = item.querySelector('.ab-team-socials'); if (!socialList) return;
+      const socialList = item.querySelector('.ab-team-socials.flex'); if (!socialList) return;
       const node = document.createElement('div');
       node.className = 'ab-social-row flex flex-wrap gap-2 items-center min-w-0';
       node.innerHTML = `
-        <input class="ab-social-name flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="名稱">
-        <input class="ab-social-href flex-1 min-w-[200px] rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="連結">
-        <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0">上移</button>
-        <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0">下移</button>
-        <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0">複製</button>
-        <button type="button" class="btn-soft btn-purple ab-social-del shrink-0">刪除</button>
+        <label class="text-sm flex-1 min-w-[200px]">名稱
+          <input class="ab-social-name w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+        </label>
+        <label class="text-sm flex-1 min-w-[200px]">連結
+          <input class="ab-social-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+        </label>
+        <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0" title="上移"><i class="fas fa-arrow-up"></i></button>
+        <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0" title="下移"><i class="fas fa-arrow-down"></i></button>
+        <button type="button" class="btn-soft btn-orange ab-social-dup shrink-0" title="複製"><i class="fas fa-copy"></i></button>
+        <button type="button" class="btn-soft btn-purple ab-social-del shrink-0" title="刪除"><i class="fas fa-trash"></i></button>
       `;
-      socialList.appendChild(node); flash(node);
+      socialList.appendChild(node); renumberSocialRows(socialList); flash(node);
     }
   });
 
@@ -1373,23 +1419,31 @@
     wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
+      <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
+        <button type="button" class="btn-soft btn-yellow sc-intro-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+        <button type="button" class="btn-soft btn-yellow sc-intro-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+        <button type="button" class="btn-soft btn-orange sc-intro-dup" title="複製"><i class="fas fa-copy"></i></button>
+        <button type="button" class="btn-soft btn-purple sc-intro-del" title="刪除"><i class="fas fa-trash"></i></button>
+      </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 items-center">
-        <input class="sc-intro-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
-        <div class="flex flex-col gap-1 min-w-0 sm:col-span-2 md:col-span-2">
-          <div class="flex items-center gap-2 min-w-0">
+        <label class="text-sm">標題
+          <input class="sc-intro-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.title||''}">
+        </label>
+        <div class="min-w-0 sm:col-span-2 md:col-span-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <label class="text-sm flex-1 min-w-0">圖片
             <input class="sc-intro-image flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image||''}">
-            <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-intro-upload" accept="image/*"></label>
-          </div>
-          <div class="sc-intro-preview min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+          </label>
+          <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-intro-upload" accept="image/*"></label>
         </div>
-        <textarea class="sc-intro-text rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="text">${toPlainText(row.text)||''}</textarea>
-        <textarea class="sc-intro-details rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="details (可選)">${toPlainText(row.details)||''}</textarea>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button type="button" class="btn-soft btn-yellow sc-intro-up">上移</button>
-          <button type="button" class="btn-soft btn-yellow sc-intro-down">下移</button>
-          <button type="button" class="btn-soft btn-orange sc-intro-dup">複製</button>
-          <button type="button" class="btn-soft btn-purple sc-intro-del">刪除</button>
-        </div>
+        <div class="sc-intro-preview mt-2 min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+      </div>
+        <label class="text-sm">說明
+          <textarea class="sc-intro-text w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.text)||''}</textarea>
+        </label>
+        <label class="text-sm">補充（可選）
+          <textarea class="sc-intro-details w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.details)||''}</textarea>
+        </label>
       </div>`;
     return wrap;
   }
@@ -1398,22 +1452,28 @@
     wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
+      <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
+        <button type="button" class="btn-soft btn-yellow sc-svc-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+        <button type="button" class="btn-soft btn-yellow sc-svc-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+        <button type="button" class="btn-soft btn-orange sc-svc-dup" title="複製"><i class="fas fa-copy"></i></button>
+        <button type="button" class="btn-soft btn-purple sc-svc-del" title="刪除"><i class="fas fa-trash"></i></button>
+      </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 items-center">
-        <input class="sc-svc-title rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title||''}">
-        <div class="flex flex-col gap-1 min-w-0 sm:col-span-2 md:col-span-2">
-          <div class="flex items-center gap-2 min-w-0">
+        <label class="text-sm">標題
+          <input class="sc-svc-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.title||''}">
+        </label>
+        <div class="min-w-0 sm:col-span-2 md:col-span-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <label class="text-sm flex-1 min-w-0">圖片
             <input class="sc-svc-image flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image||''}">
-            <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
-          </div>
-          <div class="sc-svc-preview min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+          </label>
+          <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
         </div>
-        <input class="sc-svc-link rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="link" value="${row.link||''}">
-        <div class="flex items-center gap-2 flex-wrap">
-          <button type="button" class="btn-soft btn-yellow sc-svc-up">上移</button>
-          <button type="button" class="btn-soft btn-yellow sc-svc-down">下移</button>
-          <button type="button" class="btn-soft btn-orange sc-svc-dup">複製</button>
-          <button type="button" class="btn-soft btn-purple sc-svc-del">刪除</button>
-        </div>
+        <div class="sc-svc-preview mt-2 min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+      </div>
+        <label class="text-sm">連結
+          <input class="sc-svc-link w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.link||''}">
+        </label>
       </div>`;
     return wrap;
   }
@@ -1678,15 +1738,7 @@
 
   // 初次進入頁面時依下拉狀態顯示/隱藏
   toggleSections();
-  // 首次與後續 DOM 變動時補齊欄位小標題
-  try {
-    const panelRoot = qs('#admin-panel');
-    if (panelRoot) {
-      ensureFieldCaptions(panelRoot);
-      const mo = new MutationObserver(() => { ensureFieldCaptions(panelRoot); });
-      mo.observe(panelRoot, { childList: true, subtree: true });
-    }
-  } catch(e){}
+  // 已改為各欄位以 <label> 包裹說明與輸入框，移除舊的自動補齊 caption 機制。
 
   // ===== 自訂下拉（資料集與 Provider）與插入連結 Modal =====
   function updateDsButtonLabelFromSelect(){

@@ -23,7 +23,7 @@ function _getUserByEmail(email){
   var data = sh.getDataRange().getValues();
   for (var r=1;r<data.length;r++){
     if (String(data[r][1]).toLowerCase() === String(email).toLowerCase()){
-      return { username: data[r][0], email: data[r][1], passHash: data[r][2], createdAt: data[r][3] };
+      return { username: data[r][0], email: data[r][1], passHash: data[r][2], createdAt: data[r][3], role: data[r][4] || 'member' };
     }
   }
   return null;
@@ -135,6 +135,8 @@ var CFG = Object.freeze({
   PROP_ADMIN_USER: 'ADMIN_USER',
   PROP_ADMIN_PASS: 'ADMIN_PASS',
   PROP_TOKEN_SECRET: 'TOKEN_SECRET',
+  // Admin (social worker) verification code for member system elevated role
+  PROP_ADMIN_VERIFY_CODE: 'ADMIN_VERIFY_CODE',
   // GitHub publish configuration
   PROP_GH_TOKEN: 'GITHUB_TOKEN',
   PROP_GH_OWNER: 'GITHUB_OWNER',
@@ -509,6 +511,7 @@ function doPost(e){
   if (action === 'profileUpdate') return _handleProfileUpdate(e);
   if (action === 'uploadImage') return _handleUploadImage(e);
   if (action === 'memberChangePassword') return _handleMemberChangePassword(e);
+  if (action === 'membersList') return _handleMembersList(e);
   return _badRequest('未知 action');
 }
 
@@ -518,7 +521,8 @@ function doPost(e){
 var MEMBER = Object.freeze({
   SHEET_USERS: 'members',
   SHEET_PROFILES: 'profiles',
-  HEAD_USERS: ['username','email','passHash','createdAt'],
+  // add role column (member/admin)
+  HEAD_USERS: ['username','email','passHash','createdAt','role'],
   HEAD_PROFILES: ['username','json','updatedAt']
 });
 
@@ -528,7 +532,30 @@ function _ensureUserSheet(){
   var id = _props().getProperty(CFG.PROP_SHEET_ID);
   ss = SpreadsheetApp.openById(id);
   var sh = ss.getSheetByName(MEMBER.SHEET_USERS);
-  if (!sh){ sh = ss.insertSheet(MEMBER.SHEET_USERS); sh.getRange(1,1,1,MEMBER.HEAD_USERS.length).setValues([MEMBER.HEAD_USERS]); }
+  if (!sh){
+    sh = ss.insertSheet(MEMBER.SHEET_USERS);
+    sh.getRange(1,1,1,MEMBER.HEAD_USERS.length).setValues([MEMBER.HEAD_USERS]);
+    return sh;
+  }
+  // Upgrade: ensure role column exists as the 5th column
+  try {
+    var headers = sh.getRange(1,1,1,Math.max(sh.getLastColumn(), MEMBER.HEAD_USERS.length)).getValues()[0];
+    var needCols = MEMBER.HEAD_USERS.length - sh.getMaxColumns();
+    if (needCols > 0) { sh.insertColumnsAfter(sh.getMaxColumns(), needCols); }
+    // Write header to ensure exact titles
+    sh.getRange(1,1,1,MEMBER.HEAD_USERS.length).setValues([MEMBER.HEAD_USERS]);
+    // Fill default role for existing rows if missing
+    var lastRow = sh.getLastRow();
+    if (lastRow > 1) {
+      var roleRange = sh.getRange(2, 5, lastRow-1, 1);
+      var roles = roleRange.getValues();
+      var changed = false;
+      for (var i=0;i<roles.length;i++){
+        if (!roles[i][0]) { roles[i][0] = 'member'; changed = true; }
+      }
+      if (changed) roleRange.setValues(roles);
+    }
+  } catch(e){}
   return sh;
 }
 function _ensureProfileSheet(){
@@ -553,15 +580,17 @@ function _getUser(username){
   var r = _findUserRow(username);
   if (r<0) return null;
   var sh = _ensureUserSheet();
-  var row = sh.getRange(r,1,1,MEMBER.HEAD_USERS.length).getValues()[0];
-  return { username: row[0], email: row[1], passHash: row[2], createdAt: row[3] };
+  var row = sh.getRange(r,1,1,Math.max(sh.getLastColumn(), MEMBER.HEAD_USERS.length)).getValues()[0];
+  return { username: row[0], email: row[1], passHash: row[2], createdAt: row[3], role: row[4] || 'member' };
 }
+function _getUserRole(username){ var u = _getUser(username); return (u && u.role) ? String(u.role) : 'member'; }
 function _upsertUser(u){
   var sh = _ensureUserSheet();
   var r = _findUserRow(u.username);
   var now = new Date();
-  if (r<0){ sh.appendRow([u.username, u.email, u.passHash, now]); return true; }
-  sh.getRange(r,1,1,MEMBER.HEAD_USERS.length).setValues([[u.username, u.email, u.passHash, now]]);
+  var role = (u && u.role) ? String(u.role) : (_getUserRole(u.username) || 'member');
+  if (r<0){ sh.appendRow([u.username, u.email, u.passHash, now, role]); return true; }
+  sh.getRange(r,1,1,MEMBER.HEAD_USERS.length).setValues([[u.username, u.email, u.passHash, now, role]]);
   return true;
 }
 function _getProfile(username){
@@ -607,14 +636,23 @@ function _handleMemberRegister(e){
   var u = String(body.username||'').trim();
   var email = String(body.email||'').trim();
   var p = String(body.password||'');
+  var wantAdmin = !!(body && (body.isAdmin===true || String(body.isAdmin||'').toLowerCase()==='true'));
+  var adminCode = String(body.adminCode||'').trim();
   if (!u || !email || !p) return _badRequest('缺少欄位');
   if (!_rateLimit('mreg:'+u, 20, 60)) return _badRequest('請求過於頻繁');
   var exist = _getUser(u);
   if (exist) return _badRequest('帳號已存在');
-  _upsertUser({ username:u, email: email, passHash: _hashPassword(p) });
+  var role = 'member';
+  if (wantAdmin){
+    var confCode = (_props().getProperty(CFG.PROP_ADMIN_VERIFY_CODE) || '').trim();
+    if (!confCode) return _badRequest('尚未設定管理者驗證碼，無法註冊為管理者');
+    if (adminCode !== confCode) return _badRequest('管理者驗證碼錯誤');
+    role = 'admin';
+  }
+  _upsertUser({ username:u, email: email, passHash: _hashPassword(p), role: role });
   var ts = Date.now();
   var token = _signToken(u, ts);
-  return _jsonOutput({ ok:true, token: token });
+  return _jsonOutput({ ok:true, token: token, role: role });
 }
 function _handleMemberLogin(e){
   var body = _getBodyObject(e);
@@ -626,7 +664,7 @@ function _handleMemberLogin(e){
   if (user.passHash !== _hashPassword(p)) return _badRequest('帳號或密碼錯誤');
   var ts = Date.now();
   var token = _signToken(u, ts);
-  return _jsonOutput({ ok:true, token: token, exp: ts + CFG.TOKEN_TTL_MS });
+  return _jsonOutput({ ok:true, token: token, exp: ts + CFG.TOKEN_TTL_MS, role: user.role || 'member' });
 }
 function _handleMemberForgot(e){
   var body = _getBodyObject(e);
@@ -655,8 +693,10 @@ function _handleProfileRead(e){
   var u = String(body.username||'').trim();
   var ver = _verifyToken(token);
   if (!ver.ok) return _badRequest(ver.message||'未授權');
-  if (u && u !== ver.user) return _badRequest('不可讀取他人資料');
-  var username = u || ver.user;
+  var requester = ver.user;
+  var reqRole = _getUserRole(requester);
+  if (u && u !== requester && reqRole !== 'admin') return _badRequest('不可讀取他人資料');
+  var username = u || requester;
   var p = _getProfile(username);
   // 若基本資料未含 email，且 members 表有 email，則自動補入並保存
   try {
@@ -684,6 +724,23 @@ function _handleProfileUpdate(e){
   if (typeof profile === 'undefined') return _badRequest('缺少 profile');
   _setProfile(username, profile);
   return _jsonOutput({ ok:true });
+}
+
+// 列出所有會員（僅限管理員）
+function _handleMembersList(e){
+  var body = _getBodyObject(e);
+  var token = body.token || '';
+  var ver = _verifyToken(token);
+  if (!ver.ok) return _badRequest(ver.message||'未授權');
+  if (_getUserRole(ver.user) !== 'admin') return _badRequest('需要管理員權限');
+  var sh = _ensureUserSheet();
+  var data = sh.getDataRange().getValues();
+  var list = [];
+  for (var r=1; r<data.length; r++){
+    var row = data[r];
+    if (row && row[0]){ list.push({ username: row[0], email: row[1], createdAt: row[3], role: row[4] || 'member' }); }
+  }
+  return _jsonOutput({ ok:true, users: list });
 }
 
 // ==============================

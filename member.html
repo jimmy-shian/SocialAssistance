@@ -124,6 +124,31 @@
 
     <div id="footer-placeholder"></div>
 
+    <!-- Admin Verify Modal (for admin registration confirmation/code) -->
+    <div id="admin-verify-modal" class="fixed inset-0 hidden flex items-center justify-center">
+      <div class="overlay-bg fixed inset-0 rounded-none bg-slate-900/45 dark:bg-slate-900/55"></div>
+      <section class="modal-card relative z-10 w-full max-w-md mx-auto">
+        <div class="rounded-lg shadow p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <h2 class="text-lg font-semibold mb-1">管理者註冊確認</h2>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">若您為社工或管理者，請勾選並輸入驗證碼；否則可直接繼續註冊為一般學員。</p>
+          <label class="inline-flex items-center gap-2 mb-2 text-sm">
+            <input id="admin-verify-toggle" type="checkbox" class="rounded border">
+            我要註冊為管理者（社工）
+          </label>
+          <div id="admin-code-wrap" class="mt-2 hidden">
+            <label class="block text-sm mb-1">管理者驗證碼</label>
+            <input id="admin-verify-code" type="text" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100" placeholder="請輸入驗證碼">
+            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">請向系統管理員取得驗證碼</div>
+          </div>
+          <div id="admin-verify-status" class="mt-2 text-sm text-gray-500 dark:text-gray-400" aria-live="polite"></div>
+          <div class="mt-4 flex justify-end gap-2">
+            <button id="admin-verify-cancel" type="button" class="btn-soft btn-purple">取消</button>
+            <button id="admin-verify-ok" type="button" class="btn-soft btn-green">繼續註冊</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <!-- Forgot Password Modal -->
     <div id="forgot-modal" class="fixed inset-0 hidden">
       <div class="overlay-bg fixed inset-0 rounded-none bg-slate-900/45 dark:bg-slate-900/55"></div>

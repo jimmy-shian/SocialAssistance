@@ -69,6 +69,16 @@
     const regBtn = qs('#register-submit');
     if (!form) return;
 
+    // 若已登入，依角色自動導向不同介面
+    try {
+      const logged = window.MemberData && window.MemberData.isLoggedIn && window.MemberData.isLoggedIn();
+      if (logged) {
+        const role = (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
+        window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
+        return;
+      }
+    } catch(e){}
+
     if (flip && form && regForm) {
       // 先取消 register 的 hidden，量完再加回去
       const wasHidden = regForm.classList.contains('hidden');
@@ -175,8 +185,9 @@
         setBtnLoading(loginBtn, false);
         return;
       }
-      if (window.Toast && window.Toast.show) window.Toast.show('登入成功，前往個人頁…', 'success', 1500);
-      window.location.href = './member-profile.html';
+      const role = (res && res.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
+      if (window.Toast && window.Toast.show) window.Toast.show('登入成功，前往' + (role==='admin'?'管理頁':'個人頁') + '…', 'success', 1500);
+      window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
     });
 
     // Switch to register / login
@@ -190,7 +201,71 @@
       // 不再加 hidden，保留兩面以供翻轉
     });
 
-    // Register submit
+    // Admin verify modal（用於註冊時選擇是否升級管理者並輸入驗證碼）
+    const avModal = qs('#admin-verify-modal');
+    const avToggle = qs('#admin-verify-toggle');
+    const avWrap = qs('#admin-code-wrap');
+    const avCode = qs('#admin-verify-code');
+    const avStatus = qs('#admin-verify-status');
+    const avCancel = qs('#admin-verify-cancel');
+    const avOk = qs('#admin-verify-ok');
+    function updateOkLabel(){ if (!avOk) return; avOk.textContent = (avToggle && avToggle.checked) ? '以管理者註冊' : '繼續註冊'; }
+    function openAdminVerify(){ if(!avModal) return; avStatus && (avStatus.textContent=''); if (avToggle) { avToggle.checked=false; } if (avWrap) avWrap.classList.add('hidden'); if (avCode) avCode.value=''; updateOkLabel(); avModal.classList.remove('hidden'); setTimeout(()=> avModal.classList.add('open'), 0); }
+    function closeAdminVerify(){ if(!avModal) return; avModal.classList.remove('open'); const hide=()=>avModal.classList.add('hidden'); avModal.addEventListener('transitionend', function onEnd(e){ if(e.target===avModal){ avModal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
+    function setAdminLoading(on=true){ if(!avOk) return; if(!avOk.dataset.orig) avOk.dataset.orig = avOk.innerHTML; avOk.disabled=!!on; avOk.classList.toggle('opacity-50', !!on); avOk.classList.toggle('cursor-not-allowed', !!on); if(on){ avOk.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (avOk.textContent || '送出'); } else { avOk.innerHTML = avOk.dataset.orig; }}
+    avToggle?.addEventListener('change', ()=>{ if (!avWrap) return; avWrap.classList.toggle('hidden', !avToggle.checked); updateOkLabel(); if (avToggle.checked) avCode?.focus(); });
+
+    async function proceedRegister(isAdmin){
+      ensureError('', 'register-error', '#register-form');
+      const u = qs('#reg-username')?.value?.trim();
+      const email = qs('#reg-email')?.value?.trim();
+      const p1 = qs('#reg-password')?.value || '';
+      const p2 = qs('#reg-confirm')?.value || '';
+      if (!u || !email || !p1 || !p2) { ensureError('請完整填寫資料', 'register-error', '#register-form'); return; }
+      if (p1 !== p2) { ensureError('兩次密碼不一致', 'register-error', '#register-form'); return; }
+      if (p1.length < 8) { ensureError('密碼至少 8 碼', 'register-error', '#register-form'); return; }
+      if (!window.Auth || !window.Auth.register) { ensureError('註冊功能尚未載入', 'register-error', '#register-form'); return; }
+      let options = undefined;
+      if (isAdmin) {
+        const code = (avCode?.value || '').trim();
+        if (!code) { avStatus && (avStatus.textContent = '請輸入管理者驗證碼'); avCode?.focus(); return; }
+        options = { isAdmin: true, adminCode: code };
+      }
+      try {
+        setAdminLoading(true);
+        const r = await window.Auth.register(u, email, p1, options);
+        if (!r || !r.ok) {
+          const msg = (r && r.message) || '註冊失敗';
+          ensureError(msg, 'register-error', '#register-form');
+          avStatus && (avStatus.textContent = msg);
+          if (window.Toast && window.Toast.show) window.Toast.show(msg, 'error', 3000);
+          return;
+        }
+        closeAdminVerify();
+        const role = (r && r.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
+        if (window.Toast && window.Toast.show) window.Toast.show('註冊成功，前往' + (role==='admin'?'管理頁':'個人頁') + '…', 'success', 1500);
+        window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
+      } catch(err){
+        const msg = '註冊錯誤：' + err.message;
+        ensureError(msg, 'register-error', '#register-form');
+        avStatus && (avStatus.textContent = msg);
+        if (window.Toast && window.Toast.show) window.Toast.show(msg, 'error', 3000);
+      } finally {
+        setAdminLoading(false);
+      }
+    }
+
+    avCancel?.addEventListener('click', ()=>{ // 僅關閉，不送出
+      closeAdminVerify();
+    });
+    avOk?.addEventListener('click', ()=>{
+      const wantAdmin = !!avToggle?.checked;
+      proceedRegister(wantAdmin);
+    });
+    avModal?.addEventListener('click', (e)=>{ const t=e.target; if (t && (t.id==='admin-verify-modal' || t.classList.contains('overlay-bg'))) { closeAdminVerify(); /* 不自動註冊，使用者可再按註冊 */ } });
+    document.addEventListener('keydown', (e)=>{ if (!avModal || avModal.classList.contains('hidden')) return; if (e.key==='Escape'){ e.preventDefault(); closeAdminVerify(); } if (e.key==='Enter'){ e.preventDefault(); avOk?.click(); } });
+
+    // Register submit（以 Modal 取代 confirm/prompt）
     regForm?.addEventListener('submit', async (e) => {
       e.preventDefault();
       ensureError('', 'register-error', '#register-form');
@@ -202,12 +277,8 @@
       if (p1 !== p2) { ensureError('兩次密碼不一致', 'register-error', '#register-form'); return; }
       if (p1.length < 8) { ensureError('密碼至少 8 碼', 'register-error', '#register-form'); return; }
       if (!window.Auth || !window.Auth.register) { ensureError('註冊功能尚未載入', 'register-error', '#register-form'); return; }
-      setBtnLoading(regBtn, true);
-      const r = await window.Auth.register(u, email, p1);
-      if (!r.ok) { ensureError(r.message || '註冊失敗', 'register-error', '#register-form'); setBtnLoading(regBtn, false); if (window.Toast && window.Toast.show) window.Toast.show(r.message || '註冊失敗', 'error', 3000); return; }
-      // auto login and redirect
-      if (window.Toast && window.Toast.show) window.Toast.show('註冊成功，前往個人頁…', 'success', 1500);
-      window.location.href = './member-profile.html';
+      // 開啟管理者驗證 Modal，讓使用者選擇是否為管理者並輸入驗證碼
+      openAdminVerify();
     });
 
     // Enter 鍵保證送出（瀏覽器預設已送出，這裡確保在輸入框也觸發）
