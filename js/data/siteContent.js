@@ -2,7 +2,7 @@
 window.siteContent = {
   "index": {
     "heroTitle": "探索你的未來",
-    "heroSubtitle": "生命自己會長大，重要的是<br>如何幫助他們走在自己想要的道路上。",
+    "heroSubtitle": "生命自己會長大，重要的是<br>如何幫助他們走在自己<span class='text-orange-500'>想要</span>的道路上。",
     "heroImage": "./img/index-bg.png",
     "platformIntro": [
       {
