@@ -79,6 +79,27 @@
       }
     } catch(e){}
 
+    // Apply Font Awesome icons to buttons/links for consistency
+    try {
+      const icon = (html)=> html; // helper placeholder
+      const loginSubmit = qs('#login-submit');
+      const regSubmit = qs('#register-submit');
+      const switchToReg = qs('#switch-to-register');
+      const switchToLogin = qs('#switch-to-login');
+      const forgotCancel = qs('#forgot-cancel');
+      const forgotSubmit = qs('#forgot-submit');
+      const avCancelBtn = qs('#admin-verify-cancel');
+      const avOkBtn = qs('#admin-verify-ok');
+      if (loginSubmit) loginSubmit.innerHTML = icon('<i class="fas fa-sign-in-alt mr-2"></i> 登入');
+      if (regSubmit) regSubmit.innerHTML = icon('<i class="fas fa-user-plus mr-2"></i> 註冊');
+      if (switchToReg) switchToReg.innerHTML = icon('<i class="fas fa-user-plus mr-1"></i> 沒有帳號？註冊');
+      if (switchToLogin) switchToLogin.innerHTML = icon('<i class="fas fa-sign-in-alt mr-1"></i> 已有帳號？登入');
+      if (forgotCancel) forgotCancel.innerHTML = icon('<i class="fas fa-times mr-2"></i> 取消');
+      if (forgotSubmit) forgotSubmit.innerHTML = icon('<i class="fas fa-paper-plane mr-2"></i> 送出');
+      if (avCancelBtn) avCancelBtn.innerHTML = icon('<i class="fas fa-times mr-2"></i> 取消');
+      if (avOkBtn) avOkBtn.innerHTML = icon('<i class="fas fa-user-check mr-2"></i> 繼續註冊');
+    } catch(e) {}
+
     if (flip && form && regForm) {
       // 先取消 register 的 hidden，量完再加回去
       const wasHidden = regForm.classList.contains('hidden');
@@ -209,7 +230,7 @@
     const avStatus = qs('#admin-verify-status');
     const avCancel = qs('#admin-verify-cancel');
     const avOk = qs('#admin-verify-ok');
-    function updateOkLabel(){ if (!avOk) return; avOk.textContent = (avToggle && avToggle.checked) ? '以管理者註冊' : '繼續註冊'; }
+    function updateOkLabel(){ if (!avOk) return; avOk.innerHTML = (avToggle && avToggle.checked) ? '<i class="fas fa-user-shield mr-2"></i> 以管理者註冊' : '<i class="fas fa-user-check mr-2"></i> 繼續註冊'; }
     function openAdminVerify(){ if(!avModal) return; avStatus && (avStatus.textContent=''); if (avToggle) { avToggle.checked=false; } if (avWrap) avWrap.classList.add('hidden'); if (avCode) avCode.value=''; updateOkLabel(); avModal.classList.remove('hidden'); setTimeout(()=> avModal.classList.add('open'), 0); }
     function closeAdminVerify(){ if(!avModal) return; avModal.classList.remove('open'); const hide=()=>avModal.classList.add('hidden'); avModal.addEventListener('transitionend', function onEnd(e){ if(e.target===avModal){ avModal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
     function setAdminLoading(on=true){ if(!avOk) return; if(!avOk.dataset.orig) avOk.dataset.orig = avOk.innerHTML; avOk.disabled=!!on; avOk.classList.toggle('opacity-50', !!on); avOk.classList.toggle('cursor-not-allowed', !!on); if(on){ avOk.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (avOk.textContent || '送出'); } else { avOk.innerHTML = avOk.dataset.orig; }}

@@ -831,16 +831,20 @@ input:focus, select:focus, textarea:focus {
 .dark #sc-story-list:empty::after { color: #9ca3af; background: rgba(96,165,250,.08); border-color: #60a5fa; }
 
 /* ==============================
-   Nav｜品牌文字 hover 顯示圖片
+   Nav｜品牌圖片預設，hover 顯示文字
 ============================== */
 .nav-brand { position: relative; display: inline-flex; align-items: center; gap: .5rem; }
-.nav-brand .brand-title-img { width: 50px; height: auto; opacity: 0; transform: translateY(4px); transition: opacity .25s ease, transform .25s ease; filter: drop-shadow(0 4px 10px rgba(0,0,0,.15)); }
-.nav-brand:hover .brand-title-img { opacity: 1; transform: translateY(0); }
+.nav-brand .brand-title-img { width: 75px; height: auto; transform: translateY(0); transition: transform .25s ease; filter: drop-shadow(0 4px 10px rgba(0,0,0,.15)); }
+.nav-brand .brand-title-text { opacity: 0; transform: translateY(4px); max-width: 0; overflow: hidden; white-space: nowrap; transition: opacity .25s ease, transform .25s ease, max-width .25s ease; }
+.nav-brand:hover .brand-title-text { opacity: 1; transform: translateY(0); max-width: 280px; }
 
 /* ==============================
    首頁｜平台導覽：圖片鋸齒/筆刷邊（純 CSS）
    說明：透過 conic-gradient 疊出鋸齒，--intro-bg 與區塊背景對齊
 ============================== */
+#profile-sections input,
+#profile-sections textarea { min-inline-size: 50px; }
+
 #platform-intro { --intro-bg: #ffffff; }
 @media (prefers-color-scheme: dark) { #platform-intro { --intro-bg: #111827; } }
 body.dark #platform-intro { --intro-bg: #111827; }

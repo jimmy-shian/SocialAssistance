@@ -28,7 +28,7 @@ window.AppConfig = {
     providers: 'providers',
     site: 'siteContent'
   },
-  versionCacheKey: 'app_data_version',
+  versionCacheKey: '1.0.0',
   // 預設不在公開頁自動向 GAS 取資料
   autoFetchPublic: false
 };

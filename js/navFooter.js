@@ -5,9 +5,10 @@ function renderNavFooter() {
     <header class="bg-gray-100 dark:bg-gray-800 shadow-md relative z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="主選單">
             <a href="./index.html" class="nav-brand text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-purple-500">
-              核心生涯探索平台
               <img src="./img/soundcore3co-title.png" alt="SoundCore Title" class="brand-title-img" />
+              <span class="brand-title-text">核心生涯探索平台</span>
             </a>
+
             <div class="hidden md:flex items-center space-x-6">
                 <a href="./about.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">關於我們</a>
                 <a href="./explore.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">探索資源平台</a>
@@ -64,10 +65,10 @@ function renderNavFooter() {
       </h2>
 
       <div class="mt-4 space-y-2 text-sm md:text-base">
-        <p>📞 0988-368-450</p>
-        <p>
-          📧 
-          <a href="mailto:soundcore.3co@gmail.com" class="text-blue-600 dark:text-blue-400 underline">
+        <p class="text-gray-700 dark:text-gray-200"><i class="fas fa-phone mr-2 text-gray-600 dark:text-gray-300"></i>0988-368-450</p>
+        <p class="text-gray-700 dark:text-gray-200">
+          <i class="fas fa-envelope mr-2 text-gray-600 dark:text-gray-300"></i>
+          <a href="mailto:soundcore.3co@gmail.com" class="hover:text-purple-400 hover:underline transition-colors duration-200">
             soundcore.3co@gmail.com
           </a>
         </p>
@@ -206,6 +207,10 @@ function renderNavFooter() {
             ];
             const perPage = [];
             const styles = [];
+            // Global styles used across pages (use FA v5 to match existing 'fas' usage)
+            try {
+              styles.push('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+            } catch(e) {}
             if (page === 'explore.html') {
               perPage.push('./js/explore.js');
             } else if (page === 'member.html') {
@@ -222,7 +227,8 @@ function renderNavFooter() {
               // 後台需要以本地 js/data 為來源（非 GAS），因此一併載入三個資料檔
               perPage.push('./js/data/aboutContent.js', './js/data/siteContent.js', './js/auth.js', './js/admin.js');
             } else if (page === 'member-profile.html'){
-              perPage.push('./js/member-profile.js', './js/auth.js', './js/member-data.js');
+              // 確保依賴順序：先載入 auth 與 member-data，再載入頁面腳本，避免 window.MemberData 尚未存在就執行導致被導回登入頁
+              perPage.push('./js/auth.js', './js/member-data.js', './js/member-profile.js');
             }
              else if (page === 'member-admin.html') {
               perPage.push('./js/auth.js', './js/member-admin.js');
@@ -236,17 +242,65 @@ function renderNavFooter() {
               (footerPlaceholder || document.body).appendChild(bundle);
             }
 
+            // Compute site data-driven asset version based on AppConfig.versionCacheKey cache in localStorage,
+            // fallback to per-session asset_v or Date.now
+            const __assetV = (()=>{
+              try {
+                const K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+                const raw = localStorage.getItem(K);
+                if (raw) {
+                  const versions = JSON.parse(raw || '{}') || {};
+                  if (versions && typeof versions === 'object') {
+                    const vals = Object.values(versions);
+                    if (vals && vals.length) { return vals.join('.'); }
+                  }
+                }
+              } catch(e) {}
+              try {
+                const k = 'asset_v';
+                let v = sessionStorage.getItem(k);
+                if (!v) { v = String(Date.now()); sessionStorage.setItem(k, v); }
+                return v;
+              } catch { return String(Date.now()); }
+            })();
+
+            // Update existing local CSS link tags in the page to ensure they carry the same ?v
+            (function patchExistingAssets(){
+              try {
+                function setParam(u){
+                  try { const url = new URL(u, document.baseURI); url.searchParams.set('v', __assetV); return url.href; }
+                  catch { return (u.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, '')) + (u.includes('?')?'&':'?') + 'v=' + encodeURIComponent(__assetV); }
+                }
+                // Patch local stylesheets
+                document.querySelectorAll('link[rel="stylesheet"][href^="./"], link[rel="stylesheet"][href^="css/"]').forEach(l=>{
+                  const href = l.getAttribute('href')||'';
+                  if (/^https?:/i.test(href)) return; // skip CDN
+                  l.href = setParam(href);
+                });
+              } catch(e) { /* noop */ }
+            })();
+
             function resolveAbs(u){ try { return new URL(u, document.baseURI).href; } catch { return u; } }
+            function addVersionParam(u){
+              try { const url = new URL(u, document.baseURI); if (!url.searchParams.has('v')) url.searchParams.set('v', __assetV); return url.href; }
+              catch { return (u + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(__assetV)); }
+            }
+            function normalizeNoV(u){
+              try { const url = new URL(u, document.baseURI); url.searchParams.delete('v'); return url.href; }
+              catch {
+                try { return u.replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); } catch { return u; }
+              }
+            }
             function addScriptOnce(src) {
-              const target = resolveAbs(src);
+              const targetNoV = normalizeNoV(resolveAbs(src));
               const already = Array.from(document.scripts).some(s => {
-                const cur = s.src ? resolveAbs(s.src) : '';
-                return cur === target;
+                const cur = s.src ? normalizeNoV(resolveAbs(s.src)) : '';
+                return cur === targetNoV;
               });
               if (already) return Promise.resolve();
               return new Promise((resolve) => {
                 const s = document.createElement('script');
-                s.src = src; s.defer = false; s.async = false;
+                s.src = addVersionParam(src); s.defer = false; s.async = false;
                 s.onload = () => resolve();
                 s.onerror = (e) => { console.warn('Script load failed:', src, e); resolve(); };
                 bundle.appendChild(s);
@@ -254,16 +308,18 @@ function renderNavFooter() {
             }
 
             function addStyleOnce(href) {
+              const targetNoV = normalizeNoV(resolveAbs(href));
               const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
               const hit = links.some(l => {
                 const cur = l.href || '';
-                return cur === href || cur.endsWith(href) || cur.includes(href.replace('https://','').replace('http://',''));
+                const curNoV = normalizeNoV(cur);
+                return curNoV === targetNoV;
               });
               if (hit) return Promise.resolve();
               return new Promise((resolve) => {
                 const l = document.createElement('link');
                 l.rel = 'stylesheet';
-                l.href = href;
+                l.href = addVersionParam(href);
                 l.onload = () => resolve();
                 l.onerror = () => { console.warn('Stylesheet load failed:', href); resolve(); };
                 document.head.appendChild(l);
