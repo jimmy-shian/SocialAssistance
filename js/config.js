@@ -1,7 +1,7 @@
 // Global configuration for GAS backend integration
 window.AppConfig = {
   // TODO: 填入你部署完成的 Google Apps Script Web App URL（結尾不要有斜線）
-  GAS_BASE_URL: 'https://script.google.com/macros/s/AKfycbzNax9nA1Jv7Tlqu0HY3flKN7GPyOfUdmGw5mJ5_pQaE4_S-tdtPbm_NCcmSq1xPUmqTg/exec',
+  GAS_BASE_URL: 'https://script.google.com/macros/s/AKfycbx26bhTvc8qd03SKcbveq9AP5VZ6cK-dXbDeixnPY855bRUSE-iogcpfQUuRToavcxPRw/exec',
   // 以單一 Web App 端點 + action 路由
   endpoints: {
     // Admin login (DataAPI uses this)
