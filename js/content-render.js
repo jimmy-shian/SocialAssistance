@@ -181,7 +181,10 @@
     const featured = document.getElementById('featured-cases');
     if (featured) {
       const providers = window.providersData || {};
-      const featuredProviders = Object.values(providers).filter(p => p && p.featuredOnIndex);
+      // 帶入缺漏的 id（以鍵名補上），避免連結失效
+      const featuredProviders = Object.entries(providers)
+        .map(([k,p]) => p && p.featuredOnIndex ? { ...p, id: p.id || k } : null)
+        .filter(Boolean);
       featured.innerHTML = '';
       const src = featuredProviders.length ? featuredProviders : (data.featured || []).map(x => ({
         name: x.title, description: x.text, id: (x.link||'').split('=')[1] || ''

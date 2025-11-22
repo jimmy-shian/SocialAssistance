@@ -523,6 +523,7 @@
     } catch(e) { /* ignore */ }
 
     // 寫入內部編輯器狀態
+    if (isProvidersSelected()) { try { ensureProviderIds(payload); } catch(e){} }
     setEditor(payload);
     // 渲染對應視覺化介面
     if (isProvidersSelected()) {
@@ -627,6 +628,60 @@
       description: linkifyHtml(s('#pv-desc')?.value || ''),
       featuredOnIndex: !!s('#pv-featured')?.checked
     };
+  }
+
+  // 確保每個 provider 物件都含有對應鍵名的 id 屬性
+  function ensureProviderIds(root){
+    try {
+      if (!root || typeof root !== 'object') return root;
+      Object.entries(root).forEach(([key, p])=>{
+        if (p && typeof p === 'object') {
+          if (!p.id || p.id !== key) p.id = key;
+        }
+      });
+    } catch(e){}
+    return root;
+  }
+
+  // 依「name」自動生成 provider id（slug），並以新 id 重建 map；
+  // 僅針對「新建/臨時 id 或缺 id」的項目改名，其餘沿用既有 id，並保證唯一
+  function normalizeProviderIdsFromNames(root){
+    const out = {};
+    const idMap = {};
+    try {
+      const used = new Set();
+      const entries = Object.entries(root || {});
+      const slugify = (s)=> {
+        const txt = String(s||'').toLowerCase();
+        try { return txt.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\-\s]+/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,''); }
+        catch(_) { return txt.replace(/[^a-z0-9\-\s]+/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,''); }
+      };
+      const makeUnique = (base)=>{
+        let id = base && base.length ? base : 'provider';
+        let n = 2;
+        while (used.has(id)) { id = `${base}-${n++}`; }
+        used.add(id); return id;
+      };
+      let seq = 1;
+      entries.forEach(([oldKey, p])=>{
+        const obj = (p && typeof p==='object') ? { ...p } : {};
+        const curId = (obj.id || oldKey || '').trim();
+        const isTemp = /^provider-[0-9a-z]+$/i.test(oldKey) && (!obj.id || obj.id === oldKey);
+        let nextId = curId;
+        if (!curId || isTemp) {
+          let base = slugify(obj.name);
+          if (!base) { base = `provider-${seq++}`; }
+          nextId = makeUnique(base);
+        } else {
+          // respect existing id but still ensure global uniqueness
+          nextId = makeUnique(curId);
+        }
+        obj.id = nextId;
+        out[nextId] = obj;
+        idMap[oldKey] = nextId;
+      });
+    } catch(e){}
+    return { root: out, idMap };
   }
 
   // ===== Timeline 編輯 =====
@@ -1027,11 +1082,11 @@
   // Provider add / delete
   qs('#pv-add-provider')?.addEventListener('click', ()=>{
     const obj = getEditorJSON();
-    let id = prompt('請輸入新的 Provider ID（僅英文與數字、連字號）：', 'provider-' + Date.now().toString(36));
-    if (!id) return;
-    id = id.trim();
-    if (obj[id]) { alert('此 ID 已存在'); return; }
-    obj[id] = { name:'', category:'', location:'', address:'', description:'', coords: undefined, cases: [], timeline: [], featuredOnIndex: false };
+    // 不再詢問 ID；先以臨時鍵建立，真正的 id 將在儲存時依 name 自動產生
+    const base = 'provider-' + Date.now().toString(36);
+    let id = base; let n = 2;
+    while (obj[id]) { id = `${base}-${n++}`; }
+    obj[id] = { id, name:'', category:'', location:'', address:'', description:'', coords: undefined, cases: [], timeline: [], featuredOnIndex: false };
     setEditor(obj);
     fillProviderSelect(obj);
     qs('#pv-prov-select').value = id;
@@ -1065,6 +1120,8 @@
     if (!root[id]) root[id] = {};
     const basic = collectBasicFields();
     root[id] = { ...root[id], ...basic };
+    // 保證 provider.id 與鍵名一致
+    root[id].id = id;
     root[id].timeline = collectTimeline();
     root[id].cases = collectCasesFromUI();
     setEditor(root);
@@ -1077,7 +1134,26 @@
     try {
       setBtnLoading(qs('#btn-save-publish'), true);
       let payload;
-      if (isProvidersSelected()) { syncCurrentProviderToEditor(); payload = getEditorJSON(); }
+      if (isProvidersSelected()) {
+        // 將目前 UI 回寫到編輯器，接著依 name 正規化 id 並重建鍵
+        syncCurrentProviderToEditor();
+        const before = getEditorJSON();
+        const oldSel = qs('#pv-prov-select')?.value;
+        const norm = normalizeProviderIdsFromNames(before);
+        payload = norm.root;
+        // 立即同步回編輯器與 UI（避免後續操作仍使用舊鍵）
+        setEditor(payload);
+        try {
+          fillProviderSelect(payload);
+          const nextSel = (oldSel && norm.idMap[oldSel]) || Object.keys(payload||{})[0];
+          if (nextSel) {
+            qs('#pv-prov-select').value = nextSel;
+            try { updatePvProvButtonLabelFromSelect(); } catch(e){}
+            const p = payload[nextSel] || {};
+            renderCasesEditor(p); fillBasicFields(p); renderTimelineEditor(p);
+          }
+        } catch(e){}
+      }
       else if (isAboutSelected()) { payload = collectAboutFromUI(); }
       else if (isSiteSelected()) { payload = collectSiteFromUI(); }
       else { payload = getEditorJSON(); }
@@ -1125,7 +1201,24 @@
     try {
       setBtnLoading(qs('#btn-save-only'), true);
       let payload;
-      if (isProvidersSelected()) { syncCurrentProviderToEditor(); payload = getEditorJSON(); }
+      if (isProvidersSelected()) {
+        syncCurrentProviderToEditor();
+        const before = getEditorJSON();
+        const oldSel = qs('#pv-prov-select')?.value;
+        const norm = normalizeProviderIdsFromNames(before);
+        payload = norm.root;
+        setEditor(payload);
+        try {
+          fillProviderSelect(payload);
+          const nextSel = (oldSel && norm.idMap[oldSel]) || Object.keys(payload||{})[0];
+          if (nextSel) {
+            qs('#pv-prov-select').value = nextSel;
+            try { updatePvProvButtonLabelFromSelect(); } catch(e){}
+            const p = payload[nextSel] || {};
+            renderCasesEditor(p); fillBasicFields(p); renderTimelineEditor(p);
+          }
+        } catch(e){}
+      }
       else if (isAboutSelected()) { payload = collectAboutFromUI(); }
       else if (isSiteSelected()) { payload = collectSiteFromUI(); }
       else { payload = getEditorJSON(); }

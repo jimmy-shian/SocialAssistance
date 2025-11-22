@@ -60,7 +60,8 @@
     if (!grid) return;
     grid.setAttribute('aria-busy', 'true');
     grid.innerHTML = '';
-    const all = Object.values(dataset());
+    // 確保每個 provider 皆有 id（若缺則以鍵名補上）
+    const all = Object.entries(dataset()).map(([k, p]) => ({ ...p, id: p && p.id ? p.id : k }));
     const filtered = filterList(all, searchInput && searchInput.value, categorySelect && categorySelect.value);
     if (!filtered.length) {
       const empty = el('div', 'text-center text-gray-500 col-span-full');

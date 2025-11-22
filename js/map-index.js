@@ -68,7 +68,7 @@
     // No geolocation: we'll center on a random provider below
 
     const data = window.providersData || {};
-    const items = Object.values(data);
+    const items = Object.entries(data).map(([k, p]) => ({ ...p, id: p && p.id ? p.id : k }));
     // Random initial center from one provider
     const withCoords = items.filter(p => p && p.coords);
     if (withCoords.length) {
