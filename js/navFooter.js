@@ -1,7 +1,7 @@
 // 動態插入 nav 與 footer 統一元件
 function renderNavFooter() {
-    // nav 統一元件
-    const navHTML = `
+  // nav 統一元件
+  const navHTML = `
     <header class="bg-gray-100 dark:bg-gray-800 shadow-md relative z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="主選單">
             <a href="./index.html" class="nav-brand text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-purple-500">
@@ -48,8 +48,8 @@ function renderNavFooter() {
         </div>
     </header>`;
 
-    // footer 統一元件（使用者提供之聯絡資訊）
-    const footerHTML = `
+  // footer 統一元件（使用者提供之聯絡資訊）
+  const footerHTML = `
     <footer class="bg-gray-100 dark:bg-gray-300 text-gray-800 dark:text-gray-100 mt-16 px-6 py-10">
   <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-10">
     
@@ -82,7 +82,7 @@ function renderNavFooter() {
         <!-- Facebook -->
         <a href="https://www.facebook.com/profile.php?id=61571413520720&locale=zh_TW" target="_blank" aria-label="Facebook">
           <img 
-            src="https://cdn.simpleicons.org/facebook" 
+            src="https://cdn.simpleicons.org/facebook/000/fff" 
             alt="Facebook"
             class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
           />
@@ -92,7 +92,7 @@ function renderNavFooter() {
         <!-- Instagram -->
         <a href="https://instagram.com/soundcore_2025/" target="_blank" aria-label="Instagram">
           <img 
-            src="https://cdn.simpleicons.org/instagram" 
+            src="https://cdn.simpleicons.org/instagram/000/fff" 
             alt="Instagram"
             class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
           />
@@ -101,7 +101,7 @@ function renderNavFooter() {
         <!-- Line -->
         <a href="https://lin.ee/1C3roAfA" target="_blank" aria-label="Line">
           <img 
-            src="https://cdn.simpleicons.org/line" 
+            src="https://cdn.simpleicons.org/line/000/fff" 
             alt="Line"
             class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
           />
@@ -110,7 +110,7 @@ function renderNavFooter() {
         <!-- Threads -->
         <a href="https://www.threads.net/@soundcore_2025?hl=zh-tw" target="_blank" aria-label="Threads">
           <img 
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/threads.svg" 
+            src="https://cdn.simpleicons.org/threads/000/fff" 
             alt="Threads"
             class="w-6 h-6 filter grayscale brightness-0 dark:invert transition duration-300 hover:filter-none"
           />
@@ -124,221 +124,221 @@ function renderNavFooter() {
     &copy; 2025 聽見核心工作室 SoundCore 3Co. All rights reserved.
   </div>
 </footer>`
-;
+    ;
 
-    // 插入到指定的 placeholder
-    const navPlaceholder = document.getElementById('nav-placeholder');
-    const footerPlaceholder = document.getElementById('footer-placeholder');
-    if (navPlaceholder) navPlaceholder.innerHTML = navHTML;
-    if (footerPlaceholder) footerPlaceholder.innerHTML = footerHTML;
+  // 插入到指定的 placeholder
+  const navPlaceholder = document.getElementById('nav-placeholder');
+  const footerPlaceholder = document.getElementById('footer-placeholder');
+  if (navPlaceholder) navPlaceholder.innerHTML = navHTML;
+  if (footerPlaceholder) footerPlaceholder.innerHTML = footerHTML;
 
-    // 設定當前頁面 active 樣式與 aria 屬性
-    try {
-        const current = (location.pathname.split('/').pop() || 'index.html').replace('#', '');
-        const links = document.querySelectorAll('.nav-link');
-        links.forEach((a) => {
-            const href = a.getAttribute('href') || '';
-            const file = href.split('/').pop();
-            if (file === current || (current === '' && file === 'index.html')) {
-                a.classList.remove('text-gray-600');
-                a.classList.add('text-purple-600', 'font-bold');
-                a.setAttribute('aria-current', 'page');
-            } else {
-                a.removeAttribute('aria-current');
-            }
-        });
-    } catch (e) {
-        console.warn('Active nav highlight failed:', e);
+  // 設定當前頁面 active 樣式與 aria 屬性
+  try {
+    const current = (location.pathname.split('/').pop() || 'index.html').replace('#', '');
+    const links = document.querySelectorAll('.nav-link');
+    links.forEach((a) => {
+      const href = a.getAttribute('href') || '';
+      const file = href.split('/').pop();
+      if (file === current || (current === '' && file === 'index.html')) {
+        a.classList.remove('text-gray-600');
+        a.classList.add('text-purple-600', 'font-bold');
+        a.setAttribute('aria-current', 'page');
+      } else {
+        a.removeAttribute('aria-current');
+      }
+    });
+  } catch (e) {
+    console.warn('Active nav highlight failed:', e);
+  }
+
+  // 綁定手機選單開關
+  try {
+    const btn = document.getElementById('nav-toggle');
+    const panel = document.getElementById('mobile-menu');
+    if (btn && panel) {
+      const openMenu = () => {
+        panel.classList.remove('hidden');
+        panel.setAttribute('aria-hidden', 'false');
+        // force reflow, then add open for transition
+        void panel.offsetHeight;
+        panel.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      };
+      const closeMenu = () => {
+        panel.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+        panel.setAttribute('aria-hidden', 'true');
+        const hide = () => { panel.classList.add('hidden'); };
+        // wait for transition end, with fallback timeout
+        const onEnd = (e) => { if (e.target === panel) { panel.removeEventListener('transitionend', onEnd); hide(); } };
+        panel.addEventListener('transitionend', onEnd);
+        setTimeout(() => { panel.removeEventListener('transitionend', onEnd); hide(); }, 280);
+      };
+
+      btn.addEventListener('click', () => {
+        const isOpen = panel.classList.contains('open') && !panel.classList.contains('hidden');
+        if (isOpen) closeMenu(); else openMenu();
+      });
+      // 點擊連結後自動收合
+      panel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        closeMenu();
+      }));
+      // 手機上的主題與字級按鈕委派到桌面版按鈕
+      document.getElementById('theme-toggle-mobile')?.addEventListener('click', () => document.getElementById('theme-toggle')?.click());
+      document.getElementById('font-size-btn-mobile')?.addEventListener('click', () => document.getElementById('font-size-btn')?.click());
     }
+  } catch (e) {
+    console.warn('Mobile menu bind failed:', e);
+  }
 
-    // 綁定手機選單開關
-    try {
-        const btn = document.getElementById('nav-toggle');
-        const panel = document.getElementById('mobile-menu');
-        if (btn && panel) {
-            const openMenu = () => {
-              panel.classList.remove('hidden');
-              panel.setAttribute('aria-hidden', 'false');
-              // force reflow, then add open for transition
-              void panel.offsetHeight;
-              panel.classList.add('open');
-              btn.setAttribute('aria-expanded', 'true');
-            };
-            const closeMenu = () => {
-              panel.classList.remove('open');
-              btn.setAttribute('aria-expanded', 'false');
-              panel.setAttribute('aria-hidden', 'true');
-              const hide = () => { panel.classList.add('hidden'); };
-              // wait for transition end, with fallback timeout
-              const onEnd = (e) => { if (e.target === panel) { panel.removeEventListener('transitionend', onEnd); hide(); } };
-              panel.addEventListener('transitionend', onEnd);
-              setTimeout(() => { panel.removeEventListener('transitionend', onEnd); hide(); }, 280);
-            };
+  // 通知其他腳本 nav/footer 已經注入
+  document.dispatchEvent(new CustomEvent('nav-footer-rendered'));
 
-            btn.addEventListener('click', () => {
-                const isOpen = panel.classList.contains('open') && !panel.classList.contains('hidden');
-                if (isOpen) closeMenu(); else openMenu();
-            });
-            // 點擊連結後自動收合
-            panel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
-                closeMenu();
-            }));
-            // 手機上的主題與字級按鈕委派到桌面版按鈕
-            document.getElementById('theme-toggle-mobile')?.addEventListener('click', () => document.getElementById('theme-toggle')?.click());
-            document.getElementById('font-size-btn-mobile')?.addEventListener('click', () => document.getElementById('font-size-btn')?.click());
+  // 動態在頁尾注入共用與頁面腳本，集中管理
+  try {
+    (async function injectScripts() {
+      const page = (location.pathname.split('/').pop() || 'index.html').replace('#', '');
+      let base = [
+        './js/config.js',
+        './js/toast.js',
+        './js/data-loader.js',
+        './js/data/providers.js',
+        './js/main.js'
+      ];
+      const perPage = [];
+      const styles = [];
+      // Global styles used across pages (use FA v5 to match existing 'fas' usage)
+      try {
+        styles.push('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+      } catch (e) { }
+      if (page === 'explore.html') {
+        perPage.push('./js/explore.js');
+      } else if (page === 'member.html') {
+        perPage.push('./js/auth.js', './js/member-ui.js');
+      } else if (page === 'index.html') {
+        styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+        perPage.push('./js/data/siteContent.js', './js/content-render.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-index.js');
+      } else if (page === 'provider.html') {
+        styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+        perPage.push('./js/provider-detail.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-provider.js');
+      } else if (page === 'about.html') {
+        perPage.push('./js/data/aboutContent.js', './js/about.js');
+      } else if (page === 'admin.html') {
+        // 後台需要以本地 js/data 為來源（非 GAS），因此一併載入三個資料檔
+        perPage.push('./js/data/aboutContent.js', './js/data/siteContent.js', './js/auth.js', './js/admin.js');
+      } else if (page === 'member-profile.html') {
+        // 確保依賴順序：先載入 auth 與 member-data，再載入頁面腳本，避免 window.MemberData 尚未存在就執行導致被導回登入頁
+        perPage.push('./js/auth.js', './js/member-data.js', './js/member-profile.js');
+      }
+      else if (page === 'member-admin.html') {
+        perPage.push('./js/auth.js', './js/member-admin.js');
+      }
+
+      const containerId = 'global-script-bundle';
+      let bundle = document.getElementById(containerId);
+      if (!bundle) {
+        bundle = document.createElement('div');
+        bundle.id = containerId;
+        (footerPlaceholder || document.body).appendChild(bundle);
+      }
+
+      // Compute site data-driven asset version based on AppConfig.versionCacheKey cache in localStorage,
+      // fallback to per-session asset_v or Date.now
+      const __assetV = (() => {
+        try {
+          const K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+          const raw = localStorage.getItem(K);
+          if (raw) {
+            const versions = JSON.parse(raw || '{}') || {};
+            if (versions && typeof versions === 'object') {
+              const vals = Object.values(versions);
+              if (vals && vals.length) { return vals.join('.'); }
+            }
+          }
+        } catch (e) { }
+        try {
+          const k = 'asset_v';
+          let v = sessionStorage.getItem(k);
+          if (!v) { v = String(Date.now()); sessionStorage.setItem(k, v); }
+          return v;
+        } catch { return String(Date.now()); }
+      })();
+
+      // Update existing local CSS link tags in the page to ensure they carry the same ?v
+      (function patchExistingAssets() {
+        try {
+          function setParam(u) {
+            try { const url = new URL(u, document.baseURI); url.searchParams.set('v', __assetV); return url.href; }
+            catch { return (u.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, '')) + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(__assetV); }
+          }
+          // Patch local stylesheets
+          document.querySelectorAll('link[rel="stylesheet"][href^="./"], link[rel="stylesheet"][href^="css/"]').forEach(l => {
+            const href = l.getAttribute('href') || '';
+            if (/^https?:/i.test(href)) return; // skip CDN
+            l.href = setParam(href);
+          });
+        } catch (e) { /* noop */ }
+      })();
+
+      function resolveAbs(u) { try { return new URL(u, document.baseURI).href; } catch { return u; } }
+      function addVersionParam(u) {
+        try { const url = new URL(u, document.baseURI); if (!url.searchParams.has('v')) url.searchParams.set('v', __assetV); return url.href; }
+        catch { return (u + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(__assetV)); }
+      }
+      function normalizeNoV(u) {
+        try { const url = new URL(u, document.baseURI); url.searchParams.delete('v'); return url.href; }
+        catch {
+          try { return u.replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); } catch { return u; }
         }
-    } catch (e) {
-        console.warn('Mobile menu bind failed:', e);
-    }
+      }
+      function addScriptOnce(src) {
+        const targetNoV = normalizeNoV(resolveAbs(src));
+        const already = Array.from(document.scripts).some(s => {
+          const cur = s.src ? normalizeNoV(resolveAbs(s.src)) : '';
+          return cur === targetNoV;
+        });
+        if (already) return Promise.resolve();
+        return new Promise((resolve) => {
+          const s = document.createElement('script');
+          s.src = addVersionParam(src); s.defer = false; s.async = false;
+          s.onload = () => resolve();
+          s.onerror = (e) => { console.warn('Script load failed:', src, e); resolve(); };
+          bundle.appendChild(s);
+        });
+      }
 
-    // 通知其他腳本 nav/footer 已經注入
-    document.dispatchEvent(new CustomEvent('nav-footer-rendered'));
+      function addStyleOnce(href) {
+        const targetNoV = normalizeNoV(resolveAbs(href));
+        const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+        const hit = links.some(l => {
+          const cur = l.href || '';
+          const curNoV = normalizeNoV(cur);
+          return curNoV === targetNoV;
+        });
+        if (hit) return Promise.resolve();
+        return new Promise((resolve) => {
+          const l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href = addVersionParam(href);
+          l.onload = () => resolve();
+          l.onerror = () => { console.warn('Stylesheet load failed:', href); resolve(); };
+          document.head.appendChild(l);
+        });
+      }
 
-    // 動態在頁尾注入共用與頁面腳本，集中管理
-    try {
-        (async function injectScripts() {
-            const page = (location.pathname.split('/').pop() || 'index.html').replace('#','');
-            let base = [
-              './js/config.js',
-              './js/toast.js',
-              './js/data-loader.js',
-              './js/data/providers.js',
-              './js/main.js'
-            ];
-            const perPage = [];
-            const styles = [];
-            // Global styles used across pages (use FA v5 to match existing 'fas' usage)
-            try {
-              styles.push('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
-            } catch(e) {}
-            if (page === 'explore.html') {
-              perPage.push('./js/explore.js');
-            } else if (page === 'member.html') {
-              perPage.push('./js/auth.js', './js/member-ui.js');
-            } else if (page === 'index.html') {
-              styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-              perPage.push('./js/data/siteContent.js', './js/content-render.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-index.js');
-            } else if (page === 'provider.html') {
-              styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-              perPage.push('./js/provider-detail.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-provider.js');
-            } else if (page === 'about.html') {
-              perPage.push('./js/data/aboutContent.js', './js/about.js');
-            } else if (page === 'admin.html') {
-              // 後台需要以本地 js/data 為來源（非 GAS），因此一併載入三個資料檔
-              perPage.push('./js/data/aboutContent.js', './js/data/siteContent.js', './js/auth.js', './js/admin.js');
-            } else if (page === 'member-profile.html'){
-              // 確保依賴順序：先載入 auth 與 member-data，再載入頁面腳本，避免 window.MemberData 尚未存在就執行導致被導回登入頁
-              perPage.push('./js/auth.js', './js/member-data.js', './js/member-profile.js');
-            }
-             else if (page === 'member-admin.html') {
-              perPage.push('./js/auth.js', './js/member-admin.js');
-            }
-
-            const containerId = 'global-script-bundle';
-            let bundle = document.getElementById(containerId);
-            if (!bundle) {
-              bundle = document.createElement('div');
-              bundle.id = containerId;
-              (footerPlaceholder || document.body).appendChild(bundle);
-            }
-
-            // Compute site data-driven asset version based on AppConfig.versionCacheKey cache in localStorage,
-            // fallback to per-session asset_v or Date.now
-            const __assetV = (()=>{
-              try {
-                const K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
-                const raw = localStorage.getItem(K);
-                if (raw) {
-                  const versions = JSON.parse(raw || '{}') || {};
-                  if (versions && typeof versions === 'object') {
-                    const vals = Object.values(versions);
-                    if (vals && vals.length) { return vals.join('.'); }
-                  }
-                }
-              } catch(e) {}
-              try {
-                const k = 'asset_v';
-                let v = sessionStorage.getItem(k);
-                if (!v) { v = String(Date.now()); sessionStorage.setItem(k, v); }
-                return v;
-              } catch { return String(Date.now()); }
-            })();
-
-            // Update existing local CSS link tags in the page to ensure they carry the same ?v
-            (function patchExistingAssets(){
-              try {
-                function setParam(u){
-                  try { const url = new URL(u, document.baseURI); url.searchParams.set('v', __assetV); return url.href; }
-                  catch { return (u.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, '')) + (u.includes('?')?'&':'?') + 'v=' + encodeURIComponent(__assetV); }
-                }
-                // Patch local stylesheets
-                document.querySelectorAll('link[rel="stylesheet"][href^="./"], link[rel="stylesheet"][href^="css/"]').forEach(l=>{
-                  const href = l.getAttribute('href')||'';
-                  if (/^https?:/i.test(href)) return; // skip CDN
-                  l.href = setParam(href);
-                });
-              } catch(e) { /* noop */ }
-            })();
-
-            function resolveAbs(u){ try { return new URL(u, document.baseURI).href; } catch { return u; } }
-            function addVersionParam(u){
-              try { const url = new URL(u, document.baseURI); if (!url.searchParams.has('v')) url.searchParams.set('v', __assetV); return url.href; }
-              catch { return (u + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(__assetV)); }
-            }
-            function normalizeNoV(u){
-              try { const url = new URL(u, document.baseURI); url.searchParams.delete('v'); return url.href; }
-              catch {
-                try { return u.replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); } catch { return u; }
-              }
-            }
-            function addScriptOnce(src) {
-              const targetNoV = normalizeNoV(resolveAbs(src));
-              const already = Array.from(document.scripts).some(s => {
-                const cur = s.src ? normalizeNoV(resolveAbs(s.src)) : '';
-                return cur === targetNoV;
-              });
-              if (already) return Promise.resolve();
-              return new Promise((resolve) => {
-                const s = document.createElement('script');
-                s.src = addVersionParam(src); s.defer = false; s.async = false;
-                s.onload = () => resolve();
-                s.onerror = (e) => { console.warn('Script load failed:', src, e); resolve(); };
-                bundle.appendChild(s);
-              });
-            }
-
-            function addStyleOnce(href) {
-              const targetNoV = normalizeNoV(resolveAbs(href));
-              const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
-              const hit = links.some(l => {
-                const cur = l.href || '';
-                const curNoV = normalizeNoV(cur);
-                return curNoV === targetNoV;
-              });
-              if (hit) return Promise.resolve();
-              return new Promise((resolve) => {
-                const l = document.createElement('link');
-                l.rel = 'stylesheet';
-                l.href = addVersionParam(href);
-                l.onload = () => resolve();
-                l.onerror = () => { console.warn('Stylesheet load failed:', href); resolve(); };
-                document.head.appendChild(l);
-              });
-            }
-
-            // 依序載入，確保依賴順序（先樣式後腳本）
-            for (const href of styles) { await addStyleOnce(href); }
-            for (const src of base) { await addScriptOnce(src); }
-            for (const src of perPage) { await addScriptOnce(src); }
-        })();
-    } catch (e) {
-        console.warn('Footer script injection failed:', e);
-    }
+      // 依序載入，確保依賴順序（先樣式後腳本）
+      for (const href of styles) { await addStyleOnce(href); }
+      for (const src of base) { await addScriptOnce(src); }
+      for (const src of perPage) { await addScriptOnce(src); }
+    })();
+  } catch (e) {
+    console.warn('Footer script injection failed:', e);
+  }
 }
 
 // 確保無論載入時機，都可以渲染 nav/footer
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderNavFooter);
+  document.addEventListener('DOMContentLoaded', renderNavFooter);
 } else {
-    renderNavFooter();
+  renderNavFooter();
 }

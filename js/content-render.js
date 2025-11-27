@@ -23,12 +23,12 @@
         // 盡量啟用 fixed，行動裝置不支援時瀏覽器會自動 fallback
         hero.style.backgroundAttachment = 'fixed';
       }
-    } catch(e){}
+    } catch (e) { }
 
     // 首頁重點故事
     try {
       const storySec = document.getElementById('story-section');
-      if (storySec && data.story && (data.story.heading || data.story.body || (data.story.images||[]).length)) {
+      if (storySec && data.story && (data.story.heading || data.story.body || (data.story.images || []).length)) {
         const imgs = Array.isArray(data.story.images) ? data.story.images : [];
         const html = `
           <div class="grid md:grid-cols-2 gap-8 items-start">
@@ -37,12 +37,12 @@
               ${data.story.body ? `<div class="prose prose-lg dark:prose-invert max-w-none leading-relaxed">${data.story.body}</div>` : ''}
             </div>
             <div class="grid grid-cols-2 gap-3">
-              ${(imgs.slice(0,4)).map((u,i)=>`<div class="rounded-lg overflow-hidden shadow"><img src="${u}" alt="story${i+1}" class="w-full h-40 md:h-52 object-cover"></div>`).join('')}
+              ${(imgs.slice(0, 4)).map((u, i) => `<div class="rounded-lg overflow-hidden shadow"><img src="${u}" alt="story${i + 1}" class="w-full h-40 md:h-52 object-cover"></div>`).join('')}
             </div>
           </div>`;
         storySec.innerHTML = html;
       }
-    } catch(e){}
+    } catch (e) { }
 
     // 服務項目
     try {
@@ -58,23 +58,23 @@
           if (s.link) { a.href = s.link; a.target = '_self'; a.rel = 'noopener'; }
           a.className = 'relative h-72 rounded-2xl overflow-hidden shadow-lg group block focus:outline-none focus:ring-2 focus:ring-purple-500';
           a.innerHTML = `
-            ${s.image ? `<img src="${s.image}" alt="${s.title||''}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
+            ${s.image ? `<img src="${s.image}" alt="${s.title || ''}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-            <div class="absolute bottom-4 left-4"><span class="px-3 py-1 rounded-full bg-white text-gray-900 text-sm font-semibold shadow">${s.title||''}</span></div>`;
+            <div class="absolute bottom-4 left-4"><span class="px-3 py-1 rounded-full bg-white text-gray-900 text-sm font-semibold shadow">${s.title || ''}</span></div>`;
           svcList.appendChild(a);
         });
       }
-    } catch(e){}
+    } catch (e) { }
 
     // 影片區塊
     try {
       const vSec = document.getElementById('video-section');
       const vTitle = document.getElementById('video-title');
       const vBox = document.getElementById('index-video');
-      function isYouTube(u){ return /youtube\.com\/watch\?v=|youtu\.be\//.test(u||''); }
-      function ytId(u){ const m=(u||'').match(/[?&]v=([^&]+)|youtu\.be\/([^?&]+)/); return (m && (m[1]||m[2])) || ''; }
-      function isVimeo(u){ return /vimeo\.com\//.test(u||''); }
-      function vimeoId(u){ const m=(u||'').match(/vimeo\.com\/(\d+)/); return (m && m[1]) || ''; }
+      function isYouTube(u) { return /youtube\.com\/watch\?v=|youtu\.be\//.test(u || ''); }
+      function ytId(u) { const m = (u || '').match(/[?&]v=([^&]+)|youtu\.be\/([^?&]+)/); return (m && (m[1] || m[2])) || ''; }
+      function isVimeo(u) { return /vimeo\.com\//.test(u || ''); }
+      function vimeoId(u) { const m = (u || '').match(/vimeo\.com\/(\d+)/); return (m && m[1]) || ''; }
       if (vTitle) vTitle.textContent = (data.video && data.video.title) || '';
       if (vBox) {
         const url = (data.video && data.video.url) || '';
@@ -93,14 +93,14 @@
           vBox.innerHTML = `<a class="link-cta" href="${url}" target="_blank" rel="noopener">前往觀看 <span class="arrow">→</span></a>`;
         }
       }
-    } catch(e){}
+    } catch (e) { }
 
     const intro = document.getElementById('platform-intro');
     if (intro && Array.isArray(data.platformIntro)) {
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
       // ensure intro background var matches actual background color (light/dark or custom)
       try {
-        function getBgColor(el){
+        function getBgColor(el) {
           while (el) {
             const cs = getComputedStyle(el);
             const bg = cs.backgroundColor || 'rgba(0,0,0,0)';
@@ -111,7 +111,7 @@
         }
         const bg = getBgColor(intro);
         intro.style.setProperty('--intro-bg', bg);
-      } catch(e) {}
+      } catch (e) { }
 
       intro.innerHTML = '';
       data.platformIntro.forEach((item, idx) => {
@@ -125,7 +125,7 @@
         txtWrap.className = leftImg ? 'md:order-2 order-2' : 'md:order-1 order-2';
 
         // image block (pure CSS zigzag edge)
-        const imgUrl = item.image || 'https://picsum.photos/seed/intro' + (idx+1) + '/1200/800';
+        const imgUrl = item.image || 'https://picsum.photos/seed/intro' + (idx + 1) + '/1200/800';
         imgWrap.innerHTML = `
           <div class="intro-imgwrap ${leftImg ? 'zig-right' : 'zig-left'} shadow-lg">
             <img src="${imgUrl}" alt="${item.title || ''}" class="w-full h-64 md:h-80 object-cover">
@@ -158,24 +158,25 @@
         intro.appendChild(row);
       });
 
-      // reveal on scroll（桌機）；手機直接顯示
+      // reveal on scroll
       try {
         const els = intro.querySelectorAll('.reveal-item');
+        // Mobile: show immediately to avoid layout shift issues
         if (isMobile) {
           els.forEach(el => el.classList.add('show'));
         } else {
+          // Desktop: reveal on scroll, but do NOT hide again
           const io = new IntersectionObserver(entries => {
             entries.forEach(en => {
-              if (en.intersectionRatio >= 0.5) {
+              if (en.isIntersecting) {
                 en.target.classList.add('show');
-              } else {
-                en.target.classList.remove('show');
+                io.unobserve(en.target); // Stop observing once shown
               }
             });
-          }, { threshold: [0, 0.5, 1] });
+          }, { threshold: 0.15 });
           els.forEach(el => io.observe(el));
         }
-      } catch(e) {}
+      } catch (e) { }
     }
 
     const featured = document.getElementById('featured-cases');
@@ -183,11 +184,11 @@
       const providers = window.providersData || {};
       // 帶入缺漏的 id（以鍵名補上），避免連結失效
       const featuredProviders = Object.entries(providers)
-        .map(([k,p]) => p && p.featuredOnIndex ? { ...p, id: p.id || k } : null)
+        .map(([k, p]) => p && p.featuredOnIndex ? { ...p, id: p.id || k } : null)
         .filter(Boolean);
       featured.innerHTML = '';
       const src = featuredProviders.length ? featuredProviders : (data.featured || []).map(x => ({
-        name: x.title, description: x.text, id: (x.link||'').split('=')[1] || ''
+        name: x.title, description: x.text, id: (x.link || '').split('=')[1] || ''
       }));
       src.forEach(p => {
         const wrap = document.createElement('div');
@@ -226,5 +227,5 @@
         renderIndex();
       }
     });
-  } catch (e) {}
+  } catch (e) { }
 })();

@@ -88,8 +88,16 @@
       if (!p.coords) return;
       const marker = L.marker([p.coords.lat, p.coords.lng]).addTo(map);
       const href = `./provider.html?id=${encodeURIComponent(p.id)}`;
-      marker.bindPopup(`<strong>${p.name}</strong><br><span style="font-size:12px;color:#6b7280">再次點選標註以開啟詳情</span>`);
-      marker.__armed = false;
+
+      // Make popup clickable and remove the "wait" logic
+      const popupHtml = `
+        <div style="cursor:pointer; text-align:center" onclick="window.open('${href}', '_blank')">
+          <strong class="text-lg">${p.name}</strong><br>
+          <span style="font-size:12px;color:#6b7280">點擊查看詳情</span>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml);
       marker.on('click', () => {
         // 第一次：只開啟名稱；第二次：導向
         if (!marker.isPopupOpen()) {
@@ -100,7 +108,7 @@
           marker.__armTimer = setTimeout(() => { marker.__armed = false; }, 3000);
         } else {
           if (marker.__armed) {
-            window.location.href = href;
+            window.open('${href}', '_blank');
           } else {
             marker.openPopup();
             marker.__armed = true;
@@ -108,6 +116,11 @@
             marker.__armTimer = setTimeout(() => { marker.__armed = false; }, 3000);
           }
         }
+      });
+
+      // Also allow hover to open for desktop convenience
+      marker.on('mouseover', () => {
+        marker.openPopup();
       });
     });
 
@@ -168,7 +181,7 @@
     if (label) label.textContent = r.name;
     if (ticker) ticker.textContent = regions.map(x => x.name).join(' · ');
     if (map && !suppressInitialFit) {
-      if (r.bounds) map.fitBounds(r.bounds, { padding: [20,20] }); else map.setView(r.center, 11);
+      if (r.bounds) map.fitBounds(r.bounds, { padding: [20, 20] }); else map.setView(r.center, 11);
     }
     suppressInitialFit = false;
   }
