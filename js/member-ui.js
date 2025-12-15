@@ -100,17 +100,17 @@
       if (avOkBtn) avOkBtn.innerHTML = icon('<i class="fas fa-user-check mr-2"></i> 繼續註冊');
     } catch (e) { }
 
-    if (flip && form && regForm) {
-      // 先取消 register 的 hidden，量完再加回去
-      const wasHidden = regForm.classList.contains('hidden');
-      if (wasHidden) regForm.classList.remove('hidden');
+    // if (flip && form && regForm) {
+    //   // 先取消 register 的 hidden，量完再加回去
+    //   const wasHidden = regForm.classList.contains('hidden');
+    //   if (wasHidden) regForm.classList.remove('hidden');
 
-      // 取註冊表單高度
-      const registerHeight = regForm.offsetHeight;
-      flip.style.height = registerHeight + 'px';
+    //   // 取註冊表單高度
+    //   const registerHeight = regForm.offsetHeight;
+    //   flip.style.height = registerHeight + 'px';
 
-      if (wasHidden) regForm.classList.add('hidden'); // 還原
-    }
+    //   if (wasHidden) regForm.classList.add('hidden'); // 還原
+    // }
     // 註冊密碼強度（取代登入的強度顯示）
     const regPwd = qs('#reg-password');
     if (regPwd) {
