@@ -1,73 +1,78 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>核心生涯探索平台</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <script>
-      (function(){
-        try{
-          var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
-          var raw = localStorage.getItem(K);
-          var v = null;
-          try{ if (raw) { var obj = JSON.parse(raw)||{}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } }catch(e){}
-          if (!v) { try { v = sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch(e){ v = String(Date.now()); } }
-          var s=document.createElement('script'); s.src='./tailwind.config.js?v='+encodeURIComponent(v);
-          var cur=document.currentScript; (cur&&cur.parentNode?cur.parentNode:document.head).insertBefore(s, cur);
-        }catch(e){ var s=document.createElement('script'); s.src='./tailwind.config.js?v='+Date.now(); document.head.appendChild(s); }
-      })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="./css/style.css" rel="stylesheet">
-    <script>
-      (function(){
-        try{
-          var K=(window.AppConfig&&window.AppConfig.versionCacheKey)||'app_data_version';
-          var raw=localStorage.getItem(K), v=null;
-          try{ if(raw){ var obj=JSON.parse(raw)||{}; var vals=Object.values(obj); if(vals&&vals.length) v=vals.join('.'); } }catch(e){}
-          if(!v){ try{ v=sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v);} } catch(e){ v=String(Date.now()); } }
-          var l=document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
-          if(l){ var href=l.getAttribute('href')||''; try{ var url=new URL(href, document.baseURI); url.searchParams.set('v', v); l.href=url.href; }
-            catch(e){ var h=href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/,'$1').replace(/[?&]$/,''); l.href=h+(h.indexOf('?')>-1?'&':'?')+'v='+encodeURIComponent(v); }
-          }
-        }catch(e){}
-      })();
-    </script>
-    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
-    <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
-    <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>聽見核心工作室</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K);
+        var v = null;
+        try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + encodeURIComponent(v);
+        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.head).insertBefore(s, cur);
+      } catch (e) { var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + Date.now(); document.head.appendChild(s); }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./css/style.css" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K), v = null;
+        try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var l = document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
+        if (l) {
+          var href = l.getAttribute('href') || ''; try { var url = new URL(href, document.baseURI); url.searchParams.set('v', v); l.href = url.href; }
+          catch (e) { var h = href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); l.href = h + (h.indexOf('?') > -1 ? '&' : '?') + 'v=' + encodeURIComponent(v); }
+        }
+      } catch (e) { }
+    })();
+  </script>
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
+  <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
+  <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-    <div id="nav-placeholder"></div>
+
+<body>
+
+  <div id="nav-placeholder"></div>
 
 
-    <main class="container mx-auto px-6 py-12">
-        <!-- Hero Section -->
-        <section id="hero" class="hero-banner relative rounded-xl shadow mb-12">
-          <div class="hero-band">
-            <h1 id="hero-title" class="hero-title">探索你的未來</h1>
-            <p id="hero-subtitle" class="hero-subtitle">在核心生涯探索平台，找到屬於你的道路。</p>
-          </div>
-        </section>
-        <div class="text-center">
-          <a href="./explore.html" class="bg-orange-400 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full transition duration-300">開始探索</a>
-        </div>
+  <main class="container mx-auto px-6 py-12">
+    <!-- Hero Section -->
+    <section id="hero" class="hero-banner relative rounded-xl shadow mb-12">
+      <div class="hero-band bg-black/40 backdrop-blur-sm border border-white/20 p-8 rounded-xl">
+        <h1 id="hero-title" class="hero-title text-white text-outline drop-shadow-lg">探索你的未來</h1>
+        <p id="hero-subtitle" class="hero-subtitle text-white text-outline mt-2 font-bold drop-shadow-md">
+          在核心生涯探索平台，找到屬於你的道路。</p>
+      </div>
+    </section>
+    <div class="text-center">
+      <a href="./explore.html" class="btn-soft btn-purple text-lg px-8 py-3 rounded-full">開始探索</a>
+    </div>
 
-        <!-- Story Section (重點故事) -->
-        <section class="mt-20">
-          <div id="story-section" class="rounded-2xl p-6 md:p-10 bg-gray-900 text-white">
-            <!-- 由 content-render.js 依資料渲染 -->
-          </div>
-        </section>
+    <!-- Story Section (重點故事) -->
+    <section class="mt-20">
+      <div id="story-section" class="rounded-2xl p-6 md:p-10 bg-[#fff4c5] text-gray-900 dark:bg-[#28374a] dark:text-gray-100">
+        <!-- 由 content-render.js 依資料渲染 -->
+      </div>
+    </section>
 
-        <!-- Platform Introduction -->
-        <section class="mt-20">
-            <h2 class="text-3xl font-bold text-center mb-10">平台導覽</h2>
-            <div id="platform-intro" class="space-y-12 max-w-6xl md:max-w-7xl mx-auto px-2 md:px-0">
-                <!-- <div class="p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl">
+    <!-- Platform Introduction -->
+    <section class="mt-20">
+      <h2 class="text-3xl font-bold text-center mb-10">平台導覽</h2>
+      <div id="platform-intro" class="space-y-12 max-w-6xl md:max-w-7xl mx-auto px-2 md:px-0">
+        <!-- <div class="p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl">
                     <h3 class="text-xl font-bold mb-2">資源整合</h3>
                     <p>一站式彙整嘉義地區的多元職業與課程資訊。</p>
                 </div>
@@ -79,43 +84,48 @@
                     <h3 class="text-xl font-bold mb-2">成效追蹤</h3>
                     <p>記錄你的學習歷程，看見自己的成長與轉變。</p>
                 </div> -->
-            </div>
-        </section>
+      </div>
+    </section>
 
-        <!-- Services Section -->
-        <section class="mt-20">
-          <h2 id="services-title" class="text-3xl font-bold text-center mb-10">服務項目</h2>
-          <div id="services-section" class="max-w-6xl md:max-w-7xl mx-auto">
-            <div id="services-list" class="grid md:grid-cols-3 gap-6"></div>
+    <!-- Services Section -->
+    <section class="mt-20">
+      <h2 id="services-title" class="text-3xl font-bold text-center mb-10">服務項目</h2>
+      <div id="services-section" class="max-w-6xl md:max-w-7xl mx-auto">
+        <div id="services-list" class="grid md:grid-cols-3 gap-6"></div>
+      </div>
+    </section>
+
+    <!-- Video Section -->
+    <section class="mt-20 bg-gray-900 text-white rounded-2xl py-10">
+      <div class="max-w-5xl mx-auto px-4">
+        <h2 id="video-title" class="text-2xl md:text-3xl font-bold text-center"></h2>
+        <div id="index-video" class="mt-6 aspect-video rounded-lg overflow-hidden bg-black"></div>
+      </div>
+    </section>
+
+    <!-- Chiayi Map -->
+    <section class="mt-20 text-center">
+      <div class="flex flex-col items-center gap-2 mb-4">
+        <h2 class="text-3xl font-bold">地區資源地圖 · 當前：<span id="map-region-label" class="text-[var(--primary)]">嘉義</span>
+        </h2>
+        <div class="flex items-center gap-2 text-sm">
+          <button id="region-prev"
+            class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">◀</button>
+          <div id="region-ticker"
+            class="min-w-[240px] px-3 py-1 rounded bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">載入地區中…
           </div>
-        </section>
+          <button id="region-next"
+            class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">▶</button>
+        </div>
+      </div>
+      <div id="chiayi-map" class="w-full h-96 rounded-lg shadow"></div>
+    </section>
 
-        <!-- Video Section -->
-        <section class="mt-20 bg-gray-900 text-white rounded-2xl py-10">
-          <div class="max-w-5xl mx-auto px-4">
-            <h2 id="video-title" class="text-2xl md:text-3xl font-bold text-center"></h2>
-            <div id="index-video" class="mt-6 aspect-video rounded-lg overflow-hidden bg-black"></div>
-          </div>
-        </section>
-
-        <!-- Chiayi Map -->
-        <section class="mt-20 text-center">
-            <div class="flex flex-col items-center gap-2 mb-4">
-              <h2 class="text-3xl font-bold">地區資源地圖 · 當前：<span id="map-region-label" class="text-purple-600">嘉義</span></h2>
-              <div class="flex items-center gap-2 text-sm">
-                <button id="region-prev" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">◀</button>
-                <div id="region-ticker" class="min-w-[240px] px-3 py-1 rounded bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200">載入地區中…</div>
-                <button id="region-next" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">▶</button>
-              </div>
-            </div>
-            <div id="chiayi-map" class="w-full h-96 rounded-lg shadow"></div>
-        </section>
-
-        <!-- Featured Cases -->
-        <section class="mt-20">
-            <h2 class="text-3xl font-bold text-center mb-10">精選案例</h2>
-            <div id="featured-cases" class="grid md:grid-cols-2 gap-8">
-                <!-- <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <!-- Featured Cases -->
+    <section class="mt-20">
+      <h2 class="text-3xl font-bold text-center mb-10">精選案例</h2>
+      <div id="featured-cases" class="grid md:grid-cols-2 gap-8">
+        <!-- <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
                     <div class="p-6 transition-transform duration-200 hover:-translate-y-0.5">
                         <h3 class="text-xl font-bold mb-2">從漁村到餐桌：東石漁囡仔的海洋實踐</h3>
                         <p class="text-gray-600 dark:text-gray-400">學員小明透過課程，不僅學會了牡蠣養殖，更親手策劃了一場海鮮市集活動...</p>
@@ -129,29 +139,30 @@
                         <a href="./provider.html?id=woodwork-day" class="link-cta small mt-4 inline-block">閱讀更多 <span class="arrow">→</span></a>
                     </div>
                 </div> -->
-            </div>
-        </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <div id="footer-placeholder"></div>
+  <div id="footer-placeholder"></div>
 
-    <script>
-      (function(){
-        try{
-          var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
-          var raw = localStorage.getItem(K);
-          var v = null;
-          try{
-            if (raw) { var obj = JSON.parse(raw)||{}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); }
-          }catch(e){}
-          if (!v) {
-            try { v = sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v); } }
-            catch(e){ v = String(Date.now()); }
-          }
-          var s=document.createElement('script'); s.src='./js/navFooter.js?v='+encodeURIComponent(v);
-          var cur=document.currentScript; (cur&&cur.parentNode?cur.parentNode:document.body).insertBefore(s, cur);
-        }catch(e){ var s=document.createElement('script'); s.src='./js/navFooter.js?v='+Date.now(); document.body.appendChild(s); }
-      })();
-    </script>
-    </body>
-    </html>
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K);
+        var v = null;
+        try {
+          if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); }
+        } catch (e) { }
+        if (!v) {
+          try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } }
+          catch (e) { v = String(Date.now()); }
+        }
+        var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + encodeURIComponent(v);
+        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.body).insertBefore(s, cur);
+      } catch (e) { var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + Date.now(); document.body.appendChild(s); }
+    })();
+  </script>
+</body>
+
+</html>

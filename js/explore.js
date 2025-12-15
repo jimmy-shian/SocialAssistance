@@ -14,35 +14,36 @@
   const dataset = () => (window.providersData || {});
 
   function providerCard(p) {
-    const card = el('div', 'bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl');
-    const inner = el('div', 'p-6');
+    const card = el('div', 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6');
+    // Removed complex hover effects for cleaner editorial feel
 
-    const title = el('h3', 'text-xl font-bold mb-2');
+    const title = el('h3', 'text-xl font-bold mb-2 text-[var(--primary)]');
     title.textContent = p.name;
-    inner.appendChild(title);
+    card.appendChild(title);
 
-    const cat = el('p', 'text-gray-500 dark:text-gray-200 mb-1');
+    const cat = el('span', 'inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300');
     cat.textContent = p.category;
-    inner.appendChild(cat);
+    card.appendChild(cat);
+    card.appendChild(el('div', 'mb-2')); // Spacer
 
-    const sched = el('p', 'text-gray-500 dark:text-gray-200 mb-1');
-    sched.textContent = `時間：${p.schedule || '-'}`;
-    inner.appendChild(sched);
+    const paramRow = (label, val) => {
+      const p = el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-1');
+      p.textContent = `${label}：${val || '-'}`;
+      return p;
+    };
 
-    const loc = el('p', 'text-gray-500 dark:text-gray-200 mb-4');
-    loc.textContent = `地點：${p.location || '-'}`;
-    inner.appendChild(loc);
+    card.appendChild(paramRow('時間', p.schedule));
+    card.appendChild(paramRow('地點', p.location));
 
-    const desc = el('p', 'text-gray-700 dark:text-gray-300 mb-4');
+    const desc = el('p', 'text-gray-700 dark:text-gray-300 mt-4 mb-4 leading-relaxed line-clamp-3');
     desc.textContent = p.description || '';
-    inner.appendChild(desc);
+    card.appendChild(desc);
 
-    const link = el('a', 'link-cta small');
+    const link = el('a', 'link-soft text-sm font-medium');
     link.href = `./provider.html?id=${encodeURIComponent(p.id)}`;
-    link.innerHTML = '查看詳情 <span class="arrow">→</span>';
-    inner.appendChild(link);
+    link.innerHTML = '查看詳情';
+    card.appendChild(link);
 
-    card.appendChild(inner);
     return card;
   }
 
@@ -150,48 +151,47 @@
           // call local render by triggering a microtask
           Promise.resolve().then(() => {
             // reuse local render via dispatching input change or direct call
-            try { (function(){
-              const all = Object.values(window.providersData || {});
-              // minimal rebuild similar to render()
-              grid.setAttribute('aria-busy','true');
-              grid.innerHTML = '';
-              const searchInput = document.getElementById('search-input');
-              const categorySelect = document.getElementById('category-select');
-              const kw = (searchInput && searchInput.value) || '';
-              const cat = (categorySelect && categorySelect.value) || '';
-              const filtered = all.filter(p => {
-                const kwok = !kw || (p.name + ' ' + (p.description || '')).toLowerCase().includes(kw.toLowerCase());
-                const catok = !cat || cat === '所有產業' || p.category === cat;
-                return kwok && catok;
-              });
-              if (!filtered.length) {
-                const empty = document.createElement('div');
-                empty.className = 'text-center text-gray-500 col-span-full';
-                empty.textContent = '未找到符合條件的課程';
-                grid.appendChild(empty);
-              } else {
-                filtered.forEach(p => {
-                  const card = document.createElement('div');
-                  card.className = 'bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-xl';
-                  const inner = document.createElement('div');
-                  inner.className = 'p-6';
-                  inner.innerHTML = `
-                    <h3 class="text-xl font-bold mb-2">${p.name}</h3>
-                    <p class="text-gray-500 dark:text-gray-200 mb-1">${p.category}</p>
-                    <p class="text-gray-500 dark:text-gray-200 mb-1">時間：${p.schedule || '-'}</p>
-                    <p class="text-gray-500 dark:text-gray-200 mb-4">地點：${p.location || '-'}</p>
-                    <p class="text-gray-700 dark:text-gray-300 mb-4">${p.description || ''}</p>
-                    <a class="link-cta small" href="./provider.html?id=${encodeURIComponent(p.id)}">查看詳情 <span class="arrow">→</span></a>
-                  `;
-                  card.appendChild(inner);
-                  grid.appendChild(card);
+            try {
+              (function () {
+                const all = Object.values(window.providersData || {});
+                // minimal rebuild similar to render()
+                grid.setAttribute('aria-busy', 'true');
+                grid.innerHTML = '';
+                const searchInput = document.getElementById('search-input');
+                const categorySelect = document.getElementById('category-select');
+                const kw = (searchInput && searchInput.value) || '';
+                const cat = (categorySelect && categorySelect.value) || '';
+                const filtered = all.filter(p => {
+                  const kwok = !kw || (p.name + ' ' + (p.description || '')).toLowerCase().includes(kw.toLowerCase());
+                  const catok = !cat || cat === '所有產業' || p.category === cat;
+                  return kwok && catok;
                 });
-              }
-              grid.setAttribute('aria-busy','false');
-            })(); } catch (e) {}
+                if (!filtered.length) {
+                  const empty = document.createElement('div');
+                  empty.className = 'text-center text-gray-500 col-span-full';
+                  empty.textContent = '未找到符合條件的課程';
+                  grid.appendChild(empty);
+                } else {
+                  filtered.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6';
+                    card.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2 text-[var(--primary)]">${p.name}</h3>
+                    <span class="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300 py-1">${p.category}</span>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">時間：${p.schedule || '-'}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">地點：${p.location || '-'}</p>
+                    <p class="text-gray-700 dark:text-gray-300 mt-4 mb-4 leading-relaxed line-clamp-3">${p.description || ''}</p>
+                    <a class="link-soft text-sm font-medium" href="./provider.html?id=${encodeURIComponent(p.id)}">查看詳情</a>
+                  `;
+                    grid.appendChild(card);
+                  });
+                }
+                grid.setAttribute('aria-busy', 'false');
+              })();
+            } catch (e) { }
           });
         }
       }
     });
-  } catch (e) {}
+  } catch (e) { }
 })();

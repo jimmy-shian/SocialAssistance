@@ -1,7 +1,7 @@
 // UI logic for member login page: password visibility, strength meter, and submit
 (function () {
-  function qs(s, r=document){ return r.querySelector(s); }
-  function setBtnLoading(btn, loading=true){
+  function qs(s, r = document) { return r.querySelector(s); }
+  function setBtnLoading(btn, loading = true) {
     if (!btn) return;
     if (!btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
     btn.disabled = !!loading;
@@ -24,8 +24,8 @@
     score.textContent = `${str.score}/${max}`;
     const w = Math.max(0, Math.min(str.score, max)) * (100 / max); // 0..100
     bar.style.width = w + '%';
-    bar.classList.remove('bg-red-500','bg-orange-500','bg-yellow-400','bg-green-500');
-    const colorClass = str.color === 'red' ? 'bg-red-500' : str.color === 'orange' ? 'bg-orange-500' : str.color === 'yellow' ? 'bg-yellow-400' : 'bg-green-500';
+    bar.classList.remove('bg-red-500', 'bg-orange-500', 'bg-yellow-400', 'bg-green-500');
+    const colorClass = str.color === 'red' ? 'bg-red-500' : str.color === 'orange' ? 'bg-orange-500' : str.color === 'yellow' ? 'bg-[var(--primary)]' : 'bg-[var(--primary)]';
     bar.classList.add(colorClass);
 
     const rules = str.rules || {};
@@ -34,8 +34,8 @@
       if (!li) return;
       const dot = li.querySelector('.rule-dot');
       if (!dot) return;
-      dot.classList.toggle('bg-green-500', !!ok);
-      dot.classList.toggle('bg-gray-400', !ok);
+      dot.classList.toggle('bg-[var(--primary)]', !!ok);
+      dot.classList.toggle('bg-gray-300', !ok);
     }
     setDot('rule-length8', !!rules.length8);
     setDot('rule-length12', !!rules.length12);
@@ -77,11 +77,11 @@
         window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
         return;
       }
-    } catch(e){}
+    } catch (e) { }
 
     // Apply Font Awesome icons to buttons/links for consistency
     try {
-      const icon = (html)=> html; // helper placeholder
+      const icon = (html) => html; // helper placeholder
       const loginSubmit = qs('#login-submit');
       const regSubmit = qs('#register-submit');
       const switchToReg = qs('#switch-to-register');
@@ -98,17 +98,17 @@
       if (forgotSubmit) forgotSubmit.innerHTML = icon('<i class="fas fa-paper-plane mr-2"></i> 送出');
       if (avCancelBtn) avCancelBtn.innerHTML = icon('<i class="fas fa-times mr-2"></i> 取消');
       if (avOkBtn) avOkBtn.innerHTML = icon('<i class="fas fa-user-check mr-2"></i> 繼續註冊');
-    } catch(e) {}
+    } catch (e) { }
 
     if (flip && form && regForm) {
       // 先取消 register 的 hidden，量完再加回去
       const wasHidden = regForm.classList.contains('hidden');
       if (wasHidden) regForm.classList.remove('hidden');
-  
+
       // 取註冊表單高度
       const registerHeight = regForm.offsetHeight;
       flip.style.height = registerHeight + 'px';
-  
+
       if (wasHidden) regForm.classList.add('hidden'); // 還原
     }
     // 註冊密碼強度（取代登入的強度顯示）
@@ -142,25 +142,25 @@
     const modalCancel = qs('#forgot-cancel');
     const modalSubmit = qs('#forgot-submit');
     const modalStatus = qs('#forgot-status');
-    function openForgot(){ if(!modal) return; modal.classList.remove('hidden'); setTimeout(()=> modal.classList.add('open'), 0); modalInput?.focus(); }
-    function closeForgot(){ if(!modal) return; modal.classList.remove('open'); const hide=()=>modal.classList.add('hidden'); modal.addEventListener('transitionend', function onEnd(e){ if(e.target===modal){ modal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
-    function setForgotLoading(on=true){ if(!modalSubmit) return; if(!modalSubmit.dataset.orig) modalSubmit.dataset.orig = modalSubmit.innerHTML; modalSubmit.disabled = !!on; modalSubmit.classList.toggle('opacity-50', !!on); modalSubmit.classList.toggle('cursor-not-allowed', !!on); modalStatus && (modalStatus.textContent = on ? '送出中…' : ''); if(on){ modalSubmit.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (modalSubmit.textContent || '送出'); } else { modalSubmit.innerHTML = modalSubmit.dataset.orig; } }
+    function openForgot() { if (!modal) return; modal.classList.remove('hidden'); setTimeout(() => modal.classList.add('open'), 0); modalInput?.focus(); }
+    function closeForgot() { if (!modal) return; modal.classList.remove('open'); const hide = () => modal.classList.add('hidden'); modal.addEventListener('transitionend', function onEnd(e) { if (e.target === modal) { modal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
+    function setForgotLoading(on = true) { if (!modalSubmit) return; if (!modalSubmit.dataset.orig) modalSubmit.dataset.orig = modalSubmit.innerHTML; modalSubmit.disabled = !!on; modalSubmit.classList.toggle('opacity-50', !!on); modalSubmit.classList.toggle('cursor-not-allowed', !!on); modalStatus && (modalStatus.textContent = on ? '送出中…' : ''); if (on) { modalSubmit.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (modalSubmit.textContent || '送出'); } else { modalSubmit.innerHTML = modalSubmit.dataset.orig; } }
     if (forgot && modal) {
-      forgot.addEventListener('click', (e)=>{ e.preventDefault(); openForgot(); });
-      modalCancel?.addEventListener('click', ()=> closeForgot());
-      modal?.addEventListener('click', (e)=>{ const t=e.target; if (t && (t.id==='forgot-modal' || t.classList.contains('overlay-bg'))) closeForgot(); });
+      forgot.addEventListener('click', (e) => { e.preventDefault(); openForgot(); });
+      modalCancel?.addEventListener('click', () => closeForgot());
+      modal?.addEventListener('click', (e) => { const t = e.target; if (t && (t.id === 'forgot-modal' || t.classList.contains('overlay-bg'))) closeForgot(); });
       // 驗證 Email 格式
       function isValidEmail(email) {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
       }
-      
-      modalSubmit?.addEventListener('click', async ()=>{
+
+      modalSubmit?.addEventListener('click', async () => {
         const val = (modalInput?.value || '').trim();
-        if (!val) { 
-          modalStatus && (modalStatus.textContent = '請輸入帳號或 Email'); 
+        if (!val) {
+          modalStatus && (modalStatus.textContent = '請輸入帳號或 Email');
           modalInput?.focus();
-          return; 
+          return;
         }
         // 如果輸入包含 @，則驗證 Email 格式
         if (val.includes('@') && !isValidEmail(val)) {
@@ -169,9 +169,9 @@
           modalInput?.select();
           return;
         }
-        if (!window.Auth || !window.Auth.forgot) { 
-          modalStatus && (modalStatus.textContent = '忘記密碼功能尚未載入'); 
-          return; 
+        if (!window.Auth || !window.Auth.forgot) {
+          modalStatus && (modalStatus.textContent = '忘記密碼功能尚未載入');
+          return;
         }
         try {
           setForgotLoading(true);
@@ -179,16 +179,16 @@
           const msg = (r && r.message) ? r.message : (r && r.ok ? '已發送重設指示' : '操作失敗');
           if (window.Toast && window.Toast.show) window.Toast.show(msg, r && r.ok ? 'success' : 'error', 3000);
           modalStatus && (modalStatus.textContent = msg);
-          if (r && r.ok) setTimeout(()=>{ closeForgot(); }, 800);
-        } catch(err){
+          if (r && r.ok) setTimeout(() => { closeForgot(); }, 800);
+        } catch (err) {
           const msg = '操作失敗：' + err.message;
           if (window.Toast && window.Toast.show) window.Toast.show(msg, 'error', 3000);
           modalStatus && (modalStatus.textContent = msg);
         } finally { setForgotLoading(false); }
       });
       // Enter: submit; Escape: close
-      modalInput?.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); modalSubmit?.click(); } });
-      document.addEventListener('keydown', (e)=>{ if (!modal || modal.classList.contains('hidden')) return; if (e.key==='Escape') { e.preventDefault(); closeForgot(); } });
+      modalInput?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); modalSubmit?.click(); } });
+      document.addEventListener('keydown', (e) => { if (!modal || modal.classList.contains('hidden')) return; if (e.key === 'Escape') { e.preventDefault(); closeForgot(); } });
     }
 
     form.addEventListener('submit', async (e) => {
@@ -207,7 +207,7 @@
         return;
       }
       const role = (res && res.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
-      if (window.Toast && window.Toast.show) window.Toast.show('登入成功，前往' + (role==='admin'?'管理頁':'個人頁') + '…', 'success', 1500);
+      if (window.Toast && window.Toast.show) window.Toast.show('登入成功，前往' + (role === 'admin' ? '管理頁' : '個人頁') + '…', 'success', 1500);
       window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
     });
 
@@ -230,13 +230,13 @@
     const avStatus = qs('#admin-verify-status');
     const avCancel = qs('#admin-verify-cancel');
     const avOk = qs('#admin-verify-ok');
-    function updateOkLabel(){ if (!avOk) return; avOk.innerHTML = (avToggle && avToggle.checked) ? '<i class="fas fa-user-shield mr-2"></i> 以管理者註冊' : '<i class="fas fa-user-check mr-2"></i> 繼續註冊'; }
-    function openAdminVerify(){ if(!avModal) return; avStatus && (avStatus.textContent=''); if (avToggle) { avToggle.checked=false; } if (avWrap) avWrap.classList.add('hidden'); if (avCode) avCode.value=''; updateOkLabel(); avModal.classList.remove('hidden'); setTimeout(()=> avModal.classList.add('open'), 0); }
-    function closeAdminVerify(){ if(!avModal) return; avModal.classList.remove('open'); const hide=()=>avModal.classList.add('hidden'); avModal.addEventListener('transitionend', function onEnd(e){ if(e.target===avModal){ avModal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
-    function setAdminLoading(on=true){ if(!avOk) return; if(!avOk.dataset.orig) avOk.dataset.orig = avOk.innerHTML; avOk.disabled=!!on; avOk.classList.toggle('opacity-50', !!on); avOk.classList.toggle('cursor-not-allowed', !!on); if(on){ avOk.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (avOk.textContent || '送出'); } else { avOk.innerHTML = avOk.dataset.orig; }}
-    avToggle?.addEventListener('change', ()=>{ if (!avWrap) return; avWrap.classList.toggle('hidden', !avToggle.checked); updateOkLabel(); if (avToggle.checked) avCode?.focus(); });
+    function updateOkLabel() { if (!avOk) return; avOk.innerHTML = (avToggle && avToggle.checked) ? '<i class="fas fa-user-shield mr-2"></i> 以管理者註冊' : '<i class="fas fa-user-check mr-2"></i> 繼續註冊'; }
+    function openAdminVerify() { if (!avModal) return; avStatus && (avStatus.textContent = ''); if (avToggle) { avToggle.checked = false; } if (avWrap) avWrap.classList.add('hidden'); if (avCode) avCode.value = ''; updateOkLabel(); avModal.classList.remove('hidden'); setTimeout(() => avModal.classList.add('open'), 0); }
+    function closeAdminVerify() { if (!avModal) return; avModal.classList.remove('open'); const hide = () => avModal.classList.add('hidden'); avModal.addEventListener('transitionend', function onEnd(e) { if (e.target === avModal) { avModal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
+    function setAdminLoading(on = true) { if (!avOk) return; if (!avOk.dataset.orig) avOk.dataset.orig = avOk.innerHTML; avOk.disabled = !!on; avOk.classList.toggle('opacity-50', !!on); avOk.classList.toggle('cursor-not-allowed', !!on); if (on) { avOk.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (avOk.textContent || '送出'); } else { avOk.innerHTML = avOk.dataset.orig; } }
+    avToggle?.addEventListener('change', () => { if (!avWrap) return; avWrap.classList.toggle('hidden', !avToggle.checked); updateOkLabel(); if (avToggle.checked) avCode?.focus(); });
 
-    async function proceedRegister(isAdmin){
+    async function proceedRegister(isAdmin) {
       ensureError('', 'register-error', '#register-form');
       const u = qs('#reg-username')?.value?.trim();
       const email = qs('#reg-email')?.value?.trim();
@@ -264,9 +264,9 @@
         }
         closeAdminVerify();
         const role = (r && r.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
-        if (window.Toast && window.Toast.show) window.Toast.show('註冊成功，前往' + (role==='admin'?'管理頁':'個人頁') + '…', 'success', 1500);
+        if (window.Toast && window.Toast.show) window.Toast.show('註冊成功，前往' + (role === 'admin' ? '管理頁' : '個人頁') + '…', 'success', 1500);
         window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
-      } catch(err){
+      } catch (err) {
         const msg = '註冊錯誤：' + err.message;
         ensureError(msg, 'register-error', '#register-form');
         avStatus && (avStatus.textContent = msg);
@@ -276,15 +276,15 @@
       }
     }
 
-    avCancel?.addEventListener('click', ()=>{ // 僅關閉，不送出
+    avCancel?.addEventListener('click', () => { // 僅關閉，不送出
       closeAdminVerify();
     });
-    avOk?.addEventListener('click', ()=>{
+    avOk?.addEventListener('click', () => {
       const wantAdmin = !!avToggle?.checked;
       proceedRegister(wantAdmin);
     });
-    avModal?.addEventListener('click', (e)=>{ const t=e.target; if (t && (t.id==='admin-verify-modal' || t.classList.contains('overlay-bg'))) { closeAdminVerify(); /* 不自動註冊，使用者可再按註冊 */ } });
-    document.addEventListener('keydown', (e)=>{ if (!avModal || avModal.classList.contains('hidden')) return; if (e.key==='Escape'){ e.preventDefault(); closeAdminVerify(); } if (e.key==='Enter'){ e.preventDefault(); avOk?.click(); } });
+    avModal?.addEventListener('click', (e) => { const t = e.target; if (t && (t.id === 'admin-verify-modal' || t.classList.contains('overlay-bg'))) { closeAdminVerify(); /* 不自動註冊，使用者可再按註冊 */ } });
+    document.addEventListener('keydown', (e) => { if (!avModal || avModal.classList.contains('hidden')) return; if (e.key === 'Escape') { e.preventDefault(); closeAdminVerify(); } if (e.key === 'Enter') { e.preventDefault(); avOk?.click(); } });
 
     // Register submit（以 Modal 取代 confirm/prompt）
     regForm?.addEventListener('submit', async (e) => {
@@ -303,7 +303,7 @@
     });
 
     // Enter 鍵保證送出（瀏覽器預設已送出，這裡確保在輸入框也觸發）
-    [usr, pwd].forEach(el=>{ el?.addEventListener('keydown', (ev)=>{ if (ev.key === 'Enter') { ev.preventDefault(); form.requestSubmit?.(); } }); });
+    [usr, pwd].forEach(el => { el?.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); form.requestSubmit?.(); } }); });
   }
 
   if (document.readyState === 'loading') {

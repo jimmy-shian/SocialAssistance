@@ -30,44 +30,15 @@
     typingControllers.delete(el);
   }
 
-  function shatterAndReveal(el, fullText) {
+  // Shatter effect removed for editorial style consistency
+  function fadeAndReveal(el, fullText) {
     if (!el) return;
-    const ctrl = typingControllers.get(el);
-    if (ctrl) ctrl.abort = true;
-    if (prefersReduced()) { el.textContent = fullText || ''; return; }
-    const text = el.textContent || '';
-    const rect = el.getBoundingClientRect();
-    const layer = document.createElement('div');
-    layer.style.position = 'fixed';
-    layer.style.left = rect.left + 'px';
-    layer.style.top = rect.top + 'px';
-    layer.style.width = rect.width + 'px';
-    layer.style.height = rect.height + 'px';
-    layer.style.pointerEvents = 'none';
-    layer.style.zIndex = 1200;
-    const style = getComputedStyle(el);
-    const maxPieces = Math.min(80, text.length);
-    for (let i = 0; i < maxPieces; i++) {
-      const ratio = (i + 0.5) / maxPieces;
-      const span = document.createElement('span');
-      span.className = 'shatter-piece boom';
-      span.textContent = text[i];
-      span.style.position = 'absolute';
-      span.style.left = Math.round(ratio * rect.width) + 'px';
-      span.style.top = Math.round(rect.height / 2 + (Math.random() * 10 - 5)) + 'px';
-      span.style.color = style.color;
-      span.style.font = style.font;
-      const dx = (Math.random() * 2 - 1) * 160;
-      const dy = (-Math.random() * 1.2 - 0.1) * 180;
-      const rot = (Math.random() * 2 - 1) * 100 + 'deg';
-      span.style.setProperty('--dx', dx + 'px');
-      span.style.setProperty('--dy', dy + 'px');
-      span.style.setProperty('--rot', rot);
-      layer.appendChild(span);
-    }
-    document.body.appendChild(layer);
-    setTimeout(() => layer.remove(), 650);
+    el.style.opacity = 0;
     el.textContent = fullText || '';
+    setTimeout(() => {
+      el.style.transition = 'opacity 0.5s ease';
+      el.style.opacity = 1;
+    }, 50);
   }
 
   function numberSpan(text) {
@@ -98,12 +69,10 @@
 
   function attachCardInteractions(container) {
     container.querySelectorAll('.about-card').forEach(card => {
-      card.addEventListener('mouseenter', () => card.classList.add('ring-1', 'ring-purple-300', 'dark:ring-purple-500'));
-      card.addEventListener('mouseleave', () => card.classList.remove('ring-1', 'ring-purple-300', 'dark:ring-purple-500'));
+      // Simplified interaction: just slight lift is enough (handled by CSS hover)
       card.addEventListener('click', (e) => {
-        if (e.target && e.target.closest('a')) return; // 僅連結可跳轉
-        // 不做整卡跳轉，保留輕量互動
-        card.classList.toggle('task-done');
+        if (e.target && e.target.closest('a')) return;
+        // Optional: interactions logic if needed
       });
     });
   }
@@ -231,9 +200,9 @@
       leadEl.innerHTML = leadStr;
     } else {
       setTimeout(() => typeText(leadEl, leadStr, 14), 150);
-      leadEl?.addEventListener('click', () => shatterAndReveal(leadEl, leadStr));
+      leadEl?.addEventListener('click', () => fadeAndReveal(leadEl, leadStr));
     }
-    heroEl?.addEventListener('click', () => shatterAndReveal(heroEl, data.heroTitle || '關於我們'));
+    heroEl?.addEventListener('click', () => fadeAndReveal(heroEl, data.heroTitle || '關於我們'));
 
     // interactions and animations
     attachCardInteractions(root);

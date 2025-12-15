@@ -3,54 +3,50 @@ function renderNavFooter() {
   // nav 統一元件
   const navHTML = `
     <header class="bg-gray-100 dark:bg-gray-800 shadow-md relative z-50">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="主選單">
-            <a href="./index.html" class="nav-brand text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-purple-500">
-              <img src="./img/soundcore3co-title.png" alt="SoundCore Title" class="brand-title-img" />
-              <span class="brand-title-text">核心生涯探索平台</span>
-            </a>
+      <nav class="container mx-auto px-6 py-4 flex justify-between items-center" role="navigation" aria-label="主選單">
+        <a href="./index.html" class="nav-brand text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300 hover:text-[var(--primary)]">
+          <img src="./img/soundcore3co-title.png" alt="SoundCore Title" class="brand-title-img" />
+          <span class="brand-title-text">核心生涯探索平台</span>
+        </a>
 
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="./about.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">關於我們</a>
-                <a href="./explore.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">探索資源平台</a>
-                <a href="./member.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-purple-500 transition-colors duration-300">會員專區</a>
-                <button id="theme-toggle" aria-label="切換深淺色主題" class="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
-                    <svg id="theme-toggle-dark-icon" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                    <svg id="theme-toggle-light-icon" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-                </button>
-                <div class="flex items-center space-x-2 ml-4">
-                    <div class="hidden md:block text-xs text-gray-500 dark:text-gray-400">字體</div>
-                    <button id="font-size-btn" aria-label="切換字體大小" class="font-size-btn text-gray-700 dark:text-gray-200" title="點擊切換字體大小 (小/中/大)">
-                      <span id="font-size-label" class="font-size-label text-xs">中</span>
-                    </button>
-                </div>
-            </div>
-            <div class="md:hidden">
-                 <button id="nav-toggle" class="text-gray-800 dark:text-white focus:outline-none transition-colors duration-300" aria-expanded="false" aria-controls="mobile-menu">
-                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                    </svg>
-                </button>
-            </div>
-        </nav>
-        <div id="mobile-menu" class="md:hidden hidden px-6 pb-4 mobile-menu-collapsible" aria-hidden="true">
-            <div class="flex flex-col space-y-3">
-                <a href="./about.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-purple-500 transition-colors duration-200">關於我們</a>
-                <a href="./explore.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-purple-500 transition-colors duration-200">探索資源平台</a>
-                <a href="./member.html" class="nav-link text-gray-700 dark:text-gray-200 hover:text-purple-500 transition-colors duration-200">會員專區</a>
-                <div class="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
-                    <button id="theme-toggle-mobile" aria-label="切換深淺色主題" class="mt-2 p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
-                      <svg id="theme-toggle-dark-icon-mobile" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                      <svg id="theme-toggle-light-icon-mobile" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-                    </button>
-                    <button id="font-size-btn-mobile" class="mt-2 font-size-btn text-gray-700 dark:text-gray-200" title="切換字體大小"><span class="font-size-label text-xs">中</span></button>
-                </div>
-            </div>
+        <div class="hidden md:flex items-center space-x-8">
+          <a href="./about.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-[var(--primary)] transition-colors duration-300">關於我們</a>
+          <a href="./explore.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-[var(--primary)] transition-colors duration-300">探索資源平台</a>
+          <a href="./member.html" class="nav-link text-gray-600 dark:text-gray-300 hover:text-[var(--primary)] transition-colors duration-300">會員專區</a>
+          <button id="theme-toggle" aria-label="切換深淺色主題" class="p-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-300">
+            <svg id="theme-toggle-dark-icon" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+            <svg id="theme-toggle-light-icon" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+          </button>
         </div>
-    </header>`;
+
+        <div class="md:hidden">
+          <button id="nav-toggle" class="text-[var(--text-primary)] focus:outline-none transition-colors duration-300" aria-expanded="false" aria-controls="mobile-menu">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <div id="mobile-menu" class="md:hidden hidden px-6 pb-4 mobile-menu-collapsible" aria-hidden="true">
+        <div class="flex flex-col space-y-3">
+          <a href="./about.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200">關於我們</a>
+          <a href="./explore.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200">探索資源平台</a>
+          <a href="./member.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200">會員專區</a>
+          <div class="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+            <button id="theme-toggle-mobile" aria-label="切換深淺色主題" class="mt-2 p-2 rounded-md text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]/80 transition-colors duration-300">
+              <svg id="theme-toggle-dark-icon-mobile" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+              <svg id="theme-toggle-light-icon-mobile" class="hidden h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+`;
 
   // footer 統一元件（使用者提供之聯絡資訊）
   const footerHTML = `
-    <footer class="bg-gray-100 dark:bg-gray-300 text-gray-800 dark:text-gray-100 mt-16 px-6 py-10">
+    <footer class="mt-16 px-6 py-10 border-t border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)]">
   <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-10">
     
     <!-- 左側品牌與聯絡資訊 -->
@@ -68,7 +64,7 @@ function renderNavFooter() {
         <p class="text-gray-700 dark:text-gray-200"><i class="fas fa-phone mr-2 text-gray-600 dark:text-gray-300"></i>0988-368-450</p>
         <p class="text-gray-700 dark:text-gray-200">
           <i class="fas fa-envelope mr-2 text-gray-600 dark:text-gray-300"></i>
-          <a href="mailto:soundcore.3co@gmail.com" class="hover:text-purple-400 hover:underline transition-colors duration-200">
+          <a href="mailto:soundcore.3co@gmail.com" class="hover:text-[var(--primary-light)] hover:underline transition-colors duration-200">
             soundcore.3co@gmail.com
           </a>
         </p>
@@ -140,8 +136,8 @@ function renderNavFooter() {
       const href = a.getAttribute('href') || '';
       const file = href.split('/').pop();
       if (file === current || (current === '' && file === 'index.html')) {
-        a.classList.remove('text-gray-600');
-        a.classList.add('text-purple-600', 'font-bold');
+        a.classList.remove('text-gray-600', 'dark:text-gray-300');
+        a.classList.add('text-[var(--primary)]', 'font-bold');
         a.setAttribute('aria-current', 'page');
       } else {
         a.removeAttribute('aria-current');

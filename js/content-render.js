@@ -31,13 +31,13 @@
       if (storySec && data.story && (data.story.heading || data.story.body || (data.story.images || []).length)) {
         const imgs = Array.isArray(data.story.images) ? data.story.images : [];
         const html = `
-          <div class="grid md:grid-cols-2 gap-8 items-start">
-            <div class="space-y-4">
-              ${data.story.heading ? `<h2 class="text-3xl md:text-4xl font-extrabold">${data.story.heading}</h2>` : ''}
-              ${data.story.body ? `<div class="prose prose-lg dark:prose-invert max-w-none leading-relaxed">${data.story.body}</div>` : ''}
+          <div class="grid md:grid-cols-2 gap-10 items-start">
+            <div class="space-y-6">
+              ${data.story.heading ? `<h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[var(--primary)]">${data.story.heading}</h2>` : ''}
+              ${data.story.body ? `<div class="prose prose-lg max-w-none leading-relaxed text-gray-700 dark:text-gray-100">${data.story.body}</div>` : ''}
             </div>
-            <div class="grid grid-cols-2 gap-3">
-              ${(imgs.slice(0, 4)).map((u, i) => `<div class="rounded-lg overflow-hidden shadow"><img src="${u}" alt="story${i + 1}" class="w-full h-40 md:h-52 object-cover"></div>`).join('')}
+            <div class="grid grid-cols-2 gap-4">
+              ${(imgs.slice(0, 4)).map((u, i) => `<div class="overflow-hidden border border-gray-200 dark:border-gray-700 rounded"><img src="${u}" alt="story${i + 1}" class="w-full h-40 md:h-48 object-cover transition-all duration-500 hover:scale-105"></div>`).join('')}
             </div>
           </div>`;
         storySec.innerHTML = html;
@@ -56,11 +56,13 @@
         arr.forEach(s => {
           const a = document.createElement(s.link ? 'a' : 'div');
           if (s.link) { a.href = s.link; a.target = '_self'; a.rel = 'noopener'; }
-          a.className = 'relative h-72 rounded-2xl overflow-hidden shadow-lg group block focus:outline-none focus:ring-2 focus:ring-purple-500';
+          a.className = 'group block relative h-64 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 transition-colors hover:border-[var(--primary)]';
           a.innerHTML = `
-            ${s.image ? `<img src="${s.image}" alt="${s.title || ''}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-            <div class="absolute bottom-4 left-4"><span class="px-3 py-1 rounded-full bg-white text-gray-900 text-sm font-semibold shadow">${s.title || ''}</span></div>`;
+            <div class="absolute inset-0 p-6 flex flex-col justify-end z-10 bg-gradient-to-t from-black/80 to-transparent">
+              <span class="text-xl font-bold text-white text-outline group-hover:text-white transition-colors drop-shadow-md">${s.title || ''}</span>
+            </div>
+            ${s.image ? `<img src="${s.image}" alt="${s.title || ''}" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300">` : ''}
+          `;
           svcList.appendChild(a);
         });
       }
@@ -124,21 +126,21 @@
         imgWrap.className = leftImg ? 'md:order-1 order-1' : 'md:order-2 order-1';
         txtWrap.className = leftImg ? 'md:order-2 order-2' : 'md:order-1 order-2';
 
-        // image block (pure CSS zigzag edge)
+        // image block (simple clean style)
         const imgUrl = item.image || 'https://picsum.photos/seed/intro' + (idx + 1) + '/1200/800';
         imgWrap.innerHTML = `
-          <div class="intro-imgwrap ${leftImg ? 'zig-right' : 'zig-left'} shadow-lg">
-            <img src="${imgUrl}" alt="${item.title || ''}" class="w-full h-64 md:h-80 object-cover">
+          <div class="intro-imgwrap border border-gray-200 dark:border-gray-700 p-2 bg-white dark:bg-gray-800">
+            <img src="${imgUrl}" alt="${item.title || ''}" class="w-full h-64 md:h-80 object-cover transition-all duration-500 hover:scale-105">
           </div>
         `;
 
         // text block
         txtWrap.innerHTML = `
-          <div class="pl-8 p-2 md:p-3 md:text-left">
-            <h3 class="text-2xl font-bold mb-2">${item.title || ''}</h3>
-            <p class="text-lg text-gray-700 dark:text-gray-300">${item.text || ''}</p>
-            <div class="collapse-content mt-3">
-              <p class="text-base md:text-lg text-gray-700 dark:text-gray-200">${item.details || ''}</p>
+          <div class="pl-0 md:pl-8 p-2 md:p-3 md:text-left">
+            <h3 class="text-2xl font-bold mb-3 text-[var(--primary)]">${item.title || ''}</h3>
+            <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">${item.text || ''}</p>
+            <div class="collapse-content mt-4 border-l-2 border-[var(--primary)] pl-4">
+              <p class="text-base text-gray-600 dark:text-gray-400">${item.details || ''}</p>
             </div>
           </div>
         `;
@@ -192,14 +194,14 @@
       }));
       src.forEach(p => {
         const wrap = document.createElement('div');
-        wrap.className = 'bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden';
+        wrap.className = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6';
         const inner = document.createElement('div');
-        inner.className = 'p-6 transition-transform duration-200 hover:-translate-y-0.5';
+        // inner.className = 'p-6 transition-transform duration-200 hover:-translate-y-0.5';
         const href = p.id ? `./provider.html?id=${encodeURIComponent(p.id)}` : (p.link || '#');
         inner.innerHTML = `
-          <h3 class="text-xl font-bold mb-2">${p.name || p.title}</h3>
-          <p class="text-gray-600 dark:text-gray-400">${p.description || p.text || ''}</p>
-          <a href="${href}" class="link-soft link-purple mt-4 inline-block transition-colors duration-200">閱讀更多</a>
+          <h3 class="text-xl font-bold mb-3 text-[var(--primary)]">${p.name || p.title}</h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">${p.description || p.text || ''}</p>
+          <a href="${href}" class="link-soft text-sm">閱讀更多</a>
         `;
         wrap.appendChild(inner);
         featured.appendChild(wrap);

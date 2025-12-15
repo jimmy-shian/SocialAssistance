@@ -36,20 +36,20 @@
       img.alt = `圖片 ${state.index + 1}`;
       // update active thumb
       const nodes = thumbs ? thumbs.querySelectorAll('img.thumb') : [];
-      nodes.forEach((t, idx)=>{
+      nodes.forEach((t, idx) => {
         if (idx === state.index) t.classList.add('active'); else t.classList.remove('active');
       });
       const active = thumbs?.querySelector('img.thumb.active');
       if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
-    function renderThumbs(){
+    function renderThumbs() {
       if (!thumbs) return;
       thumbs.innerHTML = '';
       const frag = document.createDocumentFragment();
       state.sources.forEach((src, idx) => {
         const t = document.createElement('img');
         t.className = 'thumb';
-        t.src = src; t.alt = `縮圖 ${idx+1}`; t.dataset.index = String(idx);
+        t.src = src; t.alt = `縮圖 ${idx + 1}`; t.dataset.index = String(idx);
         frag.appendChild(t);
       });
       thumbs.appendChild(frag);
@@ -109,79 +109,69 @@
       ctrl.open(idx, sources);
     });
   }
+function setupMarquee(rootEl) {
+  const track = rootEl.querySelector('.carousel-track');
+  const seq1 = track?.querySelector('.marquee-seq');
+  if (!track || !seq1) return;
 
-  function setupMarquee(rootEl) {
-    const track = rootEl.querySelector('.carousel-track');
-    const seq1 = track?.querySelector('.marquee-seq');
-    if (!track || !seq1) return;
-
-    function waitImagesLoaded(el) {
-      const imgs = Array.from(el.querySelectorAll('img'));
-      return Promise.all(imgs.map(img => img.complete ? Promise.resolve() : new Promise(res => { img.addEventListener('load', res, { once: true }); img.addEventListener('error', res, { once: true }); })));
-    }
-
-    function measureAndApply() {
-      const containerW = rootEl.getBoundingClientRect().width;
-      // Ensure seq1 is at least as wide as container (avoid visible blank)
-      const original = Array.from(seq1.querySelectorAll('img'));
-      let guard = 0;
-      while (seq1.getBoundingClientRect().width < containerW + 24 && guard < 200) {
-        // duplicate items cyclically
-        original.forEach(img => seq1.appendChild(img.cloneNode(true)));
-        guard++;
-      }
-      // Make the following sequence(s) identical to seq1 to guarantee seamless loop
-      const others = Array.from(track.querySelectorAll('.marquee-seq')).slice(1);
-      others.forEach(s => { s.innerHTML = seq1.innerHTML; });
-
-      const distance = seq1.getBoundingClientRect().width;
-      rootEl.style.setProperty('--marquee-distance', distance + 'px');
-      // Speed proportional to distance for similar perceived speed
-      const pxPerSec = 30; // tune feel
-      const secs = Math.max(20, Math.min(80, distance / pxPerSec));
-      rootEl.style.setProperty('--carousel-speed', secs + 's');
-    }
-
-    waitImagesLoaded(track).then(() => {
-      measureAndApply();
-      if (typeof installDragMarquee === 'function') {
-        installDragMarquee(rootEl, track, seq1);
-      }
-    });
-    let timer;
-    window.addEventListener('resize', () => { clearTimeout(timer); timer = setTimeout(measureAndApply, 180); });
+  // 等所有圖片載入完成（包含 lazy-loading）
+  function waitImagesLoaded(el) {
+    const imgs = Array.from(el.querySelectorAll('img'));
+    return Promise.all(imgs.map(img =>
+      img.complete
+        ? Promise.resolve()
+        : new Promise(res => {
+            img.addEventListener('load', res, { once: true });
+            img.addEventListener('error', res, { once: true });
+          })
+    ));
   }
 
-  function ensureConfettiCSS() {
-    if (document.getElementById('confetti-style')) return;
-    const style = document.createElement('style');
-    style.id = 'confetti-style';
-    style.textContent = `
-      @keyframes confetti-fall { from { transform: translate(0,0) rotate(0deg); opacity:1 } to { transform: translate(var(--dx), var(--dy)) rotate(720deg); opacity:0 } }
-      .confetti-piece { position: fixed; width: 8px; height: 12px; will-change: transform, opacity; border-radius: 2px; pointer-events: none; z-index: 1100; animation: confetti-fall 900ms ease-out forwards; }
-    `;
-    document.head.appendChild(style);
+  function measureAndApply() {
+    const containerW = rootEl.getBoundingClientRect().width;
+
+    // 複製 seq1 直到寬度至少大於容器（避免空白）
+    const original = Array.from(seq1.querySelectorAll('img'));
+    let guard = 0;
+    while (seq1.getBoundingClientRect().width < containerW + 24 && guard < 200) {
+      original.forEach(img => seq1.appendChild(img.cloneNode(true)));
+      guard++;
+    }
+
+    // 後續 sequence 也複製，確保無縫
+    const others = Array.from(track.querySelectorAll('.marquee-seq')).slice(1);
+    others.forEach(s => { s.innerHTML = seq1.innerHTML; });
+
+    // 設置 CSS 變數
+    const distance = seq1.getBoundingClientRect().width;
+    rootEl.style.setProperty('--marquee-distance', distance + 'px');
+
+    const pxPerSec = 30; // 調整動畫速度
+    const secs = Math.max(20, Math.min(80, distance / pxPerSec));
+    rootEl.style.setProperty('--carousel-speed', secs + 's');
   }
 
-  function confettiBurst(x = window.innerWidth/2, y = window.innerHeight/2, count = 60) {
-    ensureConfettiCSS();
-    const colors = ['#f87171', '#60a5fa', '#34d399', '#fbbf24', '#f472b6', '#a78bfa'];
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('div');
-      el.className = 'confetti-piece';
-      const dx = (Math.random() * 2 - 1) * 200 + 'px';
-      const dy = (Math.random() * 1.5 + 0.8) * 280 + 'px';
-      const left = x + (Math.random() * 40 - 20);
-      const top = y + (Math.random() * 20 - 10);
-      el.style.left = left + 'px';
-      el.style.top = top + 'px';
-      el.style.setProperty('--dx', dx);
-      el.style.setProperty('--dy', dy);
-      el.style.background = colors[i % colors.length];
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1200);
+  // 初次測量
+  waitImagesLoaded(track).then(() => {
+    measureAndApply();
+    if (typeof installDragMarquee === 'function') {
+      installDragMarquee(rootEl, track, seq1);
     }
-  }
+  });
+
+  // 自動響應 Resize
+  let timer;
+  window.addEventListener('resize', () => {
+    clearTimeout(timer);
+    timer = setTimeout(measureAndApply, 180);
+  });
+
+  // hover 暫停動畫
+  rootEl.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+  rootEl.addEventListener('mouseleave', () => track.style.animationPlayState = '');
+}
+
+  // Confetti removed for editorial design
 
   function attachInteractiveChecklist(root) {
     const items = Array.from(root.querySelectorAll('.interactive-li'));
@@ -193,11 +183,8 @@
         const icon = li.querySelector('.icon');
         if (icon) icon.textContent = wasDone ? '✓' : '•';
         done += wasDone ? 1 : -1;
-        const pt = { x: e.clientX || (window.innerWidth/2), y: e.clientY || (window.innerHeight/2) };
-        confettiBurst(pt.x, pt.y, wasDone ? 40 : 15);
-        if (done === items.length) {
-          setTimeout(() => confettiBurst(window.innerWidth/2, 120, 120), 200);
-        }
+        const pt = { x: e.clientX || (window.innerWidth / 2), y: e.clientY || (window.innerHeight / 2) };
+        // Confetti removed
       });
     });
   }
@@ -221,13 +208,13 @@
       </div>
     `).join('<div class="h-4"></div>');
 
-    function isYouTube(url){ return /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/i.test(url||''); }
-    function ytId(url){ const m=(url||'').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/i); return m?m[1]:''; }
-    function isVimeo(url){ return /vimeo\.com\/(\d+)/i.test(url||''); }
-    function vimeoId(url){ const m=(url||'').match(/vimeo\.com\/(\d+)/i); return m?m[1]:''; }
-    function isMp4(url){ return /\.mp4($|\?)/i.test(url||''); }
+    function isYouTube(url) { return /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/i.test(url || ''); }
+    function ytId(url) { const m = (url || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/i); return m ? m[1] : ''; }
+    function isVimeo(url) { return /vimeo\.com\/(\d+)/i.test(url || ''); }
+    function vimeoId(url) { const m = (url || '').match(/vimeo\.com\/(\d+)/i); return m ? m[1] : ''; }
+    function isMp4(url) { return /\.mp4($|\?)/i.test(url || ''); }
 
-    function ensureVideoModal(){
+    function ensureVideoModal() {
       let vm = document.getElementById('video-modal');
       if (vm && vm.__open) return vm.__open;
       vm = document.createElement('div');
@@ -241,12 +228,12 @@
       document.body.appendChild(vm);
       const frame = vm.querySelector('.video-frame');
       const btnClose = vm.querySelector('.close-btn');
-      function close(){ vm.classList.remove('open'); frame.innerHTML=''; }
+      function close() { vm.classList.remove('open'); frame.innerHTML = ''; }
       btnClose.addEventListener('click', close);
-      vm.addEventListener('click', (e)=>{ if (e.target===vm) close(); });
-      document.addEventListener('keydown', (e)=>{ if (vm.classList.contains('open') && e.key==='Escape') close(); });
-      function open(url){
-        let html='';
+      vm.addEventListener('click', (e) => { if (e.target === vm) close(); });
+      document.addEventListener('keydown', (e) => { if (vm.classList.contains('open') && e.key === 'Escape') close(); });
+      function open(url) {
+        let html = '';
         if (isYouTube(url)) {
           const id = ytId(url);
           html = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${id}?autoplay=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
@@ -263,10 +250,10 @@
       return open;
     }
 
-    function renderCases(provider){
-      const cases = Array.isArray(provider.cases)? provider.cases : [];
+    function renderCases(provider) {
+      const cases = Array.isArray(provider.cases) ? provider.cases : [];
       if (!cases.length) return '';
-      const withMedia = cases.filter(c => (c && ((Array.isArray(c.images)&&c.images.length) || c.video)));
+      const withMedia = cases.filter(c => (c && ((Array.isArray(c.images) && c.images.length) || c.video)));
       const textOnly = cases.filter(c => !withMedia.includes(c));
 
       const parts = [];
@@ -276,16 +263,16 @@
         const c = withMedia[0];
         const hasImg = Array.isArray(c.images) && c.images.length;
         const mediaHtml = hasImg ? `
-          <div class="rounded-xl overflow-hidden shadow-md case-media" data-images="${(c.images||[]).join('|')}">
-            <img src="${c.images[0]}" alt="${c.title||''}" class="w-full h-64 md:h-80 object-cover" />
+          <div class="rounded-xl overflow-hidden shadow-md case-media" data-images="${(c.images || []).join('|')}">
+            <img src="${c.images[0]}" alt="${c.title || ''}" class="w-full h-64 md:h-80 object-cover" />
           </div>` : `
           <button class="case-video w-full aspect-video rounded-xl overflow-hidden shadow-md bg-black text-white grid place-items-center" data-video="${c.video}">
             <span class="inline-flex items-center gap-2 font-semibold"><span class="text-2xl">▶</span> 觀看影片</span>
           </button>`;
         const textHtml = `
           <div>
-            <h3 class="text-xl font-bold mb-2">${c.title||''}</h3>
-            ${c.summary?`<p class="text-gray-700 dark:text-gray-300">${c.summary}</p>`:''}
+            <h3 class="text-xl font-bold mb-2">${c.title || ''}</h3>
+            ${c.summary ? `<p class="text-gray-700 dark:text-gray-300">${c.summary}</p>` : ''}
           </div>`;
         parts.push(`
           <div class="grid md:grid-cols-2 gap-6 items-center">
@@ -296,10 +283,10 @@
 
       // 2) Multi media cases -> vertical cards grid
       if (withMedia.length >= 2) {
-        const cards = withMedia.map((c)=>{
+        const cards = withMedia.map((c) => {
           const mediaBlock = (Array.isArray(c.images) && c.images.length) ? `
-            <div class="rounded-lg overflow-hidden case-media" data-images="${(c.images||[]).join('|')}">
-              <img src="${c.images[0]}" alt="${c.title||''}" class="w-full h-56 object-cover" />
+            <div class="rounded-lg overflow-hidden case-media" data-images="${(c.images || []).join('|')}">
+              <img src="${c.images[0]}" alt="${c.title || ''}" class="w-full h-56 object-cover" />
             </div>` : (c.video ? `
             <button class="case-video w-full aspect-video rounded-lg overflow-hidden bg-black text-white grid place-items-center" data-video="${c.video}">
               <span class="inline-flex items-center gap-2 font-semibold"><span class="text-xl">▶</span> 播放影片</span>
@@ -307,8 +294,8 @@
           return `
             <article class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hover:shadow-md transition">
               ${mediaBlock}
-              <h3 class="mt-3 font-semibold">${c.title||''}</h3>
-              ${c.summary?`<p class="text-gray-600 dark:text-gray-300 text-sm">${c.summary}</p>`:''}
+              <h3 class="mt-3 font-semibold">${c.title || ''}</h3>
+              ${c.summary ? `<p class="text-gray-600 dark:text-gray-300 text-sm">${c.summary}</p>` : ''}
             </article>`;
         }).join('');
         parts.push(`<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>`);
@@ -316,10 +303,10 @@
 
       // 3) Text-only list (no media)
       if (textOnly.length) {
-        const items = textOnly.map(c=>`
+        const items = textOnly.map(c => `
           <li class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-            <div class="font-semibold">${c.title||''}</div>
-            ${c.summary?`<div class="text-gray-600 dark:text-gray-300">${c.summary}</div>`:''}
+            <div class="font-semibold">${c.title || ''}</div>
+            ${c.summary ? `<div class="text-gray-600 dark:text-gray-300">${c.summary}</div>` : ''}
           </li>`).join('');
         parts.push(`<ul class="mt-6 space-y-3">${items}</ul>`);
       }
@@ -329,14 +316,14 @@
 
     root.innerHTML = `
       <nav class="text-sm mb-6" aria-label="麵包屑">
-        <a class="link-soft link-purple" href="./explore.html">探索資源平台</a>
+        <a class="link-soft text-[var(--primary)]" href="./explore.html">探索資源平台</a>
         <span class="mx-2 text-gray-400">/</span>
         <span class="text-gray-500 dark:text-gray-300">${provider.name}</span>
       </nav>
 
       <header class="mb-8">
         <h1 class="text-3xl md:text-4xl font-bold">${provider.name}</h1>
-        <div class="mt-2 inline-block bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200 text-sm px-2 py-1 rounded">${provider.category}</div>
+        <div class="mt-2 inline-block bg-[var(--surface-2)] text-[var(--primary)] text-sm px-2 py-1 rounded border border-gray-200 dark:border-gray-700">${provider.category}</div>
         <p class="mt-4 text-gray-700 dark:text-gray-300">${provider.description}</p>
       </header>
 
@@ -351,7 +338,7 @@
         const cols = blocks.map(b => {
           const items = (provider[b.key] || []).map(v => `<li class=\"interactive-li flex items-start gap-2\"><span class=\"icon text-purple-500\">•</span><span>${v}</span></li>`).join('');
           return `
-            <div class="p-5 rounded-lg bg-gradient-to-br ${b.color} to-transparent shadow">
+            <div class="p-5 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
               <div class="flex items-center gap-2 mb-2"><span>${b.icon}</span><h3 class="font-semibold">${b.title}</h3></div>
               <ul class="space-y-1 text-gray-700 dark:text-gray-200 text-sm">${items}</ul>
             </div>
@@ -368,22 +355,22 @@
         <div class="p-6 rounded-lg bg-gray-50 dark:bg-gray-800 shadow md:col-span-2">
           <div class="text-gray-500 text-sm">地點（點我開啟 Google 地圖）</div>
           ${(() => {
-            const lat = provider.coords?.lat;
-            const lng = provider.coords?.lng;
-            const url = provider.gmapUrl || (lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null);
-            const name = [provider.location || '', provider.address || ''].filter(Boolean).join(' ');
-            const coord = (lat && lng) ? `${lat.toFixed(3)}, ${lng.toFixed(3)}` : '';
-            const display = [name, coord ? `（${coord}）` : ''].join('');
-            if (!url) return `<div class=\"font-semibold mt-1\">${display || '-'}</div>`;
-            return `<a class=\"font-semibold mt-1 link-soft link-purple break-all\" href=\"${url}\" target=\"_blank\" rel=\"noopener\">${display || '查看地圖'}</a>`;
-          })()}
+        const lat = provider.coords?.lat;
+        const lng = provider.coords?.lng;
+        const url = provider.gmapUrl || (lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null);
+        const name = [provider.location || '', provider.address || ''].filter(Boolean).join(' ');
+        const coord = (lat && lng) ? `${lat.toFixed(3)}, ${lng.toFixed(3)}` : '';
+        const display = [name, coord ? `（${coord}）` : ''].join('');
+        if (!url) return `<div class=\"font-semibold mt-1\">${display || '-'}</div>`;
+        return `<a class=\"font-semibold mt-1 link-soft text-[var(--primary)] break-all\" href=\"${url}\" target=\"_blank\" rel=\"noopener\">${display || '查看地圖'}</a>`;
+      })()}
         </div>
       </section>
 
       <section aria-labelledby="sec-photos" class="mb-12">
         <div class="flex items-center justify-between mb-4">
           <h2 id="sec-photos" class="text-2xl font-bold">活動照片</h2>
-          <a href="#sec-cases" class="link-soft link-orange">精選案例</a>
+          <a href="#sec-cases" class="link-soft text-[var(--primary)]">精選案例</a>
         </div>
         <div class="carousel-marquee" id="photos-carousel">
           <div class="carousel-track">
@@ -431,7 +418,7 @@
       if (casesRoot) {
         // bind images
         casesRoot.querySelectorAll('.case-media').forEach(box => {
-          const sources = ((box.getAttribute('data-images')||'').split('|').filter(Boolean));
+          const sources = ((box.getAttribute('data-images') || '').split('|').filter(Boolean));
           if (sources.length) enableLightboxOn(box, sources);
         });
         // bind video
@@ -444,7 +431,7 @@
         });
 
         // apply video posters (YouTube/Vimeo)
-        function posterFrom(url){
+        function posterFrom(url) {
           if (!url) return '';
           if (isYouTube(url)) return `https://i.ytimg.com/vi/${ytId(url)}/hqdefault.jpg`;
           if (isVimeo(url)) return `https://vumbnail.com/${vimeoId(url)}.jpg`;
@@ -469,7 +456,7 @@
           }
         });
       }
-    } catch(e){}
+    } catch (e) { }
     attachInteractiveChecklist(root);
   }
 
@@ -505,5 +492,5 @@
         if (p) render(p);
       }
     });
-  } catch (e) {}
+  } catch (e) { }
 })();

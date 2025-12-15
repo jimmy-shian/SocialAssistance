@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,31 +8,32 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
   <script>
-    (function(){
-      try{
-        var K=(window.AppConfig&&window.AppConfig.versionCacheKey)||'app_data_version';
-        var raw=localStorage.getItem(K), v=null;
-        try{ if(raw){ var obj=JSON.parse(raw)||{}; var vals=Object.values(obj); if(vals&&vals.length) v=vals.join('.'); } }catch(e){}
-        if(!v){ try{ v=sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v);} } catch(e){ v=String(Date.now()); } }
-        var s=document.createElement('script'); s.src='./tailwind.config.js?v='+encodeURIComponent(v);
-        var cur=document.currentScript; (cur&&cur.parentNode?cur.parentNode:document.head).insertBefore(s, cur);
-      }catch(e){ var s=document.createElement('script'); s.src='./tailwind.config.js?v='+Date.now(); document.head.appendChild(s); }
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K), v = null;
+        try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + encodeURIComponent(v);
+        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.head).insertBefore(s, cur);
+      } catch (e) { var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + Date.now(); document.head.appendChild(s); }
     })();
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="./css/style.css" rel="stylesheet">
   <script>
-    (function(){
-      try{
-        var K=(window.AppConfig&&window.AppConfig.versionCacheKey)||'app_data_version';
-        var raw=localStorage.getItem(K), v=null; try{ if(raw){ var obj=JSON.parse(raw)||{}; var vals=Object.values(obj); if(vals&&vals.length) v=vals.join('.'); } }catch(e){}
-        if(!v){ try{ v=sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v);} } catch(e){ v=String(Date.now()); } }
-        var l=document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
-        if(l){ var href=l.getAttribute('href')||''; try{ var url=new URL(href, document.baseURI); url.searchParams.set('v', v); l.href=url.href; }catch(e){ var h=href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/,'$1').replace(/[?&]$/,''); l.href=h+(h.indexOf('?')>-1?'&':'?')+'v='+encodeURIComponent(v); } }
-      }catch(e){}
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K), v = null; try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var l = document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
+        if (l) { var href = l.getAttribute('href') || ''; try { var url = new URL(href, document.baseURI); url.searchParams.set('v', v); l.href = url.href; } catch (e) { var h = href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); l.href = h + (h.indexOf('?') > -1 ? '&' : '?') + 'v=' + encodeURIComponent(v); } }
+      } catch (e) { }
     })();
   </script>
 </head>
+
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
   <div id="nav-placeholder"></div>
 
@@ -42,37 +44,52 @@
         <p class="text-gray-600 dark:text-gray-300 mt-1">僅限社工與管理者使用</p>
       </div>
       <div class="flex items-center gap-2">
-        <button id="admin-logout" class="px-3 py-2 rounded bg-rose-600 text-white hover:bg-rose-700">登出</button>
+        <button id="admin-logout" class="btn-soft text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">登出</button>
       </div>
     </header>
 
     <section class="grid md:grid-cols-3 gap-6 items-start">
-      <aside class="md:col-span-1 surface-2 rounded-lg p-4">
+      <aside class="md:col-span-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
         <div class="flex items-center gap-2 mb-3">
-          <input id="search-user" type="text" placeholder="搜尋帳號或 Email（自動排除管理員與自己）" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400">
+          <input id="search-user" type="text" placeholder="搜尋帳號或 Email"
+            class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]">
           <button id="btn-refresh" class="btn-soft btn-purple shrink-0">重新整理</button>
         </div>
         <div class="flex items-center gap-2 mb-2">
           <label class="text-sm">排序</label>
           <div id="sort-dropdown" class="relative">
-            <button id="sort-button" class="px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500" aria-haspopup="true" aria-expanded="false" aria-controls="sort-menu">
+            <button id="sort-button"
+              class="px-3 py-2 border rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
+              aria-haspopup="true" aria-expanded="false" aria-controls="sort-menu">
               <span id="sort-button-label">建立時間（新→舊）</span>
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
             </button>
-            <div id="sort-menu" class="absolute z-10 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg origin-top transition transform duration-150 ease-out scale-95 opacity-0 pointer-events-none">
-              <button type="button" data-value="createdAt_desc" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">建立時間（新→舊）</button>
-              <button type="button" data-value="createdAt_asc" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">建立時間（舊→新）</button>
-              <button type="button" data-value="username_asc" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">帳號（A→Z）</button>
-              <button type="button" data-value="username_desc" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">帳號（Z→A）</button>
-              <button type="button" data-value="completion_desc" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">完成度（高→低）</button>
-              <button type="button" data-value="completion_asc" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">完成度（低→高）</button>
+            <div id="sort-menu"
+              class="absolute z-10 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg origin-top transition transform duration-150 ease-out scale-95 opacity-0 pointer-events-none">
+              <button type="button" data-value="createdAt_desc"
+                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">建立時間（新→舊）</button>
+              <button type="button" data-value="createdAt_asc"
+                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">建立時間（舊→新）</button>
+              <button type="button" data-value="username_asc"
+                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">帳號（A→Z）</button>
+              <button type="button" data-value="username_desc"
+                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">帳號（Z→A）</button>
+              <button type="button" data-value="completion_desc"
+                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">完成度（高→低）</button>
+              <button type="button" data-value="completion_asc"
+                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">完成度（低→高）</button>
             </div>
             <input type="hidden" id="sort-select" value="createdAt_desc">
           </div>
         </div>
         <div class="flex items-center gap-2 mb-2">
-          <label class="inline-flex items-center text-sm"><input id="filter-incomplete" type="checkbox" class="rounded border mr-2">只看未完成</label>
-          <input id="incomplete-threshold" type="number" min="0" max="100" value="80" class="w-16 rounded border px-2 py-1 bg-white dark:bg-gray-700 text-sm" title="低於此完成度視為未完成">
+          <label class="inline-flex items-center text-sm"><input id="filter-incomplete" type="checkbox"
+              class="rounded border mr-2">只看未完成</label>
+          <input id="incomplete-threshold" type="number" min="0" max="100" value="80"
+            class="w-16 rounded border px-2 py-1 bg-white dark:bg-gray-700 text-sm" title="低於此完成度視為未完成">
         </div>
         <div class="flex items-center gap-2 mb-3">
           <button id="btn-calc" class="btn-soft btn-yellow">計算完成度</button>
@@ -82,9 +99,10 @@
         <ul id="users-list" class="space-y-2 max-h-[60vh] overflow-auto" aria-live="polite"></ul>
       </aside>
 
-      <section class="md:col-span-2 surface-3 rounded-lg p-4">
+      <section
+        class="md:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
         <header class="mb-2 flex items-center justify-between">
-          <h2 class="text-xl font-semibold">學員資料</h2>
+          <h2 class="text-xl font-semibold text-[var(--primary)]">學員資料</h2>
           <div class="text-sm text-gray-500" id="selected-user-label">未選擇</div>
         </header>
         <div id="admin-stats" class="text-sm text-gray-500 mb-3"></div>
@@ -98,20 +116,21 @@
   <div id="footer-placeholder"></div>
 
   <script>
-    (function(){
-      try{
+    (function () {
+      try {
         var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
         var raw = localStorage.getItem(K);
         var v = null;
-        try{ if (raw) { var obj = JSON.parse(raw)||{}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } }catch(e){}
+        try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
         if (!v) {
-          try { v = sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v); } }
-          catch(e){ v = String(Date.now()); }
+          try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } }
+          catch (e) { v = String(Date.now()); }
         }
-        var s=document.createElement('script'); s.src='./js/navFooter.js?v='+encodeURIComponent(v);
-        var cur=document.currentScript; (cur&&cur.parentNode?cur.parentNode:document.body).insertBefore(s, cur);
-      }catch(e){ var s=document.createElement('script'); s.src='./js/navFooter.js?v='+Date.now(); document.body.appendChild(s); }
+        var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + encodeURIComponent(v);
+        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.body).insertBefore(s, cur);
+      } catch (e) { var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + Date.now(); document.body.appendChild(s); }
     })();
   </script>
 </body>
+
 </html>
