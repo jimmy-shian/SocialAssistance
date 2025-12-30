@@ -124,42 +124,58 @@
       ${Array.isArray(data.team) && data.team.length ? `
       <section class=\"mt-16 team-section rounded-lg\">
         <h2 class=\"heading-section mb-8 text-center\">Our Team.</h2>
-        <div class=\"grid gap-8 md:grid-cols-2 lg:grid-cols-3\">
+        <div class=\"team-grid\">
           ${data.team.map(t => {
-      const roles = (t.roles || []).map(r => `<span class=\"inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 dark:text-gray-300\">${r}</span>`).join(' ');
-      const motto = t.motto ? `<blockquote class=\"motto text-gray-800 dark:text-gray-100 text-base italic\">${t.motto}</blockquote>` : '';
-      const edu = (t.education || []).map(d => `<li>${d}</li>`).join('');
-      const exp = (t.experience || []).map(d => `<li>${d}</li>`).join('');
+      const roles = (t.roles || []).map(r => `<span class=\"inline-block px-2 py-0.5 rounded-full text-xl bg-[var(--primary)]/20 text-[var(--primary)] mr-1\">${r}</span>`).join('');
+      const motto = t.motto ? `<p class=\"motto italic text-xl text-gray-600 dark:text-gray-300 mt-2\">\"${t.motto}\"</p>` : '';
+      const edu = (t.education || []).map(d => `<li class=\"text-xl\">${d}</li>`).join('');
+      const exp = (t.experience || []).map(d => `<li class=\"text-xl\">${d}</li>`).join('');
       const socials = (t.socials || []).map(s => {
         const key = String(s.name || '').toLowerCase();
-        let icon = s.icon || '';
-        if (key === 'facebook' || key === 'fb') icon = 'https://cdn.simpleicons.org/facebook/E4405F';
-        else if (key === 'instagram' || key === 'ig') icon = 'https://cdn.simpleicons.org/instagram/E4405F';
-        else if (key === 'line') icon = 'https://cdn.simpleicons.org/line/E4405F';
-        else if (key === 'threads') icon = 'https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/threads.svg';
-        else if (key === 'youtube' || key === 'yt') icon = 'https://cdn.simpleicons.org/youtube/';
-        return `<a href=\"${s.href}\" target=\"_blank\" rel=\"noopener\" aria-label=\"${s.name || 'link'}\"><img src=\"${icon}\" alt=\"${s.name || 'link'}\" class=\"team-social-icon\"></a>`;
+        let icon = '';
+        let hoverColor = 'hover:text-[var(--primary)]'; // default
+        if (key === 'facebook' || key === 'fb') {
+          icon = '<i class="fab fa-facebook"></i>';
+          hoverColor = 'hover:text-[#1877F2]';
+        }
+        else if (key === 'instagram' || key === 'ig') {
+          icon = '<i class="fab fa-instagram"></i>';
+          hoverColor = 'hover:text-[#E4405F]';
+        }
+        else if (key === 'line') {
+          icon = '<i class="fab fa-line"></i>';
+          hoverColor = 'hover:text-[#00C300]';
+        }
+        else if (key === 'threads') {
+          icon = '<i class="fab fa-threads"></i>';
+          hoverColor = 'hover:text-black dark:hover:text-white';
+        }
+        else if (key === 'youtube' || key === 'yt') {
+          icon = '<i class="fab fa-youtube"></i>';
+          hoverColor = 'hover:text-[#FF0000]';
+        }
+        else {
+          icon = '<i class="fas fa-link"></i>';
+        }
+        return `<a href="${s.href}" target="_blank" rel="noopener" class="text-gray-500 ${hoverColor} transition-colors duration-300" onclick="event.stopPropagation()">${icon}</a>`;
       }).join(' ');
       return `
-            <article class=\"team-card overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900\">
+            <article class=\"team-card\" onclick=\"this.classList.toggle('flipped')\">
               <div class=\"card-inner\">
                 <div class=\"card-face front\">
-                  ${t.photo ? `<img class=\"w-full h-64 object-cover\" src=\"${t.photo}\" alt=\"${t.name || ''}\">` : ''}
-                  <div class=\"p-5 space-y-3\">
-                    <div class=\"flex items-center gap-2 flex-wrap\">${roles}</div>
-                    <h3 class=\"text-xl font-semibold\">${t.name || ''}</h3>
+                  ${t.photo ? `<img class=\"team-photo-img\" src=\"${t.photo}\" alt=\"${t.name || ''}\">` : '<div class=\"team-photo-placeholder\"></div>'}
+                  <div class=\"team-info\">
+                    <div class=\"team-roles\">${roles}</div>
+                    <h4 class=\"team-name\">${t.name || ''}</h4>
                     ${motto}
                   </div>
                 </div>
-                <div class=\"card-face back bg-gray-100 dark:bg-gray-900 rounded-lg\">
-                  <div class=\"p-5 space-y-3 h-full flex flex-col\">
-                    <div class=\"flex items-center gap-2 flex-wrap\">${roles}</div>
-                    <h3 class=\"text-xl font-semibold\">${t.name || ''}</h3>
-                    <div class=\"details flex-1 overflow-auto\">
-                      ${edu ? `<div class=\"mb-3\"><p class=\"text-sm font-semibold mb-1\">學歷</p><ul class=\"list-disc pl-5 space-y-1 text-sm text-gray-700 dark:text-gray-200\">${edu}</ul></div>` : ''}
-                      ${exp ? `<div class=\"mt-2\"><p class=\"text-sm font-semibold mb-1\">經歷</p><ul class=\"list-disc pl-5 space-y-1 text-sm text-gray-700 dark:text-gray-200\">${exp}</ul></div>` : ''}
-                      ${socials ? `<div class=\"mt-4 socials flex items-center gap-4\">${socials}</div>` : ''}
-                    </div>
+                <div class=\"card-face back\">
+                  <div class=\"team-back-content\">
+                    <h4 class=\"team-name mb-2\">${t.name || ''}</h4>
+                    ${edu ? `<div class=\"mb-2\"><p class=\"text-xl font-semibold mb-1\">學歷</p><ul class=\"list-disc pl-4 text-gray-600 dark:text-gray-300\">${edu}</ul></div>` : ''}
+                    ${exp ? `<div class=\"mb-2\"><p class=\"text-xl font-semibold mb-1\">經歷</p><ul class=\"list-disc pl-4 text-gray-600 dark:text-gray-300\">${exp}</ul></div>` : ''}
+                    ${socials ? `<div class=\"team-socials flex gap-3 mt-3\">${socials}</div>` : ''}
                   </div>
                 </div>
               </div>

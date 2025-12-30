@@ -34,13 +34,13 @@
   </script>
 </head>
 
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+<body class="">
   <div id="nav-placeholder"></div>
 
   <main class="container mx-auto px-6 pt-12 flex items-center justify-center">
     <div class="auth-flip w-full max-w-xl md:max-w-2xl">
       <form id="login-form"
-        class="auth-face front bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
+        class="auth-face front bg-[var(--bg-surface)] shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
         <h1 id="login-title" class="text-2xl font-bold text-center mb-8 text-gradient">會員登入</h1>
         <script>
           (function () {
@@ -105,7 +105,7 @@
 
       <!-- Register Form -->
       <form id="register-form"
-        class="auth-face back bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 hidden max-w-md mx-auto">
+        class="auth-face back bg-[var(--bg-surface)] shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 hidden max-w-md mx-auto">
         <h1 class="text-2xl font-bold text-center mb-8 text-gradient">會員註冊</h1>
 
         <div class="mb-4">
@@ -235,10 +235,14 @@
         var cur = document.currentScript;
         var parent = (cur && cur.parentNode) ? cur.parentNode : document.body;
 
+        parent.insertBefore(loadScript('./js/config.js'), cur);
+        parent.insertBefore(loadScript('./js/member-data.js'), cur);
         parent.insertBefore(loadScript('./js/auth.js'), cur);
         parent.insertBefore(loadScript('./js/member-ui.js'), cur);
         parent.insertBefore(loadScript('./js/navFooter.js'), cur);
       } catch (e) {
+        var s0 = document.createElement('script'); s0.src = './js/config.js?v=' + Date.now(); document.body.appendChild(s0);
+        var s01 = document.createElement('script'); s01.src = './js/member-data.js?v=' + Date.now(); document.body.appendChild(s01);
         var s1 = document.createElement('script'); s1.src = './js/auth.js?v=' + Date.now(); document.body.appendChild(s1);
         var s2 = document.createElement('script'); s2.src = './js/member-ui.js?v=' + Date.now(); document.body.appendChild(s2);
         var s3 = document.createElement('script'); s3.src = './js/navFooter.js?v=' + Date.now(); document.body.appendChild(s3);

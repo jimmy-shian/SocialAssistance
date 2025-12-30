@@ -14,7 +14,7 @@
   const dataset = () => (window.providersData || {});
 
   function providerCard(p) {
-    const card = el('div', 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6');
+    const card = el('div', 'card-dynamic-bg p-6 rounded-xl transition-all duration-300 hover:shadow-lg');
     // Removed complex hover effects for cleaner editorial feel
 
     const title = el('h3', 'text-xl font-bold mb-2 text-[var(--primary)]');
@@ -174,7 +174,7 @@
                 } else {
                   filtered.forEach(p => {
                     const card = document.createElement('div');
-                    card.className = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6';
+                    card.className = 'card-dynamic-bg p-6 rounded-xl transition-all duration-300 hover:shadow-lg';
                     card.innerHTML = `
                     <h3 class="text-xl font-bold mb-2 text-[var(--primary)]">${p.name}</h3>
                     <span class="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300 py-1">${p.category}</span>

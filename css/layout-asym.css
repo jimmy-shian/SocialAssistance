@@ -1,0 +1,312 @@
+/* =========================================
+   Asymmetrical / Magazine Layout Styles
+   ========================================= */
+
+/* --- Creative Utilities --- */
+/* A slight gritty/sketchy mask or border-radius */
+.mask-sketch {
+    border-radius: 2% 98% 2% 98% / 98% 2% 98% 2%;
+    box-shadow: 8px 8px 0px var(--primary-light);
+    border: 2px solid var(--text-primary);
+}
+
+.offset-border {
+    position: relative;
+    z-index: 1;
+}
+
+.offset-border::before {
+    content: '';
+    position: absolute;
+    inset: -15px -15px 15px 15px;
+    /* Offset background */
+    background: var(--bg-highlight);
+    border: 2px solid var(--primary);
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+/* --- Asymmetrical Hero Slider --- */
+.hero-slider-asym {
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--bg-surface);
+}
+
+.hero-slide-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 65%;
+    /* Image takes 65% width */
+    height: 100%;
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+    z-index: 1;
+}
+
+.hero-slide-asym {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+.hero-slide-asym.active {
+    opacity: 1;
+}
+
+.hero-slide-asym img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-content-asym {
+    position: relative;
+    z-index: 10;
+    width: 45%;
+    /* Overlaps slightly */
+    padding: 4rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    margin-left: 5%;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    /* Sketchy border */
+    border: 2px solid var(--text-primary);
+    box-shadow: 15px 15px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustment */
+@media (max-width: 768px) {
+    .hero-slider-asym {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .hero-slide-wrapper {
+        position: relative;
+        width: 100%;
+        height: 50vh;
+        clip-path: none;
+    }
+
+    .hero-content-asym {
+        width: 90%;
+        margin: -3rem auto 2rem;
+        /* Pull up to overlap */
+        padding: 2rem;
+    }
+}
+
+/* --- About Section Refinement --- */
+.philosophy-section.asym-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 4rem;
+}
+
+/* Mobile: Stack vertically and keep text readable */
+@media (max-width: 768px) {
+    .philosophy-section.asym-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .philosophy-content {
+        writing-mode: horizontal-tb !important;
+        text-orientation: mixed !important;
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .philosophy-content blockquote {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        word-break: break-word;
+    }
+}
+
+.philosophy-image-box {
+    position: relative;
+    padding: 2rem;
+}
+
+/* Creative image framing for About */
+.philosophy-image-box img {
+    position: relative;
+    z-index: 2;
+    border-radius: 20px;
+    border: 2px solid var(--text-primary);
+    box-shadow: 10px 10px 0 var(--primary);
+    transform: rotate(-2deg);
+    transition: transform 0.3s ease;
+}
+
+.philosophy-image-box img:hover {
+    transform: rotate(0deg) scale(1.02);
+}
+
+/* Decorative doodle behind */
+.philosophy-image-box::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(var(--border) 15%, transparent 16%);
+    background-size: 20px 20px;
+    z-index: 1;
+    border-radius: 50% 40% 30% 70% / 60% 30% 70% 40%;
+    opacity: 0.5;
+}
+
+/* --- Services River Layout (Zig-Zag) --- */
+.services-river {
+    display: flex;
+    flex-direction: column;
+    gap: 6rem;
+    position: relative;
+    padding: 4rem 0;
+}
+
+/* Connecting line (optional, conceptual river) */
+.services-river::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: repeating-linear-gradient(to bottom, var(--primary) 0, var(--primary) 10px, transparent 10px, transparent 20px);
+    transform: translateX(-50%);
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.service-river-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    text-decoration: none;
+    /* Reset link underline */
+    color: inherit;
+}
+
+.service-river-item:nth-child(even) {
+    direction: rtl;
+    /* Flip visual order */
+}
+
+.service-river-item:nth-child(even) .service-content {
+    direction: ltr;
+    /* Reset text direction */
+    text-align: right;
+}
+
+.service-river-item:nth-child(odd) .service-content {
+    text-align: left;
+}
+
+.service-river-img {
+    position: relative;
+}
+
+.service-river-img img {
+    width: 100%;
+    border-radius: 20px;
+    /* Asymmetrical shape */
+    clip-path: polygon(5% 5%, 100% 0%, 95% 95%, 0% 100%);
+    transition: clip-path 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.service-river-img:hover img {
+    clip-path: polygon(0% 0%, 100% 5%, 100% 100%, 5% 95%);
+}
+
+/* Service Content - Match Hero Style */
+.service-content {
+    position: relative;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    /* Sketchy border */
+    border: 2px solid var(--text-primary);
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.service-river-item:hover .service-content {
+    transform: translateY(-5px);
+    box-shadow: 15px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode adjustment for transparency */
+@media (prefers-color-scheme: dark) {
+    .service-content {
+        background: rgba(30, 41, 59, 0.9);
+        /* Dark slate */
+        border-color: var(--text-primary);
+    }
+}
+
+.service-content h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+    font-weight: 800;
+    position: relative;
+    display: inline-block;
+}
+
+/* Decorate headers */
+.service-content h3::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: var(--bg-highlight);
+    z-index: -1;
+    transform: skewX(-15deg);
+}
+
+@media (max-width: 768px) {
+    .services-river::before {
+        left: 20px;
+    }
+
+    .service-river-item {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .service-river-item:nth-child(even) {
+        direction: ltr;
+    }
+
+    .service-river-item:nth-child(even) .service-content {
+        text-align: left;
+    }
+}
+
+/* Team Flip Logic - On Click */
+.team-card:hover .card-inner {
+    transform: none;
+    /* Disable hover flip */
+}
+
+.team-card.flipped .card-inner {
+    transform: rotateY(180deg);
+}

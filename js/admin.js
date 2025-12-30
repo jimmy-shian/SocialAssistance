@@ -424,6 +424,22 @@
     try {
       document.addEventListener((window.DataAPI && window.DataAPI.EVENT) || 'data:updated', updateVersionLabel);
     } catch (e) { }
+
+    // Provider: Generate Google Maps URL from address
+    qs('#pv-gen-gmap')?.addEventListener('click', () => {
+      const addressEl = qs('#pv-address');
+      const gmapEl = qs('#pv-gmap');
+      if (!addressEl || !gmapEl) return;
+      const address = (addressEl.value || '').trim();
+      if (!address) {
+        if (window.Toast) Toast.show('請先填寫地址', 'warning', 2000);
+        return;
+      }
+      // Generate Google Maps search URL (free, no API key required)
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+      gmapEl.value = url;
+      if (window.Toast) Toast.show('已生成地圖連結', 'success', 2000);
+    });
   }
 
   if (document.readyState === 'loading') {
@@ -436,13 +452,14 @@
   function isProvidersSelected() { return (qs('#ds-select')?.value) === 'providers'; }
   function isAboutSelected() { return (qs('#ds-select')?.value) === 'about'; }
   function isSiteSelected() { return (qs('#ds-select')?.value) === 'site'; }
+  function isBlogSelected() { return (qs('#ds-select')?.value) === 'blog'; }
   // 平滑展開/收合區塊
   let __curSectionId = null;
-  function currentSectionId() { if (isProvidersSelected()) return 'providers-visual'; if (isAboutSelected()) return 'about-visual'; if (isSiteSelected()) return 'site-visual'; return null; }
+  function currentSectionId() { if (isProvidersSelected()) return 'providers-visual'; if (isAboutSelected()) return 'about-visual'; if (isSiteSelected()) return 'site-visual'; if (isBlogSelected()) return 'blog-visual'; return null; }
   function asEl(id) { return id ? qs('#' + id) : null; }
   function ensureCollapsible(el) { if (!el) return; el.classList.add('admin-collapsible'); }
   function toggleSections() {
-    const ids = ['providers-visual', 'about-visual', 'site-visual'];
+    const ids = ['providers-visual', 'about-visual', 'site-visual', 'blog-visual'];
     ids.forEach(id => ensureCollapsible(asEl(id)));
     const nextId = currentSectionId();
     if (__curSectionId === nextId) {
@@ -509,6 +526,7 @@
       if (key === DS.about) return window.aboutContent || {};
       if (key === DS.providers) return window.providersData || {};
       if (key === DS.site) return window.siteContent || {};
+      if (key === DS.blog) return window.blogContent || { posts: [] };
       return {};
     })();
     // 若已登入，向 GAS 讀取；若 hasData=true 則優先使用暫存資料
@@ -541,6 +559,8 @@
       renderAboutEditor(payload || {});
     } else if (isSiteSelected()) {
       renderSiteEditor(payload || {});
+    } else if (isBlogSelected()) {
+      renderBlogEditor(payload || {});
     }
     hideLoading();
     try { renderLivePreview(); } catch (e) { }
@@ -1156,6 +1176,7 @@
       }
       else if (isAboutSelected()) { payload = collectAboutFromUI(); }
       else if (isSiteSelected()) { payload = collectSiteFromUI(); }
+      else if (isBlogSelected()) { payload = collectBlogFromUI(); }
       else { payload = getEditorJSON(); }
       let res = await window.DataAPI.savePublish(key, payload, [key]);
       if (!res || !res.ok) {
@@ -1221,6 +1242,7 @@
       }
       else if (isAboutSelected()) { payload = collectAboutFromUI(); }
       else if (isSiteSelected()) { payload = collectSiteFromUI(); }
+      else if (isBlogSelected()) { payload = collectBlogFromUI(); }
       else { payload = getEditorJSON(); }
       const res = await window.DataAPI.update(key, payload);
       if (st) st.textContent = (res && res.ok) ? '已儲存' : ('儲存失敗：' + (res && res.message || '未知錯誤'));
@@ -1506,40 +1528,59 @@
     }
   });
 
-  // ===== Site 視覺化 =====
-  function buildIntroItem(row = {}, idx = 0) {
+  // ===== Site 視覺化 (Updated for Dynamic Index) =====
+  function buildHeroSlideItem(row = {}, idx = 0) {
     const wrap = document.createElement('div');
     wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
-        <button type="button" class="btn-soft btn-yellow sc-intro-up" title="上移"><i class="fas fa-arrow-up"></i></button>
-        <button type="button" class="btn-soft btn-yellow sc-intro-down" title="下移"><i class="fas fa-arrow-down"></i></button>
-        <button type="button" class="btn-soft btn-orange sc-intro-dup" title="複製"><i class="fas fa-copy"></i></button>
-        <button type="button" class="btn-soft btn-purple sc-intro-del" title="刪除"><i class="fas fa-trash"></i></button>
+        <button type="button" class="btn-soft btn-yellow sc-slide-up" title="上移"><i class="fas fa-arrow-up"></i></button>
+        <button type="button" class="btn-soft btn-yellow sc-slide-down" title="下移"><i class="fas fa-arrow-down"></i></button>
+        <button type="button" class="btn-soft btn-purple sc-slide-del" title="刪除"><i class="fas fa-trash"></i></button>
       </div>
-      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 items-center">
-        <label class="text-sm">標題
-          <input class="sc-intro-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.title || ''}">
-        </label>
-        <div class="min-w-0 sm:col-span-2 md:col-span-2">
-        <div class="flex items-center gap-2 min-w-0">
-          <label class="text-sm flex-1 min-w-0">圖片
-            <input class="sc-intro-image flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image || ''}">
+      <div class="grid grid-cols-1 gap-2 w-full">
+        <div class="flex items-center gap-2">
+          <label class="text-sm flex-1">圖片 URL
+            <input class="sc-slide-img w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.img || ''}" placeholder="./img/...">
           </label>
-          <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-intro-upload" accept="image/*"></label>
+          <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0 self-end mb-[2px]">上傳<input type="file" class="hidden sc-slide-upload" accept="image/*"></label>
         </div>
-        <div class="sc-intro-preview mt-2 min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
-      </div>
-        <label class="text-sm">說明
-          <textarea class="sc-intro-text w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.text) || ''}</textarea>
+        <label class="text-sm">替代文字 (Alt)
+          <input class="sc-slide-alt w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.alt || ''}">
         </label>
-        <label class="text-sm">補充（可選）
-          <textarea class="sc-intro-details w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.details) || ''}</textarea>
-        </label>
+        <div class="h-24 bg-gray-100 dark:bg-gray-800 rounded mt-1 overflow-hidden relative sc-slide-preview-box">
+           <img src="${row.img || ''}" class="sc-slide-preview w-full h-full object-cover" onerror="this.style.display='none'" onload="this.style.display='block'">
+           <div class="sc-slide-uploading hidden absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs">上傳中...</div>
+        </div>
       </div>`;
+    // Preview update on input
+    wrap.querySelector('.sc-slide-img').addEventListener('input', e => {
+      const img = wrap.querySelector('.sc-slide-preview');
+      img.src = e.target.value;
+      img.style.display = 'block';
+    });
+    // Upload handler
+    wrap.querySelector('.sc-slide-upload').addEventListener('change', async e => {
+      const file = e.target.files?.[0]; if (!file) return;
+      const input = wrap.querySelector('.sc-slide-img');
+      const upBox = wrap.querySelector('.sc-slide-uploading');
+      try {
+        upBox?.classList.remove('hidden');
+        const ph = await uploadFileAndGetPlaceholder(file);
+        input.value = ph;
+        wrap.querySelector('.sc-slide-preview').src = previewCache[ph] || ph;
+        if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
+      } catch (err) {
+        if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000);
+      } finally {
+        upBox?.classList.add('hidden');
+        e.target.value = '';
+      }
+    });
     return wrap;
   }
+
   function buildServiceItem(row = {}, idx = 0) {
     const wrap = document.createElement('div');
     wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
@@ -1548,110 +1589,168 @@
       <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
         <button type="button" class="btn-soft btn-yellow sc-svc-up" title="上移"><i class="fas fa-arrow-up"></i></button>
         <button type="button" class="btn-soft btn-yellow sc-svc-down" title="下移"><i class="fas fa-arrow-down"></i></button>
-        <button type="button" class="btn-soft btn-orange sc-svc-dup" title="複製"><i class="fas fa-copy"></i></button>
         <button type="button" class="btn-soft btn-purple sc-svc-del" title="刪除"><i class="fas fa-trash"></i></button>
       </div>
-      <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 items-center">
+      <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-2 items-center w-full">
         <label class="text-sm">標題
           <input class="sc-svc-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.title || ''}">
         </label>
-        <div class="min-w-0 sm:col-span-2 md:col-span-2">
-        <div class="flex items-center gap-2 min-w-0">
-          <label class="text-sm flex-1 min-w-0">圖片
-            <input class="sc-svc-image flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="image" value="${row.image || ''}">
-          </label>
-          <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
-        </div>
-        <div class="sc-svc-preview mt-2 min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
-      </div>
-        <label class="text-sm">連結
+        <label class="text-sm">Icon (FontAwesome)
+          <input class="sc-svc-icon w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.icon || ''}" placeholder="fas fa-star">
+        </label>
+        <label class="text-sm md:col-span-2">描述
+          <textarea class="sc-svc-desc w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${row.desc || ''}</textarea>
+        </label>
+        <label class="text-sm">連結 (HTML Path)
           <input class="sc-svc-link w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.link || ''}">
         </label>
+        <div class="text-sm">
+          <span>圖片</span>
+          <div class="flex gap-2 items-end mt-1">
+            <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.img || ''}" placeholder="./img/... 或上傳">
+            <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
+            <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden shrink-0">
+              <img src="${row.img || ''}" class="w-full h-full object-cover sc-svc-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
+            </div>
+          </div>
+        </div>
       </div>`;
+    // Live preview for image
+    wrap.querySelector('.sc-svc-image').addEventListener('input', e => {
+      const preview = wrap.querySelector('.sc-svc-preview');
+      if (preview) {
+        preview.src = e.target.value;
+        preview.style.display = 'block';
+      }
+    });
+    // Upload handler
+    wrap.querySelector('.sc-svc-upload').addEventListener('change', async e => {
+      const file = e.target.files?.[0]; if (!file) return;
+      const input = wrap.querySelector('.sc-svc-image');
+      const preview = wrap.querySelector('.sc-svc-preview');
+      try {
+        const ph = await uploadFileAndGetPlaceholder(file);
+        if (input) input.value = ph;
+        if (preview) {
+          preview.src = previewCache[ph] || ph;
+          preview.style.display = 'block';
+        }
+        if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
+      } catch (err) {
+        if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000);
+      } finally {
+        e.target.value = '';
+      }
+    });
     return wrap;
   }
-  function renderSiteEditor(obj) {
-    const idx = (obj && obj.index) || {};
-    const h1 = qs('#sc-hero-title'); if (h1) h1.value = idx.heroTitle || '';
-    const h2 = qs('#sc-hero-subtitle'); if (h2) h2.value = toPlainText(idx.heroSubtitle) || '';
-    const img = qs('#sc-hero-image'); if (img) img.value = idx.heroImage || '';
-    try { updateHeroPreview(); } catch (e) { }
-    const list = qs('#sc-intro-list'); if (list) {
-      list.innerHTML = '';
-      const arr = Array.isArray(idx.platformIntro) ? idx.platformIntro : [];
-      arr.forEach((it, i) => {
-        // 將 HTML 欄位還原成可編輯文字
-        const row = { ...it, text: toPlainText(it.text), details: toPlainText(it.details) };
-        const node = buildIntroItem(row, i);
-        list.appendChild(node);
-        try { updateIntroPreview(node); } catch (e) { }
-      });
+
+  function renderSiteEditor(data) {
+    // data is window.siteContent (hero, philosophy, services keys at root)
+    const hero = data.hero || {};
+    const hTitle = qs('#sc-hero-title'); if (hTitle) hTitle.value = toPlainText(hero.title) || '';
+    const hSub = qs('#sc-hero-subtitle'); if (hSub) hSub.value = toPlainText(hero.subtitle) || '';
+    const hInfo = qs('#sc-hero-info'); if (hInfo) hInfo.value = toPlainText(hero.info) || '';
+
+    const sList = qs('#sc-hero-slides');
+    if (sList) {
+      sList.innerHTML = '';
+      (hero.slides || []).forEach((s, i) => sList.appendChild(buildHeroSlideItem(s, i)));
     }
-    // Story
-    try {
-      const story = idx.story || {};
-      const sh = qs('#sc-story-heading'); if (sh) sh.value = story.heading || '';
-      const sb = qs('#sc-story-body'); if (sb) sb.value = toPlainText(story.body) || '';
-      const si = qs('#sc-story-images'); if (si) si.value = Array.isArray(story.images) ? story.images.join('\n') : '';
-      renderStoryList();
-    } catch (e) { }
-    // Services
-    try {
-      const st = qs('#sc-services-title'); if (st) st.value = idx.servicesTitle || '';
-      const sl = qs('#sc-service-list'); if (sl) {
-        sl.innerHTML = '';
-        const arr = Array.isArray(idx.services) ? idx.services : [];
-        arr.forEach((s, i) => { const node = buildServiceItem(s, i); sl.appendChild(node); try { updateServicePreview(node); } catch (e) { } });
-      }
-    } catch (e) { }
-    // Video
-    try {
-      const vt = qs('#sc-video-title'); if (vt) vt.value = (idx.video && idx.video.title) || '';
-      const vu = qs('#sc-video-url'); if (vu) vu.value = (idx.video && idx.video.url) || '';
-    } catch (e) { }
+
+    const phil = data.philosophy || {};
+    if (qs('#sc-phil-label')) qs('#sc-phil-label').value = phil.label || '';
+    if (qs('#sc-phil-title')) qs('#sc-phil-title').value = toPlainText(phil.title) || '';
+    if (qs('#sc-phil-content')) qs('#sc-phil-content').value = toPlainText(phil.content) || '';
+    if (qs('#sc-phil-img')) qs('#sc-phil-img').value = phil.img || '';
+    // Update philosophy preview
+    const philPreview = qs('#sc-phil-preview-img');
+    if (philPreview) philPreview.src = phil.img || '';
+
+    const svcList = qs('#sc-service-list');
+    if (svcList) {
+      svcList.innerHTML = '';
+      (data.services || []).forEach((s, i) => svcList.appendChild(buildServiceItem(s, i)));
+    }
   }
-  function addBlankIntro() {
-    const list = qs('#sc-intro-list'); if (!list) return;
-    const node = buildIntroItem({ title: '', image: '', text: '', details: '' }, list.children.length);
-    list.appendChild(node);
+
+  function addBlankSlide() {
+    const list = qs('#sc-hero-slides'); if (!list) return;
+    list.appendChild(buildHeroSlideItem({}, list.children.length));
   }
   function addBlankService() {
     const list = qs('#sc-service-list'); if (!list) return;
-    const node = buildServiceItem({ title: '', image: '', link: '' }, list.children.length);
-    list.appendChild(node);
+    list.appendChild(buildServiceItem({}, list.children.length));
   }
+
   function collectSiteFromUI() {
-    const out = { index: {} };
-    out.index.heroTitle = qs('#sc-hero-title')?.value?.trim() || '';
-    out.index.heroSubtitle = linkifyHtml(qs('#sc-hero-subtitle')?.value || '');
-    out.index.heroImage = qs('#sc-hero-image')?.value?.trim() || '';
-    out.index.platformIntro = Array.from(qs('#sc-intro-list')?.children || []).map(el => ({
-      title: el.querySelector('.sc-intro-title')?.value?.trim() || '',
-      image: el.querySelector('.sc-intro-image')?.value?.trim() || '',
-      text: linkifyHtml(el.querySelector('.sc-intro-text')?.value || ''),
-      details: linkifyHtml(el.querySelector('.sc-intro-details')?.value || '')
-    })).filter(x => x.title || x.text || x.image);
-    // Story
-    const storyImgs = (qs('#sc-story-images')?.value || '').split(/\n+/).map(s => s.trim()).filter(Boolean);
-    out.index.story = {
-      heading: qs('#sc-story-heading')?.value?.trim() || '',
-      body: linkifyHtml(qs('#sc-story-body')?.value || ''),
-      images: storyImgs.length ? storyImgs : undefined
+    // Preserve existing data for fields not edited via UI
+    const existing = window.siteContent || {};
+
+    const out = {
+      hero: {
+        label: existing.hero?.label || 'SOUND CORE STUDIO',
+        title: linkifyHtml(qs('#sc-hero-title')?.value || ''),
+        subtitle: linkifyHtml(qs('#sc-hero-subtitle')?.value || ''),
+        info: linkifyHtml(qs('#sc-hero-info')?.value || ''),
+        slides: Array.from(qs('#sc-hero-slides')?.children || []).map(el => ({
+          img: el.querySelector('.sc-slide-img')?.value?.trim() || '',
+          alt: el.querySelector('.sc-slide-alt')?.value?.trim() || ''
+        })).filter(x => x.img),
+        buttons: existing.hero?.buttons || [
+          { text: '開始探索', link: './explore.html', style: 'primary' },
+          { text: '了解更多', link: '#about', style: 'outline' }
+        ]
+      },
+      philosophy: {
+        label: qs('#sc-phil-label')?.value?.trim() || '',
+        title: linkifyHtml(qs('#sc-phil-title')?.value || ''),
+        content: linkifyHtml(qs('#sc-phil-content')?.value || ''),
+        img: qs('#sc-phil-img')?.value?.trim() || ''
+      },
+      services: Array.from(qs('#sc-service-list')?.children || []).map(el => ({
+        title: el.querySelector('.sc-svc-title')?.value?.trim() || '',
+        desc: el.querySelector('.sc-svc-desc')?.value?.trim() || '',
+        icon: el.querySelector('.sc-svc-icon')?.value?.trim() || '',
+        link: el.querySelector('.sc-svc-link')?.value?.trim() || '',
+        img: el.querySelector('.sc-svc-image')?.value?.trim() || ''
+      })).filter(x => x.title),
+      // Preserve existing sections not edited in admin
+      sdgs: existing.sdgs || [],
+      resources: existing.resources || {},
+      blogPosts: existing.blogPosts || [],
+      map: existing.map || {}
     };
-    // Services
-    out.index.servicesTitle = qs('#sc-services-title')?.value?.trim() || '';
-    out.index.services = Array.from(qs('#sc-service-list')?.children || []).map(el => ({
-      title: el.querySelector('.sc-svc-title')?.value?.trim() || '',
-      image: el.querySelector('.sc-svc-image')?.value?.trim() || '',
-      link: el.querySelector('.sc-svc-link')?.value?.trim() || ''
-    })).filter(x => x.title || x.image || x.link);
-    // Video
-    out.index.video = {
-      title: qs('#sc-video-title')?.value?.trim() || '',
-      url: qs('#sc-video-url')?.value?.trim() || ''
-    };
-    return out;
+    return out; // Return flat siteContent, not wrapped
   }
+
+  // Global Binding for Site Editor Buttons
+  document.addEventListener('click', e => {
+    if (!e.target) return;
+    if (e.target.id === 'sc-add-slide') { e.preventDefault(); addBlankSlide(); }
+    if (e.target.id === 'sc-add-service') { e.preventDefault(); addBlankService(); }
+
+    // Delegation for dynamic items
+    if (e.target.closest('.sc-slide-del')) e.target.closest('[data-index]').remove();
+    if (e.target.closest('.sc-slide-up')) {
+      const el = e.target.closest('[data-index]');
+      if (el.previousElementSibling) el.parentNode.insertBefore(el, el.previousElementSibling);
+    }
+    if (e.target.closest('.sc-slide-down')) {
+      const el = e.target.closest('[data-index]');
+      if (el.nextElementSibling) el.parentNode.insertBefore(el.nextElementSibling, el);
+    }
+
+    if (e.target.closest('.sc-svc-del')) e.target.closest('[data-index]').remove();
+    if (e.target.closest('.sc-svc-up')) {
+      const el = e.target.closest('[data-index]');
+      if (el.previousElementSibling) el.parentNode.insertBefore(el, el.previousElementSibling);
+    }
+    if (e.target.closest('.sc-svc-down')) {
+      const el = e.target.closest('[data-index]');
+      if (el.nextElementSibling) el.parentNode.insertBefore(el.nextElementSibling, el);
+    }
+  });
   qs('#sc-add-intro')?.addEventListener('click', () => addBlankIntro());
   qs('#sc-intro-list')?.addEventListener('click', (e) => {
     const btn = e.target.closest('button'); if (!btn) return;
@@ -1713,6 +1812,27 @@
       if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
     } catch (err) { if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
     finally { up.value = ''; up.disabled = false; const pv = item.querySelector('.sc-svc-preview'); if (pv) pv.classList.remove('is-uploading'); }
+  });
+
+  // Site｜Philosophy 圖片預覽/上傳
+  qs('#sc-phil-img')?.addEventListener('input', (e) => {
+    const preview = qs('#sc-phil-preview-img');
+    if (preview) preview.src = e.target.value || '';
+  });
+  qs('#sc-phil-upload')?.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    const input = qs('#sc-phil-img');
+    const preview = qs('#sc-phil-preview-img');
+    try {
+      const ph = await uploadFileAndGetPlaceholder(file);
+      if (input) input.value = ph;
+      if (preview) preview.src = previewCache[ph] || ph;
+      if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
+    } catch (err) {
+      if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000);
+    } finally {
+      e.target.value = '';
+    }
   });
 
   // Site｜Story 圖片：上傳、刪除、上下移、即時預覽
@@ -2208,29 +2328,131 @@
       </div>`;
   }
 
-  function renderLivePreview() {
+  function renderPreviewBlog(data) {
     const vp = pvwRoot(); if (!vp) return;
-    const sel = qs('#ds-select')?.value || 'about';
+    const posts = Array.isArray(data.posts) ? data.posts : [];
+    vp.innerHTML = `
+        <div class="space-y-8">
+           <h1 class="text-3xl font-bold">資源與部落格 (Preview)</h1>
+           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+             ${posts.map(p => `
+               <article class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow">
+                  <div class="h-48 overflow-hidden bg-gray-200">
+                     ${p.cover ? `<img src="${p.cover}" class="w-full h-full object-cover">` : ''}
+                  </div>
+                  <div class="p-4">
+                     <div class="text-xs text-gray-500 mb-1">${p.date || ''}</div>
+                     <h3 class="font-bold text-lg mb-2 line-clamp-2">${p.title || '無標題'}</h3>
+                     <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">${p.summary || ''}</p>
+                  </div>
+               </article>
+             `).join('')}
+           </div>
+        </div>
+     `;
+  }
+
+  function renderLivePreview() {
+    const iframe = qs('#preview-iframe');
+    const label = qs('#preview-page-label');
+    if (!iframe) return;
+
+    const sel = qs('#ds-select')?.value || 'site';
+
+    // Determine which page to load based on dataset
+    let pagePath = './index.html';
+    let dataKey = 'siteContent';
+    let collectFn = null;
+
     if (sel === 'site') {
-      const obj = collectSiteFromUI();
-      renderPreviewSite(obj);
+      pagePath = './index.html';
+      dataKey = 'siteContent';
+      collectFn = collectSiteFromUI;
     } else if (sel === 'about') {
-      const obj = collectAboutFromUI();
-      renderPreviewAbout(obj);
+      pagePath = './about.html';
+      dataKey = 'aboutContent';
+      collectFn = collectAboutFromUI;
+    } else if (sel === 'blog') {
+      pagePath = './blog.html';
+      dataKey = 'blogContent';
+      collectFn = collectBlogFromUI;
     } else if (sel === 'providers') {
-      const root = getEditorJSON();
-      const id = qs('#pv-prov-select')?.value;
-      if (!id) { vp.innerHTML = '<div class="text-gray-500">請先選擇業者</div>'; return; }
-      const base = root[id] || {};
-      const merged = { ...base, ...collectBasicFields() };
-      merged.timeline = collectTimeline();
-      merged.cases = collectCasesFromUI();
-      renderPreviewProvider(merged);
+      pagePath = './explore.html';
+      dataKey = 'providersData';
+      collectFn = () => {
+        const root = getEditorJSON();
+        const id = qs('#pv-prov-select')?.value;
+        if (!id) return root;
+        const base = root[id] || {};
+        const merged = { ...base, ...collectBasicFields() };
+        merged.timeline = collectTimeline();
+        merged.cases = collectCasesFromUI();
+        root[id] = merged;
+        return root;
+      };
     }
+
+    if (label) label.textContent = pagePath.replace('./', '');
+
+    // Collect current edited data
+    const editedData = collectFn ? collectFn() : {};
+
+    // Create a blob URL with the page that injects data before loading scripts
+    // This approach: load page in iframe, then use srcdoc with injected data
+
+    // Simpler approach: use postMessage after load
+    // First load the page, then send data to override
+
+    // We'll use the srcdoc approach to inject data before page scripts run
+    fetch(pagePath)
+      .then(res => res.text())
+      .then(html => {
+        // Inject data override script before closing </head> or at start of <body>
+        const dataScript = `
+<script>
+// Admin preview data injection
+window.__ADMIN_PREVIEW__ = true;
+window.${dataKey} = ${JSON.stringify(editedData, null, 2)};
+// Also set aboutContent for index.html Team section if editing site
+${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent || {}, null, 2)};` : ''}
+</script>
+`;
+        // Insert after <head> opening or before first <script>
+        let modifiedHtml;
+        if (html.includes('<head>')) {
+          modifiedHtml = html.replace('<head>', '<head>' + dataScript);
+        } else if (html.includes('<body>')) {
+          modifiedHtml = html.replace('<body>', '<body>' + dataScript);
+        } else {
+          modifiedHtml = dataScript + html;
+        }
+
+        // Remove nav and footer placeholders to keep preview clean
+        modifiedHtml = modifiedHtml.replace(/<div id="nav-placeholder"><\/div>/gi, '');
+        modifiedHtml = modifiedHtml.replace(/<div id="footer-placeholder"><\/div>/gi, '');
+        // Also remove navFooter.js script
+        modifiedHtml = modifiedHtml.replace(/<script src="\.\/js\/navFooter\.js"><\/script>/gi, '');
+
+        // CRITICAL FIX: Remove original data scripts that would overwrite injected data
+        // These scripts load window.aboutContent, window.siteContent, etc. from js/data/*.js
+        // and would overwrite our injected edited data. Must remove them!
+        modifiedHtml = modifiedHtml.replace(/<script[^>]*src="[^"]*\/data\/aboutContent\.js[^"]*"[^>]*><\/script>/gi, '');
+        modifiedHtml = modifiedHtml.replace(/<script[^>]*src="[^"]*\/data\/siteContent\.js[^"]*"[^>]*><\/script>/gi, '');
+        modifiedHtml = modifiedHtml.replace(/<script[^>]*src="[^"]*\/data\/providers\.js[^"]*"[^>]*><\/script>/gi, '');
+        modifiedHtml = modifiedHtml.replace(/<script[^>]*src="[^"]*\/data\/blogContent\.js[^"]*"[^>]*><\/script>/gi, '');
+        modifiedHtml = modifiedHtml.replace(/<script[^>]*src="[^"]*navFooter\.js[^"]*"[^>]*><\/script>/gi, '');
+
+        iframe.srcdoc = modifiedHtml;
+      })
+      .catch(err => {
+        console.error('Preview load error:', err);
+        iframe.srcdoc = '<div style="padding:2rem;color:red;">預覽載入失敗: ' + err.message + '</div>';
+      });
   }
 
   function bindPreviewLive() {
-    const deb = debounce(renderLivePreview, 120);
+    // Increased debounce for iframe-based preview (loading page takes time)
+    const deb = debounce(renderLivePreview, 500);
     const panel = qs('#admin-panel');
     panel?.addEventListener('input', (e) => { const t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) deb(); });
     panel?.addEventListener('change', () => deb());
@@ -2247,4 +2469,135 @@
   } else {
     bindDropdowns(); bindLinkModal(); bindPreviewControls(); bindPreviewLive(); try { renderLivePreview(); } catch (e) { }
   }
+  // ===== Blog Editor Logic =====
+  function buildPostItem(p = {}, idx = 0) {
+    const wrap = document.createElement('div');
+    wrap.className = 'p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow relative';
+    wrap.dataset.index = String(idx);
+    wrap.innerHTML = `
+      <div class="flex items-center justify-between mb-2">
+        <h4 class="font-bold text-gray-700 dark:text-gray-200">#${idx + 1}</h4>
+        <div class="flex gap-2">
+            <button type="button" class="btn-soft btn-yellow bl-move-up" title="上移">↑</button>
+            <button type="button" class="btn-soft btn-yellow bl-move-down" title="下移">↓</button>
+            <button type="button" class="btn-soft btn-purple bl-del" title="刪除">×</button>
+        </div>
+      </div>
+      <div class="grid admin-grid gap-4">
+        <label class="text-sm">標題
+          <input class="bl-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.title)}">
+        </label>
+        <div class="grid grid-cols-2 gap-4">
+            <label class="text-sm">日期
+              <input type="date" class="bl-date w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${p.date || ''}">
+            </label>
+             <label class="text-sm">標籤 (逗號分隔)
+              <input class="bl-tags w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml((Array.isArray(p.tags) ? p.tags : []).join(', '))}">
+            </label>
+        </div>
+         <label class="text-sm">摘要
+          <textarea class="bl-summary w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${escHtml(p.summary)}</textarea>
+        </label>
+         <label class="text-sm">封面圖
+           <div class="flex gap-2 items-end">
+              <input class="bl-cover flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.cover || '')}" placeholder="./img/... 或上傳">
+              <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden bl-cover-upload" accept="image/*"></label>
+              <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden relative shrink-0">
+                 <img src="${p.cover || ''}" class="w-full h-full object-cover bl-cover-preview" onerror="this.style.display='none'">
+              </div>
+           </div>
+        </label>
+        <label class="text-sm">內容 (HTML / Text)
+          <textarea class="bl-content w-full rounded border px-2 py-1 bg-white dark:bg-gray-800 font-mono text-sm" rows="6">${escHtml(p.content || '')}</textarea>
+        </label>
+      </div>
+    `;
+
+    // Bind events
+    wrap.querySelector('.bl-del').onclick = () => wrap.remove();
+    wrap.querySelector('.bl-move-up').onclick = () => { if (wrap.previousElementSibling) wrap.parentNode.insertBefore(wrap, wrap.previousElementSibling); };
+    wrap.querySelector('.bl-move-down').onclick = () => { if (wrap.nextElementSibling) wrap.parentNode.insertBefore(wrap.nextElementSibling, wrap); };
+
+    // Live preview for cover
+    const coverInput = wrap.querySelector('.bl-cover');
+    const coverPreview = wrap.querySelector('.bl-cover-preview');
+    coverInput.addEventListener('input', () => {
+      coverPreview.src = coverInput.value;
+      coverPreview.style.display = 'block';
+    });
+
+    // Upload handler for cover
+    wrap.querySelector('.bl-cover-upload').addEventListener('change', async (e) => {
+      const file = e.target.files?.[0]; if (!file) return;
+      try {
+        const ph = await uploadFileAndGetPlaceholder(file);
+        coverInput.value = ph;
+        coverPreview.src = previewCache[ph] || ph;
+        coverPreview.style.display = 'block';
+        if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
+      } catch (err) {
+        if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000);
+      } finally {
+        e.target.value = '';
+      }
+    });
+
+    return wrap;
+  }
+
+  function renderBlogEditor(data) {
+    const list = qs('#bl-post-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const posts = Array.isArray(data.posts) ? data.posts : [];
+    posts.forEach((p, i) => list.appendChild(buildPostItem(p, i)));
+
+    // Bind Add button
+    const addBtn = qs('#bl-add-post');
+    // Remove old listener to avoid duplicates if any (though usually we rely on Id)
+    // Actually, button is outside the list, so we should bind it once or check if bound.
+    // Better: bind it in init(). But here we do it ad-hoc or check.
+    // admin.js style is to bind global listeners in init(), but 'bl-add-post' is new.
+    // I'll bind it here but safeguard? Or better, bind it ONCE in renderBlogEditor is bad if called multiple times.
+    // I'll check if it has a listener? No easy way.
+    // I'll use onclick assignment to be safe.
+    if (addBtn) addBtn.onclick = () => {
+      list.prepend(buildPostItem({ title: '新文章', date: new Date().toISOString().split('T')[0] }, 0));
+    };
+  }
+
+  // Hook collect function for saving?
+  // admin.js seems to rely on 'getEditorJSON()' or updating the editor content when inputs change?
+  // Actually admin.js likely *doesn't* auto-update the hidden JSON editor from UI.
+  // It probably does `collect...` on Save. i need to find `onSavePublish`.
+  // Wait, `onSavePublish` calls `getEditorJSON()`.
+  // Does `admin.js` have a "Sync UI to JSON" loop?
+  // I need to find how `admin.js` handles saving. 
+  // It seems `loadDatasetAndRender` populates UI. 
+  // I need to ensure when `btn-save...` is clicked, the UI state is gathered back to JSON.
+  // Let's check `onSavePublish` or `collect...` function in admin.js.
+  // I might have missed that part in my read. 
+  // Re-reading `loadDatasetAndRender`: it calls `setEditor(payload)`. 
+  // So the JSON editor has the Initial state.
+  // When user edits UI, does it update JSON editor?
+  // The provided `admin.js` snippet didn't show `onSavePublish`.
+  // I must check.
+
+  function collectBlogFromUI() {
+    const list = qs('#bl-post-list');
+    if (!list) return { posts: [] };
+    const posts = Array.from(list.children).map(el => {
+      const get = sel => el.querySelector(sel);
+      return {
+        title: get('.bl-title')?.value || '',
+        date: get('.bl-date')?.value || '',
+        summary: get('.bl-summary')?.value || '',
+        cover: get('.bl-cover')?.value || '',
+        tags: (get('.bl-tags')?.value || '').split(/[,\s]+/).map(s => s.trim()).filter(Boolean),
+        content: get('.bl-content')?.value || ''
+      };
+    });
+    return { posts };
+  }
+
 })();

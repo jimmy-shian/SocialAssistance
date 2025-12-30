@@ -109,67 +109,67 @@
       ctrl.open(idx, sources);
     });
   }
-function setupMarquee(rootEl) {
-  const track = rootEl.querySelector('.carousel-track');
-  const seq1 = track?.querySelector('.marquee-seq');
-  if (!track || !seq1) return;
+  function setupMarquee(rootEl) {
+    const track = rootEl.querySelector('.carousel-track');
+    const seq1 = track?.querySelector('.marquee-seq');
+    if (!track || !seq1) return;
 
-  // 等所有圖片載入完成（包含 lazy-loading）
-  function waitImagesLoaded(el) {
-    const imgs = Array.from(el.querySelectorAll('img'));
-    return Promise.all(imgs.map(img =>
-      img.complete
-        ? Promise.resolve()
-        : new Promise(res => {
+    // 等所有圖片載入完成（包含 lazy-loading）
+    function waitImagesLoaded(el) {
+      const imgs = Array.from(el.querySelectorAll('img'));
+      return Promise.all(imgs.map(img =>
+        img.complete
+          ? Promise.resolve()
+          : new Promise(res => {
             img.addEventListener('load', res, { once: true });
             img.addEventListener('error', res, { once: true });
           })
-    ));
-  }
-
-  function measureAndApply() {
-    const containerW = rootEl.getBoundingClientRect().width;
-
-    // 複製 seq1 直到寬度至少大於容器（避免空白）
-    const original = Array.from(seq1.querySelectorAll('img'));
-    let guard = 0;
-    while (seq1.getBoundingClientRect().width < containerW + 24 && guard < 200) {
-      original.forEach(img => seq1.appendChild(img.cloneNode(true)));
-      guard++;
+      ));
     }
 
-    // 後續 sequence 也複製，確保無縫
-    const others = Array.from(track.querySelectorAll('.marquee-seq')).slice(1);
-    others.forEach(s => { s.innerHTML = seq1.innerHTML; });
+    function measureAndApply() {
+      const containerW = rootEl.getBoundingClientRect().width;
 
-    // 設置 CSS 變數
-    const distance = seq1.getBoundingClientRect().width;
-    rootEl.style.setProperty('--marquee-distance', distance + 'px');
+      // 複製 seq1 直到寬度至少大於容器（避免空白）
+      const original = Array.from(seq1.querySelectorAll('img'));
+      let guard = 0;
+      while (seq1.getBoundingClientRect().width < containerW + 24 && guard < 200) {
+        original.forEach(img => seq1.appendChild(img.cloneNode(true)));
+        guard++;
+      }
 
-    const pxPerSec = 30; // 調整動畫速度
-    const secs = Math.max(20, Math.min(80, distance / pxPerSec));
-    rootEl.style.setProperty('--carousel-speed', secs + 's');
-  }
+      // 後續 sequence 也複製，確保無縫
+      const others = Array.from(track.querySelectorAll('.marquee-seq')).slice(1);
+      others.forEach(s => { s.innerHTML = seq1.innerHTML; });
 
-  // 初次測量
-  waitImagesLoaded(track).then(() => {
-    measureAndApply();
-    if (typeof installDragMarquee === 'function') {
-      installDragMarquee(rootEl, track, seq1);
+      // 設置 CSS 變數
+      const distance = seq1.getBoundingClientRect().width;
+      rootEl.style.setProperty('--marquee-distance', distance + 'px');
+
+      const pxPerSec = 30; // 調整動畫速度
+      const secs = Math.max(20, Math.min(80, distance / pxPerSec));
+      rootEl.style.setProperty('--carousel-speed', secs + 's');
     }
-  });
 
-  // 自動響應 Resize
-  let timer;
-  window.addEventListener('resize', () => {
-    clearTimeout(timer);
-    timer = setTimeout(measureAndApply, 180);
-  });
+    // 初次測量
+    waitImagesLoaded(track).then(() => {
+      measureAndApply();
+      if (typeof installDragMarquee === 'function') {
+        installDragMarquee(rootEl, track, seq1);
+      }
+    });
 
-  // hover 暫停動畫
-  rootEl.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
-  rootEl.addEventListener('mouseleave', () => track.style.animationPlayState = '');
-}
+    // 自動響應 Resize
+    let timer;
+    window.addEventListener('resize', () => {
+      clearTimeout(timer);
+      timer = setTimeout(measureAndApply, 180);
+    });
+
+    // hover 暫停動畫
+    rootEl.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+    rootEl.addEventListener('mouseleave', () => track.style.animationPlayState = '');
+  }
 
   // Confetti removed for editorial design
 
@@ -292,10 +292,14 @@ function setupMarquee(rootEl) {
               <span class="inline-flex items-center gap-2 font-semibold"><span class="text-xl">▶</span> 播放影片</span>
             </button>` : '');
           return `
-            <article class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hover:shadow-md transition">
-              ${mediaBlock}
-              <h3 class="mt-3 font-semibold">${c.title || ''}</h3>
-              ${c.summary ? `<p class="text-gray-600 dark:text-gray-300 text-sm">${c.summary}</p>` : ''}
+            <article class="p-4 rounded-xl card-dynamic-bg hover:shadow-lg transition-all duration-300 group">
+              <div class="overflow-hidden rounded-lg mb-4">
+                 <div class="transform group-hover:scale-105 transition-transform duration-500">
+                    ${mediaBlock}
+                 </div>
+              </div>
+              <h3 class="mt-2 font-bold text-xl group-hover:text-[var(--primary)] transition-colors">${c.title || ''}</h3>
+              ${c.summary ? `<p class="text-gray-600 dark:text-gray-300 text-sm mt-2 leading-relaxed">${c.summary}</p>` : ''}
             </article>`;
         }).join('');
         parts.push(`<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>`);
@@ -304,7 +308,7 @@ function setupMarquee(rootEl) {
       // 3) Text-only list (no media)
       if (textOnly.length) {
         const items = textOnly.map(c => `
-          <li class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+          <li class="p-6 rounded-xl card-dynamic-bg hover:shadow-md transition-all duration-300">
             <div class="font-semibold">${c.title || ''}</div>
             ${c.summary ? `<div class="text-gray-600 dark:text-gray-300">${c.summary}</div>` : ''}
           </li>`).join('');
@@ -321,39 +325,48 @@ function setupMarquee(rootEl) {
         <span class="text-gray-500 dark:text-gray-300">${provider.name}</span>
       </nav>
 
-      <header class="mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold">${provider.name}</h1>
-        <div class="mt-2 inline-block bg-[var(--surface-2)] text-[var(--primary)] text-sm px-2 py-1 rounded border border-gray-200 dark:border-gray-700">${provider.category}</div>
-        <p class="mt-4 text-gray-700 dark:text-gray-300">${provider.description}</p>
+      <header class="mb-8 card-dynamic-bg p-8 rounded-2xl shadow-lg relative overflow-hidden group">
+        <div class="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/5 to-transparent opacity-50 pointer-events-none"></div>
+        <div class="relative z-10">
+          <div class="flex flex-wrap items-center gap-4 mb-4">
+             <h1 class="text-3xl md:text-5xl font-black text-gradient">${provider.name}</h1>
+             <div class="px-3 py-1 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm font-bold border border-[var(--primary)]/20">${provider.category}</div>
+          </div>
+          <p class="text-lg text-gray-700 dark:text-gray-200 leading-relaxed max-w-3xl">${provider.description}</p>
+        </div>
       </header>
 
       ${(() => {
         const blocks = [
-          { key: 'know', title: '你將認識', color: 'from-blue-500/10', icon: '📘' },
-          { key: 'learn', title: '你將學到', color: 'from-green-500/10', icon: '🛠️' },
-          { key: 'gain', title: '你將獲得', color: 'from-purple-500/10', icon: '🏆' }
+          { key: 'know', title: '你將認識', color: 'bg-blue-500/10 text-blue-600', border: 'border-blue-100' },
+          { key: 'learn', title: '你將學到', color: 'bg-green-500/10 text-green-600', border: 'border-green-100' },
+          { key: 'gain', title: '你將獲得', color: 'bg-purple-500/10 text-purple-600', border: 'border-purple-100' }
         ];
         const hasAny = blocks.some(b => Array.isArray(provider[b.key]) && provider[b.key].length);
         if (!hasAny) return '';
         const cols = blocks.map(b => {
-          const items = (provider[b.key] || []).map(v => `<li class=\"interactive-li flex items-start gap-2\"><span class=\"icon text-purple-500\">•</span><span>${v}</span></li>`).join('');
+          const items = (provider[b.key] || []).map(v => `<li class=\"flex items-start gap-3 text-gray-700 dark:text-gray-300 group/li\"><span class=\"mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--primary)] group-hover/li:scale-150 transition-transform\"></span><span class="group-hover/li:text-[var(--primary)] transition-colors">${v}</span></li>`).join('');
+          if (!items) return '';
           return `
-            <div class="p-5 rounded-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
-              <div class="flex items-center gap-2 mb-2"><span>${b.icon}</span><h3 class="font-semibold">${b.title}</h3></div>
-              <ul class="space-y-1 text-gray-700 dark:text-gray-200 text-sm">${items}</ul>
+            <div class="card-dynamic-bg p-6 rounded-xl hover:-translate-y-1 transition-transform duration-300">
+              <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <span class="w-2 h-6 rounded-full ${b.color.split(' ')[0]}"></span>
+                ${b.title}
+              </h3>
+              <ul class="space-y-3">${items}</ul>
             </div>
           `;
         }).join('');
-        return `<section class="grid md:grid-cols-3 gap-4 mb-10">${cols}</section>`;
+        return `<section class="grid md:grid-cols-3 gap-6 mb-12">${cols}</section>`;
       })()}
 
       <section aria-labelledby="sec-info" class="grid md:grid-cols-3 gap-6 mb-12">
-        <div class="p-6 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
-          <div class="text-gray-500 text-sm">課程時間</div>
-          <div class="font-semibold mt-1">${provider.schedule || '-'}</div>
+        <div class="p-6 rounded-xl card-dynamic-bg flex flex-col justify-center">
+          <div class="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">課程時間</div>
+          <div class="font-bold text-xl text-[var(--primary)]">${provider.schedule || '-'}</div>
         </div>
-        <div class="p-6 rounded-lg bg-gray-50 dark:bg-gray-800 shadow md:col-span-2">
-          <div class="text-gray-500 text-sm">地點（點我開啟 Google 地圖）</div>
+        <div class="p-6 rounded-xl card-dynamic-bg md:col-span-2 flex flex-col justify-center">
+          <div class="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">地點</div>
           ${(() => {
         const lat = provider.coords?.lat;
         const lng = provider.coords?.lng;
@@ -361,8 +374,11 @@ function setupMarquee(rootEl) {
         const name = [provider.location || '', provider.address || ''].filter(Boolean).join(' ');
         const coord = (lat && lng) ? `${lat.toFixed(3)}, ${lng.toFixed(3)}` : '';
         const display = [name, coord ? `（${coord}）` : ''].join('');
-        if (!url) return `<div class=\"font-semibold mt-1\">${display || '-'}</div>`;
-        return `<a class=\"font-semibold mt-1 link-soft text-[var(--primary)] break-all\" href=\"${url}\" target=\"_blank\" rel=\"noopener\">${display || '查看地圖'}</a>`;
+        if (!url) return `<div class=\"font-bold text-lg\">${display || '-'}</div>`;
+        return `<a class=\"font-bold text-lg hover:text-[var(--primary)] transition-colors flex items-center gap-2 group\" href=\"${url}\" target=\"_blank\" rel=\"noopener\">
+                  ${display || '查看地圖'} 
+                  <i class="fas fa-external-link-alt text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </a>`;
       })()}
         </div>
       </section>
@@ -394,12 +410,23 @@ function setupMarquee(rootEl) {
       </section>
 
       <section aria-labelledby="sec-timeline" class="mb-12">
-        <h2 id="sec-timeline" class="text-2xl font-bold mb-4">課程安排（時間軸）</h2>
-        <div class="relative pl-6">
-          <div class="absolute left-2 top-0 bottom-0 w-px bg-gray-300 dark:bg-gray-600"></div>
-          <div class="space-y-4">
-            ${timelineHtml}
-          </div>
+        <h2 id="sec-timeline" class="text-2xl font-bold mb-6 flex items-center gap-3">
+          課程安排
+          <span class="text-sm font-normal text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">Timeline</span>
+        </h2>
+        <div class="relative pl-8 border-l-2 border-[var(--primary)]/20 space-y-8">
+          ${(provider.timeline || []).map(item => `
+            <div class="relative group">
+              <span class="absolute -left-[39px] top-1 w-5 h-5 rounded-full border-4 border-white dark:border-gray-900 bg-[var(--primary)] shadow-sm group-hover:scale-125 transition-transform"></span>
+              <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                 <div class="font-mono font-bold text-[var(--primary)] text-lg min-w-[5rem]">${item.time}</div>
+                 <div class="flex-1 card-dynamic-bg p-4 rounded-lg hover:shadow-md transition-shadow">
+                    <h3 class="font-bold text-lg mb-1">${item.title}</h3>
+                    <p class="text-gray-600 dark:text-gray-300">${item.detail}</p>
+                 </div>
+              </div>
+            </div>
+          `).join('')}
         </div>
       </section>
 

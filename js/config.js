@@ -26,7 +26,8 @@ window.AppConfig = {
   datasets: {
     about: 'aboutContent',
     providers: 'providers',
-    site: 'siteContent'
+    site: 'siteContent',
+    blog: 'blogContent'
   },
   versionCacheKey: '1.0.0',
   // 預設不在公開頁自動向 GAS 取資料

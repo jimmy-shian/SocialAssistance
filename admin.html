@@ -121,12 +121,15 @@
                 class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">關於我們（aboutContent）</button>
               <button type="button" data-value="providers"
                 class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">探索資源平台（providers）</button>
+              <button type="button" data-value="blog"
+                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">部落格（blogContent）</button>
             </div>
             <!-- 保留原生 select 供既有 JS 使用（視覺隱藏） -->
             <select id="ds-select" class="sr-only absolute -left-[9999px]" aria-hidden="true" tabindex="-1">
               <option value="site">主畫面（siteContent）</option>
               <option value="about">關於我們（aboutContent）</option>
               <option value="providers">探索資源平台（providers）</option>
+              <option value="blog">部落格（blogContent）</option>
             </select>
           </div>
           <span id="ds-version" class="text-sm text-gray-500"></span>
@@ -150,12 +153,15 @@
       <!-- Live Preview Panel -->
       <section id="preview-panel" class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hidden">
         <div class="flex items-center justify-between flex-wrap gap-2">
-          <h3 class="font-semibold">即時預覽（不含導覽與頁尾）</h3>
-        </div>
-        <div id="live-preview-shell" class="mt-3 overflow-x-auto">
-          <div id="live-preview-viewport"
-            class="mx-auto bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 shadow min-h-[240px] p-4">
+          <h3 class="font-semibold">即時預覽（嵌入實際頁面）</h3>
+          <div class="flex gap-2 items-center text-sm text-gray-500">
+            <span id="preview-page-label">index.html</span>
           </div>
+        </div>
+        <div id="live-preview-shell"
+          class="mt-3 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+          <iframe id="preview-iframe" class="w-full bg-white dark:bg-gray-900"
+            style="min-height: 600px; border: none;"></iframe>
         </div>
       </section>
 
@@ -219,92 +225,79 @@
       <!-- Site 視覺化編輯器 -->
       <section id="site-visual" class="mt-8 hidden">
         <header class="mb-3">
-          <h3 class="text-lg font-semibold">Site Content（首頁文案）</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-300">編輯首頁標題、副標題、首圖，以及平台導覽卡片。</p>
+          <h3 class="text-lg font-semibold">首頁文案 (Dynamic)</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">管理首頁輪播、理念區塊與服務項目。</p>
         </header>
-        <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          <div class="md:col-span-1">
-            <label class="text-sm block">首頁首圖（index.heroImage）
-              <input id="sc-hero-image" class="w-full mt-1 rounded border px-2 py-1 bg-white dark:bg-gray-800"
-                placeholder="https://... 或 gas://image/...">
-            </label>
-            <div class="mt-2 flex items-center gap-2">
-              <label class="btn-soft btn-blue text-xs cursor-pointer">上傳圖片<input id="sc-hero-upload" type="file"
-                  class="hidden" accept="image/*"></label>
-              <span id="sc-hero-loading" class="text-xs text-gray-500"></span>
-            </div>
-            <div id="sc-hero-preview"
-              class="mt-2 h-36 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-xs text-gray-500 dark:text-gray-400"
-              aria-label="首圖預覽">尚未選擇</div>
-          </div>
-          <label class="text-sm">首頁主標題（index.heroTitle）
-            <input id="sc-hero-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
-          </label>
-          <label class="text-sm">首頁副標題（index.heroSubtitle）
-            {{ ... }}
-            <textarea id="sc-hero-subtitle" rows="2"
-              class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
-          </label>
-        </div>
+
+        <!-- Hero Section -->
         <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
-          <div class="flex items-center justify-between mb-2">
-            <h4 class="font-semibold">平台導覽卡片（index.platformIntro）</h4>
-            <button id="sc-add-intro" class="btn-soft btn-purple">新增卡片</button>
-          </div>
-          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">每張卡片可填標題、圖片網址、簡述與補充細節。</p>
-          <div id="sc-intro-list" class="space-y-3"></div>
-        </div>
-        <!-- 首頁重點故事 -->
-        <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
-          <h4 class="font-semibold mb-2">首頁重點故事（index.story）</h4>
+          <h4 class="font-semibold mb-3">Hero 區塊 (Hero Slider)</h4>
           <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="text-sm">故事標題（story.heading）
-              <input id="sc-story-heading" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
-                placeholder="如：自立">
-            </label>
-            <label class="text-sm">故事圖片（每行一張 URL）
-              <textarea id="sc-story-images" rows="4" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
-                placeholder="https://...\nhttps://..."></textarea>
-            </label>
+            <label class="text-sm block">主標題 (Hero Title)<textarea id="sc-hero-title" rows="2"
+                class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+            <label class="text-sm block">副標題 (Hero Subtitle)<textarea id="sc-hero-subtitle" rows="2"
+                class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+            <label class="text-sm block md:col-span-2">聯絡資訊 (Info)<textarea id="sc-hero-info" rows="3"
+                class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
           </div>
-          <div class="mt-2 flex items-center gap-2">
-            <label class="btn-soft btn-blue text-xs cursor-pointer">上傳圖片<input id="sc-story-upload" type="file"
-                class="hidden" accept="image/*" multiple></label>
-            <span id="sc-story-loading" class="text-xs text-gray-500"></span>
+          <div class="mt-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="text-sm font-semibold">輪播圖片 (Slides)</label>
+              <button id="sc-add-slide" class="btn-soft btn-purple text-xs">新增圖片</button>
+            </div>
+            <div id="sc-hero-slides" class="space-y-2"></div>
           </div>
-          <div id="sc-story-list" class="mt-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"></div>
-          <label class="text-sm block mt-3">故事內文（支援自動連結與換行）
-            <textarea id="sc-story-body" rows="5" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
-              placeholder="輸入段落文字，可含網址"></textarea>
-          </label>
         </div>
 
-        <!-- 服務項目 -->
+        <!-- Philosophy Section -->
+        <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <h4 class="font-semibold mb-3">理念區塊 (About/Philosophy)</h4>
+          <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="text-sm block">標籤 (Label)<input id="sc-phil-label"
+                class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></label>
+            <label class="text-sm block">標題 (Title)<textarea id="sc-phil-title" rows="2"
+                class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+            <label class="text-sm block md:col-span-2">內容 (Content/Quote)<textarea id="sc-phil-content" rows="4"
+                class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+            <div class="md:col-span-2">
+              <div class="flex items-center gap-2">
+                <label class="text-sm flex-1">圖片網址 (Image URL)<input id="sc-phil-img"
+                    class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></label>
+                <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0 self-end mb-[2px]">上傳<input type="file"
+                    id="sc-phil-upload" class="hidden" accept="image/*"></label>
+              </div>
+              <div id="sc-phil-preview" class="mt-2 h-32 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden relative">
+                <img id="sc-phil-preview-img" class="w-full h-full object-cover" onerror="this.style.display='none'"
+                  onload="this.style.display='block'">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services Section -->
         <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="font-semibold">服務項目（index.services）</h4>
+            <h4 class="font-semibold">服務項目 (Services)</h4>
             <button id="sc-add-service" class="btn-soft btn-purple">新增服務</button>
           </div>
-          <label class="text-sm block mb-2">區塊標題（servicesTitle）
-            <input id="sc-services-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
-              placeholder="如：服務項目">
-          </label>
           <div id="sc-service-list" class="space-y-3"></div>
         </div>
+      </section>
 
-        <!-- 首頁影片 -->
+      <!-- Blog 視覺化編輯器 -->
+      <section id="blog-visual" class="mt-8 hidden">
+        <header class="mb-3">
+          <h3 class="text-lg font-semibold">Blog (部落格文章)</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300">管理最新消息與文章。</p>
+        </header>
+
         <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
-          <h4 class="font-semibold mb-2">首頁影片（index.video）</h4>
-          <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-4">
-            <label class="text-sm">影片標題（video.title）
-              <input id="sc-video-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
-                placeholder="如：冒險挑戰 x 生命探索">
-            </label>
-            <label class="text-sm">影片網址（YouTube/Vimeo/MP4）
-              <input id="sc-video-url" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
-                placeholder="https://www.youtube.com/watch?v=... 或 MP4">
-            </label>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="font-semibold">文章列表 (posts)</h4>
+            <button id="bl-add-post" class="btn-soft btn-purple">新增文章</button>
           </div>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">每篇文章包含標題、日期、摘要、封面圖、標籤與內容。</p>
+          <div id="bl-post-list" class="space-y-4"></div>
         </div>
       </section>
 
@@ -375,8 +368,13 @@
             </label>
           </div>
           <div>
-            <label class="text-sm">gmapUrl（Google 地圖網址，可選）
-              <input id="pv-gmap" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+            <label class="text-sm">gmapUrl（Google 地圖網址）
+              <div class="flex gap-2 items-end">
+                <input id="pv-gmap" class="flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800"
+                  placeholder="輸入網址或點擊按鈕自動生成">
+                <button type="button" id="pv-gen-gmap" class="btn-soft btn-blue text-xs shrink-0"
+                  title="根據地址自動生成 Google 地圖連結">🗺️ 生成連結</button>
+              </div>
             </label>
           </div>
           <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-3">
@@ -492,6 +490,12 @@
       } catch (e) { var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + Date.now(); document.body.appendChild(s); }
     })();
   </script>
+  <script src="./js/config.js"></script>
+  <script src="./js/data/aboutContent.js"></script>
+  <script src="./js/data/siteContent.js"></script>
+  <script src="./js/data/providers.js"></script>
+  <script src="./js/data-loader.js"></script>
+  <script src="./js/admin.js"></script>
 </body>
 
 </html>

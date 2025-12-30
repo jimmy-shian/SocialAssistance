@@ -1,66 +1,71 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>關於我們 - 核心生涯探索平台</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <script>
-      (function(){
-        try{
-          var K=(window.AppConfig&&window.AppConfig.versionCacheKey)||'app_data_version';
-          var raw=localStorage.getItem(K), v=null;
-          try{ if(raw){ var obj=JSON.parse(raw)||{}; var vals=Object.values(obj); if(vals&&vals.length) v=vals.join('.'); } }catch(e){}
-          if(!v){ try{ v=sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v);} } catch(e){ v=String(Date.now()); } }
-          var s=document.createElement('script'); s.src='./tailwind.config.js?v='+encodeURIComponent(v);
-          var cur=document.currentScript; (cur&&cur.parentNode?cur.parentNode:document.head).insertBefore(s, cur);
-        }catch(e){ var s=document.createElement('script'); s.src='./tailwind.config.js?v='+Date.now(); document.head.appendChild(s); }
-      })();
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="./css/style.css" rel="stylesheet">
-    <script>
-      (function(){
-        try{
-          var K=(window.AppConfig&&window.AppConfig.versionCacheKey)||'app_data_version';
-          var raw=localStorage.getItem(K), v=null; try{ if(raw){ var obj=JSON.parse(raw)||{}; var vals=Object.values(obj); if(vals&&vals.length) v=vals.join('.'); } }catch(e){}
-          if(!v){ try{ v=sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v);} } catch(e){ v=String(Date.now()); } }
-          var l=document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
-          if(l){ var href=l.getAttribute('href')||''; try{ var url=new URL(href, document.baseURI); url.searchParams.set('v', v); l.href=url.href; }catch(e){ var h=href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/,'$1').replace(/[?&]$/,''); l.href=h+(h.indexOf('?')>-1?'&':'?')+'v='+encodeURIComponent(v); } }
-        }catch(e){}
-      })();
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>關於我們 - 核心生涯探索平台</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K), v = null;
+        try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + encodeURIComponent(v);
+        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.head).insertBefore(s, cur);
+      } catch (e) { var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + Date.now(); document.head.appendChild(s); }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./css/style.css" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K), v = null; try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var l = document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
+        if (l) { var href = l.getAttribute('href') || ''; try { var url = new URL(href, document.baseURI); url.searchParams.set('v', v); l.href = url.href; } catch (e) { var h = href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); l.href = h + (h.indexOf('?') > -1 ? '&' : '?') + 'v=' + encodeURIComponent(v); } }
+      } catch (e) { }
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
-    <div id="nav-placeholder"></div>
 
-    <main class="container mx-auto px-6 py-12" id="about-root">
-        <div class="text-center text-gray-500">載入中…</div>
-    </main>
+<body class="">
+  <div id="nav-placeholder"></div>
 
-    <div id="footer-placeholder"></div>
+  <main class="container mx-auto px-6 py-12" id="about-root">
+    <div class="text-center text-gray-500">載入中…</div>
+  </main>
 
-    <script>
-      (function(){
-        try{
-          var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
-          var raw = localStorage.getItem(K);
-          var v = null;
-          try{
-            if (raw) { var obj = JSON.parse(raw)||{}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); }
-          }catch(e){}
-          if (!v) {
-            try { v = sessionStorage.getItem('asset_v'); if(!v){ v=String(Date.now()); sessionStorage.setItem('asset_v', v); } }
-            catch(e){ v = String(Date.now()); }
-          }
-          var s=document.createElement('script'); s.src='./js/navFooter.js?v='+encodeURIComponent(v);
-          var cur=document.currentScript; (cur&&cur.parentNode?cur.parentNode:document.body).insertBefore(s, cur);
-        }catch(e){ var s=document.createElement('script'); s.src='./js/navFooter.js?v='+Date.now(); document.body.appendChild(s); }
-      })();
-    </script>
+  <div id="footer-placeholder"></div>
+
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K);
+        var v = null;
+        try {
+          if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); }
+        } catch (e) { }
+        if (!v) {
+          try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } }
+          catch (e) { v = String(Date.now()); }
+        }
+        var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + encodeURIComponent(v);
+        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.body).insertBefore(s, cur);
+      } catch (e) { var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + Date.now(); document.body.appendChild(s); }
+    })();
+  </script>
+  <script src="./js/data/aboutContent.js"></script>
+  <script src="./js/about.js"></script>
 </body>
+
 </html>

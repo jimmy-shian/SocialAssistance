@@ -1,5 +1,7 @@
 // Renders and manages the Member Profile page
 (function () {
+  let currentProfile = null;
+  let currentUser = null;
   function qs(s, r = document) { return r.querySelector(s); }
   function setBtnLoading(btn, loading = true) {
     if (!btn) return;
@@ -12,7 +14,7 @@
 
   function card(title, bodyHTML, actionsHTML = '') {
     const wrap = document.createElement('section');
-    wrap.className = `bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 fade-appear`;
+    wrap.className = `card-dynamic-bg rounded-xl p-6 fade-appear`;
     wrap.innerHTML = `
       <header class="mb-4 flex items-center justify-between">
         <h2 class="text-xl font-semibold text-[var(--primary)]">${title}</h2>

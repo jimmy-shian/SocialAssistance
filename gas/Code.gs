@@ -150,7 +150,8 @@ var CFG = Object.freeze({
 var ALLOWED_KEYS = Object.freeze({
   'aboutContent': true,
   'providers': true,
-  'siteContent': true
+  'siteContent': true,
+  'blogContent': true
 });
 
 // Simple rate limits per minute (approx)
@@ -352,12 +353,14 @@ function _datasetFilename(key){
   if (key === 'aboutContent') return 'aboutContent.js';
   if (key === 'providers') return 'providers.js';
   if (key === 'siteContent') return 'siteContent.js';
+  if (key === 'blogContent') return 'blogContent.js';
   return key + '.js';
 }
 function _datasetGlobalVar(key){
   if (key === 'aboutContent') return 'window.aboutContent';
   if (key === 'providers') return 'window.providersData';
   if (key === 'siteContent') return 'window.siteContent';
+  if (key === 'blogContent') return 'window.blogContent';
   return 'window.' + key;
 }
 function _formatDatasetContent(key, obj){
