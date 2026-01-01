@@ -11,12 +11,13 @@ const COL_IMAGES = 'UploadedImages';
 // User / Auth Helpers
 // ==========================================
 
-export async function getUser(username) {
+export async function getUser(identifier) {
     try {
         const results = await wixData.query(COL_USERS)
-            .eq('username', username)
+            .eq('username', identifier)
+            .or(wixData.query(COL_USERS).eq('email', identifier))
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
         if (results.items.length > 0) return results.items[0];
         return null;
     } catch (error) {
@@ -30,7 +31,7 @@ export async function getUserByEmail(email) {
         const results = await wixData.query(COL_USERS)
             .eq('email', email)
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
         if (results.items.length > 0) return results.items[0];
         return null;
     } catch (error) {
@@ -61,7 +62,7 @@ export async function upsertUser(userObj) {
         // Ensure role
         if (!toSave.role) toSave.role = 'member';
 
-        return await wixData.save(COL_USERS, toSave);
+        return await wixData.save(COL_USERS, toSave, { suppressAuth: true });
     } catch (error) {
         console.error('upsertUser Error:', error);
         throw error;
@@ -77,7 +78,7 @@ export async function saveResetCode(username, code) {
         // Expire in 30 minutes
         user.resetCodeExp = new Date(Date.now() + 30 * 60 * 1000);
 
-        await wixData.save(COL_USERS, user);
+        await wixData.save(COL_USERS, user, { suppressAuth: true });
         return true;
     } catch (e) {
         console.error('saveResetCode Error:', e);
@@ -121,7 +122,7 @@ export async function getProfile(username) {
         const results = await wixData.query(COL_PROFILES)
             .eq('username', username)
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
 
         if (results.items.length > 0) {
             const item = results.items[0];
@@ -164,7 +165,7 @@ export async function setProfile(username, profileObj) {
             toSave._id = results.items[0]._id;
         }
 
-        await wixData.save(COL_PROFILES, toSave);
+        await wixData.save(COL_PROFILES, toSave, { suppressAuth: true });
         return true;
     } catch (error) {
         console.error('setProfile Error:', error);
@@ -181,7 +182,7 @@ export async function getDataset(key) {
         const results = await wixData.query(COL_DATASETS)
             .eq('key', key)
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
 
         if (results.items.length > 0) {
             const item = results.items[0];
@@ -217,7 +218,7 @@ export async function setDataset(key, dataObj) {
             toSave.version = version;
         }
 
-        await wixData.save(COL_DATASETS, toSave);
+        await wixData.save(COL_DATASETS, toSave, { suppressAuth: true });
         return { key, version };
     } catch (error) {
         console.error('setDataset Error:', error);
@@ -244,6 +245,9 @@ export function checkPassword(password, hash) {
 // Aliases for compatibility with http-functions
 export const findUserByUsername = getUser;
 export const createUser = upsertUser;
+export const verifyResetCode = verifyAndClearResetCode;
+export const loadDataset = getDataset;
+export const saveDataset = setDataset;
 export const DATASETS_COLL = COL_DATASETS;
 
 // findUserByToken implies decoding token then finding. 
@@ -266,7 +270,7 @@ export async function saveImage(imgData) {
             mimetype: imgData.mimetype,
             base64: imgData.base64,
             createdAt: new Date()
-        });
+        }, { suppressAuth: true });
         return true;
     } catch (error) {
         console.error('saveImage Error:', error);
@@ -279,7 +283,7 @@ export async function getImageById(id) {
         const results = await wixData.query(COL_IMAGES)
             .eq('imageId', id)
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
         if (results.items.length > 0) return results.items[0];
         return null;
     } catch (error) {

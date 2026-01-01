@@ -52,7 +52,7 @@
                 }
               }
             } catch (e) { }
-            return remote;
+            return (remote && typeof remote === 'object' && Object.keys(remote).length > 0) ? remote : defaultProfile(username);
           }
         }
       } catch (e) {

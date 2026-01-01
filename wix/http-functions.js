@@ -1,4 +1,4 @@
-import { ok, badRequest, created, serverError, forbidden, notFound } from 'wix-http-functions';
+import { response } from 'wix-http-functions';
 import wixData from 'wix-data';
 import wixCrmBackend from 'wix-crm-backend';
 import {
@@ -49,15 +49,28 @@ function simpleHash(str) {
     return Math.abs(hash).toString(16);
 }
 function jsonResponse(body, status = 200) {
-    return {
+    return response({
         status: status,
-        body: body,
         headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*", // 允許外部存取，或指定您的 GitHub Pages 網址
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With"
+        },
+        body: JSON.stringify(body)
+    });
+}
+
+function optionsResponse() {
+    return response({
+        status: 204,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+            "Access-Control-Max-Age": "86400"
         }
-    };
+    });
 }
 function getJsonBody(request) {
     return request.body.text().then(text => {
@@ -74,6 +87,22 @@ function checkRateLimit(ip, limit = 50, windowMs = 60000) {
     _rateLimitCache[ip].push(now);
     return true;
 }
+
+// CORS OPTIONS handlers
+export function options_memberLogin(request) { return optionsResponse(); }
+export function options_memberRegister(request) { return optionsResponse(); }
+export function options_memberForgot(request) { return optionsResponse(); }
+export function options_memberChangePassword(request) { return optionsResponse(); }
+export function options_profileRead(request) { return optionsResponse(); }
+export function options_profileUpdate(request) { return optionsResponse(); }
+export function options_membersList(request) { return optionsResponse(); }
+export function options_uploadImage(request) { return optionsResponse(); }
+export function options_read(request) { return optionsResponse(); }
+export function options_update(request) { return optionsResponse(); }
+export function options_questionnaireCreate(request) { return optionsResponse(); }
+export function options_questionnaireList(request) { return optionsResponse(); }
+export function options_questionnaireResponseSubmit(request) { return optionsResponse(); }
+export function options_questionnaireResponseList(request) { return optionsResponse(); }
 
 // 1. User Login
 export async function post_memberLogin(request) {
@@ -133,24 +162,39 @@ export async function post_memberRegister(request) {
 
 // 3. Forgot Password
 export async function post_memberForgot(request) {
+    console.log('[API] post_memberForgot called');
     const body = await getJsonBody(request);
     const { username, email } = body;
-    // Logic: find user -> generate code -> send triggered email
-    // This requires wix-crm-backend and Triggered Emails setup
+    console.log('[API] Forgot requested for:', username || email);
+
     try {
-        // Mock success to prevent enumeration if not found
-        // But if found:
-        const user = await findUserByUsername(username || email); // Helper needs adjustment to search by email if username is empty
+        const user = await findUserByUsername(username || email);
         if (user) {
+            console.log('[API] User found:', user.username);
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             await saveResetCode(user.username, code);
-            // await wixCrmBackend.emailUser(EMAIL_TEMPLATE_ID, user._id, { variables: { code } });
-            // Note: 'emailUser' requires a Wix Member ID. Our 'SocialUsers' are custom. 
-            // To enable emails, you must create a Contact for this email and use emailContact, or use 3rd party (SendGrid).
+
+            try {
+                // Use default import object for better compatibility
+                const contact = await wixCrmBackend.createContact({
+                    emails: [{ email: user.email }]
+                });
+                const contactId = contact._id || contact.id || contact;
+
+                await wixCrmBackend.emailContact(EMAIL_TEMPLATE_ID, contactId, {
+                    variables: { code }
+                });
+                console.log('[API] Email sent successfully');
+            } catch (err) {
+                console.error(`[API] triggered email failed:`, err.message);
+            }
             console.log(`[Forgot] Code for ${user.username}: ${code}`);
+        } else {
+            console.log('[API] User not found');
         }
         return jsonResponse({ ok: true, message: '若帳號存在，我們已發送重設代碼至您的信箱。' });
     } catch (e) {
+        console.error('[API] Forgot Error:', e.message);
         return jsonResponse({ ok: false, message: '處理失敗' }, 500);
     }
 }
@@ -171,7 +215,7 @@ export async function post_memberChangePassword(request) {
         }
 
         user.passHash = hashPassword(newPass);
-        await wixData.update('SocialUsers', user);
+        await wixData.update('SocialUsers', user, { suppressAuth: true });
         return jsonResponse({ ok: true });
     } catch (e) {
         return jsonResponse({ ok: false, message: e.message }, 500);
@@ -193,13 +237,21 @@ export async function post_profileRead(request) {
     }
 
     try {
-        const result = await wixData.query('Profiles').eq('username', username).find();
+        const result = await wixData.query('Profiles').eq('username', username).find({ suppressAuth: true });
         if (result.items.length > 0) {
             const p = result.items[0];
             const profileData = JSON.parse(p.json || '{}');
             return jsonResponse({ ok: true, profile: profileData, updatedAt: p.updatedAt });
         } else {
-            return jsonResponse({ ok: true, profile: null });
+            // Return a default empty profile instead of null to prevent frontend crash
+            const defaultP = {
+                username,
+                basic: { name: '', email: '', phone: '', birthday: '', address: '' },
+                selfEvaluation: { interests: '', strengths: '', goals: '', teacherComments: '' },
+                activities: [],
+                learningRecords: []
+            };
+            return jsonResponse({ ok: true, profile: defaultP });
         }
     } catch (e) {
         return jsonResponse({ ok: false, message: e.message }, 500);
@@ -222,7 +274,7 @@ export async function post_profileUpdate(request) {
         // If not admin, prevent overwriting teacher comments
         if (requester.role !== 'admin') {
             // Fetch existing to preserve teacherComments
-            const existingRes = await wixData.query('Profiles').eq('username', username).find();
+            const existingRes = await wixData.query('Profiles').eq('username', username).find({ suppressAuth: true });
             if (existingRes.items.length > 0) {
                 const existingP = JSON.parse(existingRes.items[0].json || '{}');
                 const existingComments = (existingP.selfEvaluation && existingP.selfEvaluation.teacherComments) || '';
@@ -234,20 +286,20 @@ export async function post_profileUpdate(request) {
         }
         // If admin, they can edit everything (including teacherComments)
 
-        const result = await wixData.query('Profiles').eq('username', username).find();
+        const result = await wixData.query('Profiles').eq('username', username).find({ suppressAuth: true });
         let item;
         if (result.items.length > 0) {
             item = result.items[0];
             item.json = JSON.stringify(profile);
             item.updatedAt = new Date();
-            await wixData.update('Profiles', item);
+            await wixData.update('Profiles', item, { suppressAuth: true });
         } else {
             item = {
                 username,
                 json: JSON.stringify(profile),
                 updatedAt: new Date()
             };
-            await wixData.insert('Profiles', item);
+            await wixData.insert('Profiles', item, { suppressAuth: true });
         }
         return jsonResponse({ ok: true });
     } catch (e) {
@@ -263,7 +315,7 @@ export async function post_membersList(request) {
     if (!requester || requester.role !== 'admin') return jsonResponse({ ok: false, message: '無權限' }, 403);
 
     try {
-        const res = await wixData.query('SocialUsers').limit(1000).find();
+        const res = await wixData.query('SocialUsers').limit(1000).find({ suppressAuth: true });
         const users = res.items.map(u => ({
             username: u.username,
             email: u.email,
@@ -357,7 +409,7 @@ export async function post_questionnaireCreate(request) {
             status: status || 'active',
             createdAt: new Date()
         };
-        await wixData.insert('Questionnaires', item);
+        await wixData.insert('Questionnaires', item, { suppressAuth: true });
         return jsonResponse({ ok: true });
     } catch (e) { return jsonResponse({ ok: false, message: e.message }, 500); }
 }
@@ -366,7 +418,7 @@ export async function post_questionnaireCreate(request) {
 export async function post_questionnaireList(request) {
     try {
         // Active questionnaires
-        const res = await wixData.query('Questionnaires').eq('status', 'active').find();
+        const res = await wixData.query('Questionnaires').eq('status', 'active').find({ suppressAuth: true });
         return jsonResponse({ ok: true, list: res.items });
     } catch (e) { return jsonResponse({ ok: false, message: e.message }, 500); }
 }
@@ -386,7 +438,7 @@ export async function post_questionnaireResponseSubmit(request) {
             answers: typeof answers === 'string' ? answers : JSON.stringify(answers),
             submittedAt: new Date()
         };
-        await wixData.insert('QuestionnaireResponses', item);
+        await wixData.insert('QuestionnaireResponses', item, { suppressAuth: true });
         return jsonResponse({ ok: true });
     } catch (e) { return jsonResponse({ ok: false, message: e.message }, 500); }
 }
@@ -401,7 +453,7 @@ export async function post_questionnaireResponseList(request) {
     try {
         let q = wixData.query('QuestionnaireResponses');
         if (questionnaireId) q = q.eq('questionnaireId', questionnaireId);
-        const res = await q.find();
+        const res = await q.find({ suppressAuth: true });
         return jsonResponse({ ok: true, responses: res.items });
     } catch (e) { return jsonResponse({ ok: false, message: e.message }, 500); }
 }

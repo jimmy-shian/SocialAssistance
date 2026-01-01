@@ -104,6 +104,7 @@
     // skeleton loading while request
     showSkeleton();
     let profile = currentProfile ? JSON.parse(JSON.stringify(currentProfile)) : await window.MemberData.loadProfile(user);
+    if (!profile) profile = { username: user, basic: {}, selfEvaluation: {}, activities: [], learningRecords: [] };
     // ensure new fields exist
     profile.activities = Array.isArray(profile.activities) ? profile.activities : [];
     profile.learningRecords = Array.isArray(profile.learningRecords) ? profile.learningRecords : [];
