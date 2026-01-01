@@ -57,23 +57,27 @@
   }
 
   async function membersList() {
-    const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
-    const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.membersList) || '';
+    const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+    const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.membersList) || 'membersList';
     const token = localStorage.getItem('auth_token') || '';
-    if (!base || !ep || !token) return { ok: false, message: '未登入或未設定後端' };
+    if (!base || !token) return { ok: false, message: '未登入或未設定後端' };
     try {
-      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token }) });
+      // Construct endpoint URL
+      const url = base.replace(/\/$/, '') + '/' + ep.replace(/^\//, '');
+      const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) });
       return await resp.json();
     } catch (e) { return { ok: false, message: e.message }; }
   }
 
   async function profileRead(username) {
-    const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
-    const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.profileRead) || '';
+    const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+    const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.profileRead) || 'profileRead';
     const token = localStorage.getItem('auth_token') || '';
-    if (!base || !ep || !token) return { ok: false, message: '未登入或未設定後端' };
+    if (!base || !token) return { ok: false, message: '未登入或未設定後端' };
     try {
-      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token, username }) });
+      // Construct endpoint URL
+      const url = base.replace(/\/$/, '') + '/' + ep.replace(/^\//, '');
+      const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, username }) });
       return await resp.json();
     } catch (e) { return { ok: false, message: e.message }; }
   }
@@ -212,7 +216,7 @@
     }
 
     box.innerHTML = `
-      <article class="space-y-2">
+      <article class="space-y-4">
         <section>
           <h3 class="text-lg font-semibold mb-2">基本資料</h3>
           ${row('姓名', b.name)}
@@ -221,16 +225,49 @@
           ${row('生日', b.birthday)}
           ${row('地址', b.address)}
         </section>
-        <section class="mt-4">
+        <section>
           <h3 class="text-lg font-semibold mb-2">自立評估</h3>
           ${row('興趣/志向', se.interests)}
           ${row('優勢/擅長', se.strengths)}
           ${row('短中期目標', se.goals)}
+          
+          <div class="mt-4 border-t pt-4">
+             <label class="block mb-2 font-semibold text-rose-600">老師評語 (點擊編輯)</label>
+             <textarea id="teacher-comments" class="w-full rounded border p-3 min-h-[5rem] bg-rose-50 dark:bg-rose-900/20 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:bg-white dark:focus:bg-gray-700" placeholder="請輸入給該學員的評語...">${se.teacherComments || ''}</textarea>
+             <div class="mt-2 text-right">
+               <button id="btn-save-comments" class="btn-soft btn-purple text-sm"><i class="fas fa-save mr-1"></i> 儲存評語</button>
+             </div>
+          </div>
         </section>
         ${list('活動記錄', acts)}
         ${list('學習歷程', lrs)}
       </article>
     `;
+
+    setTimeout(() => {
+      const btnSave = qs('#btn-save-comments');
+      if (btnSave) btnSave.onclick = async () => {
+        btnSave.textContent = '儲存中...'; btnSave.disabled = true;
+        try {
+          const cmt = qs('#teacher-comments').value;
+          if (!p.selfEvaluation) p.selfEvaluation = {};
+          p.selfEvaluation.teacherComments = cmt;
+
+          // Use MemberData.saveProfile but with current user token (admin)
+          // We need to construct the API call manually or use saveProfile if it supports acting as admin (it usually implies 'me', but endpoints check username vs token)
+          // member-data.js saveProfile uses localStorage user defaults. We should use a direct fetch here to avoid confusion.
+          const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+          const token = localStorage.getItem('auth_token');
+          const url = base.replace(/\/$/, '') + '/profileUpdate';
+
+          const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, username, profile: p }) });
+          const d = await r.json();
+          if (d.ok) alert('評語已儲存');
+          else alert('儲存失敗: ' + d.message);
+        } catch (e) { alert('錯誤: ' + e.message); }
+        finally { btnSave.textContent = '儲存評語'; btnSave.disabled = false; }
+      };
+    }, 100);
   }
 
   function bind() {
@@ -277,6 +314,85 @@
     qs('#incomplete-threshold')?.addEventListener('input', applyFiltersAndRender);
     qs('#btn-calc')?.addEventListener('click', computeCompletionsForCurrentView);
     qs('#btn-export')?.addEventListener('click', exportCsv);
+    // Tabs
+    const tabM = qs('#tab-members');
+    const tabQ = qs('#tab-questionnaires');
+    const viewM = qs('#view-members');
+    const viewQ = qs('#view-questionnaires');
+
+    if (tabM && tabQ && viewM && viewQ) {
+      tabM.onclick = () => {
+        tabM.classList.add('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]'); tabM.classList.remove('text-gray-500');
+        tabQ.classList.remove('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]'); tabQ.classList.add('text-gray-500');
+        viewM.classList.remove('hidden'); viewQ.classList.add('hidden');
+      };
+      tabQ.onclick = () => {
+        tabQ.classList.add('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]'); tabQ.classList.remove('text-gray-500');
+        tabM.classList.remove('text-[var(--primary)]', 'border-b-2', 'border-[var(--primary)]'); tabM.classList.add('text-gray-500');
+        viewQ.classList.remove('hidden'); viewM.classList.add('hidden');
+        loadQuestionnaires();
+      };
+    }
+
+    // Questionnaire Logic
+    qs('#btn-create-q')?.addEventListener('click', () => {
+      const title = prompt('請輸入問卷標題:');
+      if (!title) return;
+      // Mock Items creation - simple prompt for now
+      const qText = prompt('請輸入題目，用分號分隔 (例如: 您滿意嗎?;您有什麼建議?)');
+      if (!qText) return;
+      const items = qText.split(/[;；]/).filter(s => s.trim()).map((q, i) => ({ id: i + 1, type: 'text', question: q.trim() }));
+
+      (async () => {
+        const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+        const token = localStorage.getItem('auth_token');
+        const url = base.replace(/\/$/, '') + '/questionnaireCreate';
+        const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, title, items, status: 'active' }) });
+        const d = await r.json();
+        if (d.ok) { alert('問卷已建立'); loadQuestionnaires(); } else alert('建立失敗: ' + d.message);
+      })();
+    });
+
+    async function loadQuestionnaires() {
+      const list = qs('#q-list-admin'); if (!list) return;
+      list.innerHTML = '載入中...';
+      const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+      const url = base.replace(/\/$/, '') + '/questionnaireList';
+      try {
+        const r = await fetch(url, { method: 'POST' });
+        const d = await r.json();
+        const items = d.list || [];
+        list.innerHTML = items.map(q => `
+           <div class="p-4 border rounded bg-white shadow-sm">
+             <div class="font-bold text-lg mb-2">${q.title}</div>
+             <div class="text-sm text-gray-500 mb-3">建立於: ${new Date(q.createdAt).toLocaleDateString()}</div>
+             <button class="btn-soft btn-blue text-sm" onclick="exportQResponses('${q._id}')">匯出回應 (CSV)</button>
+           </div>
+         `).join('');
+      } catch (e) { list.innerHTML = '載入失敗'; }
+    }
+    window.exportQResponses = async (qid) => {
+      const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+      const token = localStorage.getItem('auth_token');
+      const url = base.replace(/\/$/, '') + '/questionnaireResponseList';
+      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, questionnaireId: qid }) });
+      const d = await r.json();
+      const resps = d.responses || [];
+      if (!resps.length) { alert('尚無回應'); return; }
+
+      // CSV
+      const headers = ['Username', 'SubmittedAt', 'Answers'];
+      const csv = [headers.join(',')];
+      resps.forEach(re => {
+        const ansStr = JSON.stringify(JSON.parse(re.answers || '{}')).replace(/"/g, '""');
+        csv.push(`${re.username},${re.submittedAt},"${ansStr}"`);
+      });
+
+      const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `responses_${qid}.csv`;
+      document.body.appendChild(a); a.click(); a.remove();
+    };
+
     refreshList();
   }
 

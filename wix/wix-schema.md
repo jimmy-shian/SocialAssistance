@@ -43,7 +43,7 @@
 **建議資料集 ID (Collection ID)**：**`Datasets`**
 
 ## 4. 資料集名稱：`Images`
-*描述：儲存上傳圖片的 metadata (若完全依照 GAS 邏輯)。*
+*描述：儲存上傳圖片的 metadata 與 Base64 資料。*
 
 | 欄位名稱 (Field Name) | 欄位鍵值 (Field Key) | 欄位類型 (Field Type) | 備註 |
 | :--- | :--- | :--- | :--- |
@@ -51,7 +51,29 @@
 | 檔名 (Filename) | `filename` | 文字 (Text) | |
 | Mime Type | `mimetype` | 文字 (Text) | |
 | Base64 | `base64` | 文字 (Text) | **注意**：Wix 文字欄位有大小限制，若圖片過大建議改用 Wix Media Manager，但為求遷移方便先維持此欄位。 |
-| 路徑 (Path) | `path` | 文字 (Text) | 若有發佈到 GitHub 的路徑。 |
-| SHA | `sha` | 文字 (Text) | GitHub SHA。 |
 
 **建議資料集 ID (Collection ID)**：**`UploadedImages`**
+
+## 5. 資料集名稱：`Questionnaires`
+*描述：儲存問卷定義 (題目與設定)。*
+
+| 欄位名稱 (Field Name) | 欄位鍵值 (Field Key) | 欄位類型 (Field Type) | 備註 |
+| :--- | :--- | :--- | :--- |
+| 問卷標題 (Title) | `title` | 文字 (Text) | |
+| 狀態 (Status) | `status` | 文字 (Text) | 'active' (進行中) 或 'closed' (已關閉)。 |
+| 題目定義 (Items) | `items` | 文字 (Text) | JSON 字串 array (例如 `[{id:1, type:'text', question:'...'}]`)。 |
+| 建立時間 (Created At) | `createdAt` | 日期與時間 (Date) | |
+
+**建議資料集 ID (Collection ID)**：**`Questionnaires`**
+
+## 6. 資料集名稱：`QuestionnaireResponses`
+*描述：儲存學員的問卷填寫結果。*
+
+| 欄位名稱 (Field Name) | 欄位鍵值 (Field Key) | 欄位類型 (Field Type) | 備註 |
+| :--- | :--- | :--- | :--- |
+| 問卷 ID (Questionnaire ID) | `questionnaireId` | 文字 (Text) | 關聯到 `Questionnaires`。 |
+| 學員帳號 (Username) | `username` | 文字 (Text) | |
+| 回答內容 (Answers) | `answers` | 文字 (Text) | JSON 字串 (例如 `{"q1": "yes"}`)。 |
+| 提交時間 (Submitted At) | `submittedAt` | 日期與時間 (Date) | |
+
+**建議資料集 ID (Collection ID)**：**`QuestionnaireResponses`**

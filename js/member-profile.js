@@ -44,15 +44,26 @@
     const arr = Array.isArray(items) ? items : [];
     if (!arr.length) return '<div class="text-gray-500 dark:text-gray-400">尚無資料</div>';
     return `<ul class="space-y-2" data-list-container="${listName}">${arr.map((it, i) => `
-      <li class="p-3 rounded bg-gray-50 dark:bg-gray-700/50 flex items-center gap-2 flex-wrap">
-        <input data-list="${listName}" data-index="${i}" data-field="title" type="text" placeholder="名稱" value="${it.title || ''}" class="flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
-        <input data-list="${listName}" data-index="${i}" data-field="date" type="date" value="${it.date || ''}" class="rounded border px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
-        <div class="ml-auto inline-flex items-center gap-1">
-          <button type="button" class="btn-soft btn-yellow" data-action="up" data-list="${listName}" data-index="${i}" title="上移"><i class="fas fa-arrow-up"></i></button>
-          <button type="button" class="btn-soft btn-yellow" data-action="down" data-list="${listName}" data-index="${i}" title="下移"><i class="fas fa-arrow-down"></i></button>
-          <button type="button" class="btn-soft btn-orange" data-action="dup" data-list="${listName}" data-index="${i}" title="複製"><i class="fas fa-copy"></i></button>
-          <button type="button" class="btn-soft btn-purple" data-action="del" data-list="${listName}" data-index="${i}" title="刪除"><i class="fas fa-trash"></i></button>
+      <li class="p-3 rounded bg-gray-50 dark:bg-gray-700/50 flex flex-col gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <input data-list="${listName}" data-index="${i}" data-field="title" type="text" placeholder="名稱" value="${it.title || ''}" class="flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
+          <input data-list="${listName}" data-index="${i}" data-field="date" type="date" value="${it.date || ''}" class="rounded border px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
+          <div class="ml-auto inline-flex items-center gap-1">
+             <button type="button" class="btn-soft btn-blue" data-action="photo" data-list="${listName}" data-index="${i}" title="照片"><i class="fas fa-camera"></i></button>
+             <button type="button" class="btn-soft btn-yellow" data-action="up" data-list="${listName}" data-index="${i}" title="上移"><i class="fas fa-arrow-up"></i></button>
+             <button type="button" class="btn-soft btn-yellow" data-action="down" data-list="${listName}" data-index="${i}" title="下移"><i class="fas fa-arrow-down"></i></button>
+             <button type="button" class="btn-soft btn-orange" data-action="dup" data-list="${listName}" data-index="${i}" title="複製"><i class="fas fa-copy"></i></button>
+             <button type="button" class="btn-soft btn-purple" data-action="del" data-list="${listName}" data-index="${i}" title="刪除"><i class="fas fa-trash"></i></button>
+          </div>
         </div>
+        ${it.images && it.images.length ? `
+        <div class="flex gap-2 flex-wrap mt-1">
+          ${it.images.map(img => `
+            <a href="${(img || '').replace(/^app:\/\/image\/([^\/]+)\/(.+)$/, (window.AppConfig?.API_BASE?.replace('/_functions', '') || '') + '/_functions/image/$1/$2')}" target="_blank" class="block w-16 h-16 rounded overflow-hidden border border-gray-300 bg-gray-100 relative group">
+               <div class="w-full h-full bg-cover bg-center" style="background-image:url('${(img || '').replace(/^app:\/\/image\//, '') /* Warning: won't load if not blob/url, handled by custom logic usually */}')"></div> 
+               <span class="text-[0.6rem] bg-black/50 text-white absolute bottom-0 w-full text-center truncate px-1">${img.split('/').pop()}</span>
+            </a>`).join('')}
+        </div>` : ''}
       </li>`).join('')}</ul>`;
   }
 
@@ -144,6 +155,7 @@
       const actions = `
         <div class=\"flex gap-2\">
           <button id=\"export-json\" class=\"btn-soft btn-purple\"><i class=\"fas fa-file-export mr-2\"></i> 匯出 JSON</button>
+          <button id=\"export-csv\" class=\"btn-soft btn-blue\"><i class=\"fas fa-table mr-2\"></i> 匯出 CSV</button>
           <button id=\"export-png\" class=\"btn-soft btn-orange\"><i class=\"fas fa-image mr-2\"></i> 匯出圖片</button>
         </div>
       `;
@@ -206,6 +218,10 @@
       ${textArea('pf-interests', '興趣/志向', profile.selfEvaluation?.interests, 3)}
       ${textArea('pf-strengths', '優勢/擅長', profile.selfEvaluation?.strengths, 3)}
       ${textArea('pf-goals', '短中期目標', profile.selfEvaluation?.goals, 3)}
+      <div class="mt-4 border-t border-gray-100 dark:border-gray-700 pt-4">
+        <label class="block mb-2 text-sm font-semibold text-rose-600 dark:text-rose-400">老師評語 (僅老師可編輯)</label>
+        <div class="p-3 rounded bg-rose-50 dark:bg-rose-900/20 text-gray-800 dark:text-gray-200 min-h-[4rem] whitespace-pre-wrap">${profile.selfEvaluation?.teacherComments || '尚無評語'}</div>
+      </div>
     `;
     const evalActions = '';
     const evalCard = card('自立評估', evalBody, evalActions);
@@ -311,6 +327,44 @@
       </div>`;
     const jCard = card('情緒／學習札記', jBody);
     gridWrap.appendChild(jCard);
+
+    // Questionnaires
+    function renderQuestionnaires() {
+      const wrap = document.createElement('div');
+      wrap.id = 'questionnaire-section';
+      wrap.innerHTML = '<div class="text-gray-500">載入問卷中…</div>';
+
+      // Fetch questionnaires
+      (async () => {
+        try {
+          const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+          if (!base) { wrap.innerHTML = '<div class="text-sm text-gray-500">未連接後端，無法載入問卷</div>'; return; }
+          const url = base.replace(/\/$/, '') + '/questionnaireList';
+          const resp = await fetch(url, { method: 'POST' }); // Usually POST for wix http functions if configured or GET
+          if (!resp.ok) throw new Error('Fetch failed');
+          const data = await resp.json();
+          const list = (data.list || []);
+
+          if (!list.length) { wrap.innerHTML = '<div class="text-gray-500 dark:text-gray-400">目前沒有進行中的問卷</div>'; return; }
+
+          wrap.innerHTML = `<ul class="space-y-3">${list.map(q => `
+             <li class="p-4 rounded bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+               <div class="flex items-center justify-between mb-2">
+                 <div class="font-semibold text-lg text-[var(--primary)]">${q.title}</div>
+                 <button class="btn-soft btn-blue btn-sm" onclick="window.MemberProfile.openQuestionnaire('${q._id}', '${encodeURIComponent(q.title)}', '${encodeURIComponent(q.items)}')">填寫問卷</button>
+               </div>
+               <div class="text-xs text-gray-500">發佈於 ${new Date(q.createdAt).toLocaleDateString()}</div>
+             </li>
+           `).join('')}</ul>`;
+        } catch (e) { wrap.innerHTML = '<div class="text-rose-500">載入問卷失敗</div>'; }
+      })();
+
+      const c = card('問卷調查', '');
+      c.querySelector('div:last-child').appendChild(wrap);
+      return c;
+    }
+    const qCard = renderQuestionnaires();
+    gridWrap.appendChild(qCard);
 
     // Timeline (full width, after grid)
     function timelineCard(p) {
@@ -607,7 +661,7 @@
         }
       });
 
-      sections.addEventListener('click', (e) => {
+      sections.addEventListener('click', async (e) => {
         const btn = (e.target && (e.target.closest && e.target.closest('button[data-action]')));
         if (!btn) return;
         try { e.preventDefault(); e.stopPropagation(); } catch (_) { }
@@ -617,6 +671,7 @@
         if (!list || !Array.isArray(currentProfile[list])) return;
         const arr = currentProfile[list];
         let newIdx = idx;
+
         if (action === 'up' && idx > 0) {
           [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
           newIdx = idx - 1;
@@ -628,12 +683,53 @@
           arr.splice(idx + 1, 0, copy);
           newIdx = idx + 1;
         } else if (action === 'del') {
+          if (!confirm('確定刪除此項目？')) return;
           arr.splice(idx, 1);
           newIdx = Math.max(0, Math.min(idx, arr.length - 1));
+        } else if (action === 'photo') {
+          // Handle photo upload
+          const fileInp = document.createElement('input');
+          fileInp.type = 'file'; fileInp.accept = 'image/*';
+          fileInp.onchange = async () => {
+            if (!fileInp.files.length) return;
+            const f = fileInp.files[0];
+            try {
+              setBtnLoading(btn, true);
+              const dataUrl = await resizeImageToDataURL(f, 800, 'image/jpeg', 0.8);
+
+              // Upload to backend
+              const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+              const token = localStorage.getItem('auth_token');
+              if (!base) throw new Error('未連接後端');
+
+              const uResp = await fetch(base.replace(/\/$/, '') + '/uploadImage', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token, dataUrl, filename: f.name })
+              });
+              const uData = await uResp.json();
+              if (!uData.ok) throw new Error(uData.message || '上傳失敗');
+
+              // Store as app:// URI
+              const uri = `app://image/${uData.id}/${uData.filename}`;
+              // Append to title or separate field? User requested "Upload Activity Photos". 
+              // Let's assume we append markdown-like link or just store it in a new field 'images' array if schema allows, 
+              // but current schema is implicit JSON. Let's add an 'images' array to the item.
+              if (!arr[idx].images) arr[idx].images = [];
+              arr[idx].images.push(uri);
+
+              toast('照片已上傳', true);
+              rerenderList(list);
+              rerenderTimeline();
+            } catch (e) { toast('上傳錯誤: ' + e.message, false); }
+            finally { setBtnLoading(btn, false); }
+          };
+          fileInp.click();
+          return; // Skip standard re-render
         }
+
         rerenderList(list);
         if (list === 'activities' || list === 'learningRecords' || list === 'journal') rerenderTimeline();
-        if (arr.length) {
+        if (arr.length && action !== 'del') {
           const fieldMap = { activities: 'title', learningRecords: 'title', skills: 'value', portfolio: 'title', journal: 'text' };
           focusListItem(list, newIdx, fieldMap[list]);
         }
@@ -697,6 +793,89 @@
         btn.addEventListener('click', () => { try { window.Auth && window.Auth.logout && window.Auth.logout(); } catch (e) { } window.location.href = './member.html'; });
       }
     } catch (e) { }
+    // CSV Export
+    qs('#export-csv')?.addEventListener('click', () => {
+      const p = currentProfile;
+      const rows = [['Category', 'Item', 'Detail', 'Date']];
+      // Basic
+      rows.push(['Basic', 'Name', p.basic?.name || '', '']);
+      rows.push(['Basic', 'Email', p.basic?.email || '', '']);
+      rows.push(['Basic', 'Phone', p.basic?.phone || '', '']);
+      rows.push(['Basic', 'Address', p.basic?.address || '', '']);
+      // Self Eval
+      rows.push(['SelfEval', 'Interests', p.selfEvaluation?.interests || '', '']);
+      rows.push(['SelfEval', 'Strengths', p.selfEvaluation?.strengths || '', '']);
+      rows.push(['SelfEval', 'Goals', p.selfEvaluation?.goals || '', '']);
+      rows.push(['SelfEval', 'TeacherComments', p.selfEvaluation?.teacherComments || '', '']);
+      // Activities
+      (p.activities || []).forEach(a => rows.push(['Activity', a.title || '', '', a.date || '']));
+      // Learning
+      (p.learningRecords || []).forEach(l => rows.push(['Learning', l.title || '', '', l.date || '']));
+      // Journal
+      (p.journal || []).forEach(j => rows.push(['Journal', j.text || '', '', j.date || '']));
+
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `profile_${currentUser || 'export'}.csv`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    });
+
+    // Expose for questionnaire click
+    window.MemberProfile = window.MemberProfile || {};
+    window.MemberProfile.openQuestionnaire = async (id, titleEnc, itemsEnc) => {
+      const title = decodeURIComponent(titleEnc);
+      const items = JSON.parse(decodeURIComponent(itemsEnc));
+
+      // Simple Questionnaire Modal
+      let m = document.getElementById('q-modal');
+      if (!m) {
+        m = document.createElement('div'); m.id = 'q-modal';
+        m.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
+        document.body.appendChild(m);
+      }
+      m.innerHTML = `
+         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6">
+           <h3 class="text-xl font-bold mb-4">${title}</h3>
+           <form id="q-form" class="space-y-4">
+             ${items.map((it, idx) => `
+               <div>
+                 <label class="block font-medium mb-1">${idx + 1}. ${it.question}</label>
+                 ${it.type === 'textarea' ? `<textarea name="q${idx}" class="w-full border rounded p-2 dark:bg-gray-700"></textarea>` :
+          `<input type="text" name="q${idx}" class="w-full border rounded p-2 dark:bg-gray-700">`}
+               </div>
+             `).join('')}
+           </form>
+           <div class="mt-6 flex justify-end gap-3">
+             <button id="q-cancel" class="btn-soft text-gray-500">取消</button>
+             <button id="q-submit" class="btn-soft btn-green">提交</button>
+           </div>
+         </div>
+       `;
+      m.classList.remove('hidden');
+
+      m.querySelector('#q-cancel').onclick = () => m.classList.add('hidden');
+      m.querySelector('#q-submit').onclick = async () => {
+        const btn = m.querySelector('#q-submit');
+        btn.disabled = true; btn.textContent = '提交中...';
+        const answers = {};
+        items.forEach((it, idx) => {
+          answers[`q${idx}`] = m.querySelector(`[name="q${idx}"]`).value;
+        });
+
+        const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+        const token = localStorage.getItem('auth_token');
+        try {
+          const url = base.replace(/\/$/, '') + '/questionnaireResponseSubmit';
+          const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, questionnaireId: id, answers }) });
+          const d = await r.json();
+          if (d.ok) { alert('提交成功'); m.classList.add('hidden'); }
+          else alert('提交失敗: ' + d.message);
+        } catch (e) { alert('提交錯誤: ' + e.message); }
+        finally { btn.disabled = false; btn.textContent = '提交'; }
+      };
+    };
+
     render();
   }
 

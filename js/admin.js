@@ -27,21 +27,25 @@
     };
   }
   function flash(el) { if (!el) return; el.classList.add('swap-highlight'); setTimeout(() => el.classList.remove('swap-highlight'), 700); }
-  // Preview cache for gas://image placeholders
+  // Preview cache for app://image placeholders
   const previewCache = (window.__imgPreviewCache = window.__imgPreviewCache || {});
-  // 全域：透過 GAS 上傳圖片並回傳 gas://image 佔位符（同時寫入 previewCache 以便預覽）
+  // 全域：透過 Wix Backend 上傳圖片並回傳 app://image 佔位符（同時寫入 previewCache 以便預覽）
+  // Global: Upload image via Wix Backend and return app://image placeholder (write to previewCache)
   async function uploadFileAndGetPlaceholder(file) {
-    const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
-    const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.uploadImage) || '';
+    const base = (window.AppConfig && window.AppConfig.API_BASE) || '';
+    const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.uploadImage) || 'uploadImage';
     const t = (window.DataAPI && window.DataAPI.token && window.DataAPI.token()) || '';
-    if (!base || !ep || !t) throw new Error('未登入或未設定 GAS');
+    if (!base || !t) throw new Error('未登入或未設定 API_BASE');
+
+    const url = base.replace(/\/$/, '') + '/' + ep.replace(/^\//, '');
+
     const fr = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(new Error('讀檔失敗')); r.readAsDataURL(file); });
-    const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
     if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
     const data = await resp.json();
     if (!data || !data.ok || !data.id) throw new Error(data && data.message || '上傳失敗');
-    const ph = `gas://image/${data.id}/${data.filename}`;
-    previewCache[ph] = fr; // 立刻可見縮圖
+    const ph = `app://image/${data.id}/${data.filename}`;
+    previewCache[ph] = fr; // Immediate preview
     return ph;
   }
   // 全域：目前編輯焦點（供插入連結使用）
@@ -140,7 +144,7 @@
     const val = (input.value || '').trim();
     if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
     let url = val;
-    if (/^gas:\/\/image\//.test(val)) { const p = previewCache[val]; if (p) url = p; }
+    if (/^app:\/\/image\//.test(val)) { const p = previewCache[val]; if (p) url = p; }
     pv.style.backgroundImage = `url('${url}')`;
     pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
     setPreviewHeightFromImage(pv, url, 0.7);
@@ -154,7 +158,7 @@
     const imgs = parseStoryImages();
     list.innerHTML = '';
     imgs.forEach((url, i) => {
-      const isGas = /^gas:\/\/image\//.test(url); const preview = isGas ? previewCache[url] : null;
+      const isGas = /^app:\/\/image\//.test(url); const preview = isGas ? previewCache[url] : null;
       const cell = document.createElement('div');
       cell.className = 'sc-story-cell drag-transition relative h-40 md:h-52 rounded overflow-hidden border border-gray-300 dark:border-gray-700 cursor-move';
       cell.draggable = true;
@@ -186,7 +190,7 @@
       if (!pv || !input) return;
       const val = (input.value || '').trim();
       if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
-      let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
+      let url = val; if (/^app:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
       pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
       setPreviewHeightFromImage(pv, url, 0.7);
     } catch (e) { }
@@ -199,7 +203,7 @@
       if (!pv || !input) return;
       const val = (input.value || '').trim();
       if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
-      let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
+      let url = val; if (/^app:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
       pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
       setPreviewHeightFromImage(pv, url, 0.7);
     } catch (e) { }
@@ -210,7 +214,7 @@
       if (!pv || !input) return;
       const val = (input.value || '').trim();
       if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
-      let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
+      let url = val; if (/^app:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
       pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
       setPreviewHeightFromImage(pv, url, 0.7);
     } catch (e) { }
@@ -228,15 +232,18 @@
     return v; // fallback
   }
 
-  // ---- GAS secure read（回傳完整 JSON：含 hasData/updatedAt/version/data） ----
+  // ---- Secure read (Return full JSON: hasData/updatedAt/version/data) ----
   async function postReadRaw(key) {
     try {
-      const BASE = window.AppConfig?.GAS_BASE_URL || '';
-      const EP = window.AppConfig?.endpoints?.read || '';
+      const BASE = window.AppConfig?.API_BASE || '';
+      const EP = window.AppConfig?.endpoints?.read || 'read';
       const t = window.DataAPI?.token?.() || '';
-      if (!BASE || !EP || !t) return null;
+      if (!BASE || !t) return null;
+      // Construct endpoint URL
+      const url = BASE.replace(/\/$/, '') + '/' + EP.replace(/^\//, '');
+
       const nonce = Date.now().toString(36);
-      const resp = await fetch(BASE + EP, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ key, token: t, nonce }) });
+      const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key, token: t, nonce }) });
       if (!resp.ok) return null;
       const data = await resp.json();
       return data || null;
@@ -278,7 +285,7 @@
   function setEditor(obj) { qs('#ds-editor').value = JSON.stringify(obj || {}, null, 2); }
 
   async function init() {
-    const hasBase = !!(AppConfig && AppConfig.GAS_BASE_URL);
+    const hasBase = !!(AppConfig && AppConfig.API_BASE);
     show(qs('#gas-url-warning'), !hasBase);
 
     // Overlay: warning must dismiss on click/Enter/Escape
@@ -1031,7 +1038,7 @@
       if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
       const data = await resp.json();
       if (!data || !data.ok || !data.id) throw new Error(data && data.message || '上傳失敗');
-      const ph = `gas://image/${data.id}/${data.filename}`;
+      const ph = `app://image/${data.id}/${data.filename}`;
       previewCache[ph] = fr; // 立刻可見縮圖
       return ph;
     }
