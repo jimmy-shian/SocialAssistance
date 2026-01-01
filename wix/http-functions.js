@@ -2,7 +2,6 @@ import { ok, badRequest, created, serverError, forbidden, notFound } from 'wix-h
 import wixData from 'wix-data';
 import wixCrmBackend from 'wix-crm-backend';
 import {
-    findUserByToken,
     findUserByUsername,
     createUser,
     hashPassword,
@@ -18,6 +17,7 @@ import {
 // SECRET KEY for JWT-like token signature
 const TOKEN_SECRET = 'secretKEY2026'; // ★ IMPORTANT: Change this to a random string!
 const EMAIL_TEMPLATE_ID = 'V73N0RS'; // ★ IMPORTANT: ID of Triggered Email template
+const ADMIN_REGISTER_CODE = 'secretKEY2026'; // ★ IMPORTANT: Code to register as Admin
 
 // ... (Helper functions from previous step: signToken, verifyToken, jsonResponse, etc.) ...
 function signToken(payload) {
@@ -113,7 +113,7 @@ export async function post_memberRegister(request) {
 
     // simple admin code check
     let role = 'member';
-    if (isAdmin && adminCode === 'ADMIN_SECRET_123') { // Replace with env var in production
+    if (isAdmin && adminCode === ADMIN_REGISTER_CODE) {
         role = 'admin';
     }
 
@@ -144,8 +144,9 @@ export async function post_memberForgot(request) {
         if (user) {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             await saveResetCode(user.username, code);
-            await wixCrmBackend.emailUser(EMAIL_TEMPLATE_ID, user._id, { variables: { code } });
-            // Note: Without Triggered Email ID configured, this will fail. user needs to setup.
+            // await wixCrmBackend.emailUser(EMAIL_TEMPLATE_ID, user._id, { variables: { code } });
+            // Note: 'emailUser' requires a Wix Member ID. Our 'SocialUsers' are custom. 
+            // To enable emails, you must create a Contact for this email and use emailContact, or use 3rd party (SendGrid).
             console.log(`[Forgot] Code for ${user.username}: ${code}`);
         }
         return jsonResponse({ ok: true, message: '若帳號存在，我們已發送重設代碼至您的信箱。' });

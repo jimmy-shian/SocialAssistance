@@ -2,7 +2,7 @@
 window.AppConfig = {
   // TODO: 填入您的 Wix 網站網址，結尾加上 /_functions
   // 例如: https://your-site.wixsite.com/mysite/_functions
-  API_BASE: 'https://<your-wix-site-url>/_functions',
+  API_BASE: 'https://www.soundcore3co.com/_functions',
 
   // Wix HTTP Functions 端點名稱
   endpoints: {

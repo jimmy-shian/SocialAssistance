@@ -226,6 +226,34 @@ export async function setDataset(key, dataObj) {
 }
 
 // ==========================================
+// Crypto / Auth Helpers
+// ==========================================
+
+import crypto from 'crypto';
+
+export function hashPassword(password) {
+    if (!password) return '';
+    return crypto.createHash('sha256').update(password + 'THE_SALT_2024').digest('hex');
+}
+
+export function checkPassword(password, hash) {
+    if (!password || !hash) return false;
+    return hashPassword(password) === hash;
+}
+
+// Aliases for compatibility with http-functions
+export const findUserByUsername = getUser;
+export const createUser = upsertUser;
+export const DATASETS_COLL = COL_DATASETS;
+
+// findUserByToken implies decoding token then finding. 
+// http-functions handles decoding (verifyToken). 
+// If it needs strict DB check by ID, valid usage differs, 
+// but based on http-functions usage verifyToken returns payload, 
+// then uses findUserByUsername. So verifyToken is sufficient usually.
+// We can export a dummy or ignore if removed from imports.
+
+// ==========================================
 // Image Helpers
 // ==========================================
 
