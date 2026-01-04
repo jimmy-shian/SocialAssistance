@@ -92,7 +92,7 @@ export async function verifyAndClearResetCode(code) {
         const results = await wixData.query(COL_USERS)
             .eq('resetCode', code)
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
 
         if (results.items.length === 0) return null;
 
@@ -154,7 +154,7 @@ export async function setProfile(username, profileObj) {
         const results = await wixData.query(COL_PROFILES)
             .eq('username', username)
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
 
         let toSave = {
             username: username,
@@ -203,7 +203,7 @@ export async function setDataset(key, dataObj) {
         const results = await wixData.query(COL_DATASETS)
             .eq('key', key)
             .limit(1)
-            .find();
+            .find({ suppressAuth: true });
 
         let version = 1;
         let toSave = {
@@ -227,14 +227,24 @@ export async function setDataset(key, dataObj) {
 }
 
 // ==========================================
-// Crypto / Auth Helpers
+// Crypto / Auth Helpers (no Node 'crypto' in Velo)
 // ==========================================
 
-import crypto from 'crypto';
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = (hash << 5) - hash + char;
+        hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
+}
 
 export function hashPassword(password) {
     if (!password) return '';
-    return crypto.createHash('sha256').update(password + 'THE_SALT_2024').digest('hex');
+    // Lightweight non-crypto hash to stay compatible in Velo backend.
+    // Consider migrating to wix-secrets + a stronger approach if needed.
+    return simpleHash(password + '|THE_SALT_2024');
 }
 
 export function checkPassword(password, hash) {

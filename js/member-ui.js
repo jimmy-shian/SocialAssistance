@@ -73,8 +73,8 @@
     try {
       const logged = window.MemberData && window.MemberData.isLoggedIn && window.MemberData.isLoggedIn();
       if (logged) {
-        const role = (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
-        window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
+        const role = (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'student';
+        window.location.href = (role === 'admin') ? './admin.html' : (role === 'teacher' ? './member-admin.html' : './member-profile.html');
         return;
       }
     } catch (e) { }
@@ -206,9 +206,10 @@
         setBtnLoading(loginBtn, false);
         return;
       }
-      const role = (res && res.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
-      if (window.Toast && window.Toast.show) window.Toast.show('登入成功，前往' + (role === 'admin' ? '管理頁' : '個人頁') + '…', 'success', 1500);
-      window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
+      const role = (res && res.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'student';
+      const goto = (role === 'admin') ? './admin.html' : (role === 'teacher' ? './member-admin.html' : './member-profile.html');
+      if (window.Toast && window.Toast.show) window.Toast.show('登入成功，前往' + (role === 'admin' ? '資料管理' : role === 'teacher' ? '老師後台' : '個人頁') + '…', 'success', 1500);
+      window.location.href = goto;
     });
 
     // Switch to register / login
@@ -227,16 +228,47 @@
     const avToggle = qs('#admin-verify-toggle');
     const avWrap = qs('#admin-code-wrap');
     const avCode = qs('#admin-verify-code');
+    const tvToggle = qs('#teacher-verify-toggle');
+    const tvWrap = qs('#teacher-code-wrap');
+    const tvCode = qs('#teacher-verify-code');
     const avStatus = qs('#admin-verify-status');
     const avCancel = qs('#admin-verify-cancel');
     const avOk = qs('#admin-verify-ok');
-    function updateOkLabel() { if (!avOk) return; avOk.innerHTML = (avToggle && avToggle.checked) ? '<i class="fas fa-user-shield mr-2"></i> 以管理者註冊' : '<i class="fas fa-user-check mr-2"></i> 繼續註冊'; }
-    function openAdminVerify() { if (!avModal) return; avStatus && (avStatus.textContent = ''); if (avToggle) { avToggle.checked = false; } if (avWrap) avWrap.classList.add('hidden'); if (avCode) avCode.value = ''; updateOkLabel(); avModal.classList.remove('hidden'); setTimeout(() => avModal.classList.add('open'), 0); }
+    function updateOkLabel() {
+      if (!avOk) return;
+      if (avToggle && avToggle.checked) avOk.innerHTML = '<i class="fas fa-user-shield mr-2"></i> 以管理者註冊';
+      else if (tvToggle && tvToggle.checked) avOk.innerHTML = '<i class="fas fa-chalkboard-teacher mr-2"></i> 以老師註冊';
+      else avOk.innerHTML = '<i class="fas fa-user-check mr-2"></i> 繼續註冊';
+    }
+    function openAdminVerify() {
+      if (!avModal) return;
+      avStatus && (avStatus.textContent = '');
+      if (avToggle) { avToggle.checked = false; }
+      if (tvToggle) { tvToggle.checked = false; }
+      if (avWrap) avWrap.classList.add('hidden');
+      if (tvWrap) tvWrap.classList.add('hidden');
+      if (avCode) avCode.value = '';
+      if (tvCode) tvCode.value = '';
+      updateOkLabel();
+      avModal.classList.remove('hidden');
+      setTimeout(() => avModal.classList.add('open'), 0);
+    }
     function closeAdminVerify() { if (!avModal) return; avModal.classList.remove('open'); const hide = () => avModal.classList.add('hidden'); avModal.addEventListener('transitionend', function onEnd(e) { if (e.target === avModal) { avModal.removeEventListener('transitionend', onEnd); hide(); } }); setTimeout(hide, 220); }
     function setAdminLoading(on = true) { if (!avOk) return; if (!avOk.dataset.orig) avOk.dataset.orig = avOk.innerHTML; avOk.disabled = !!on; avOk.classList.toggle('opacity-50', !!on); avOk.classList.toggle('cursor-not-allowed', !!on); if (on) { avOk.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (avOk.textContent || '送出'); } else { avOk.innerHTML = avOk.dataset.orig; } }
-    avToggle?.addEventListener('change', () => { if (!avWrap) return; avWrap.classList.toggle('hidden', !avToggle.checked); updateOkLabel(); if (avToggle.checked) avCode?.focus(); });
+    avToggle?.addEventListener('change', () => {
+      if (avToggle.checked && tvToggle) { tvToggle.checked = false; if (tvWrap) tvWrap.classList.add('hidden'); }
+      if (avWrap) avWrap.classList.toggle('hidden', !avToggle.checked);
+      updateOkLabel();
+      if (avToggle.checked) avCode?.focus();
+    });
+    tvToggle?.addEventListener('change', () => {
+      if (tvToggle.checked && avToggle) { avToggle.checked = false; if (avWrap) avWrap.classList.add('hidden'); }
+      if (tvWrap) tvWrap.classList.toggle('hidden', !tvToggle.checked);
+      updateOkLabel();
+      if (tvToggle.checked) tvCode?.focus();
+    });
 
-    async function proceedRegister(isAdmin) {
+    async function proceedRegister() {
       ensureError('', 'register-error', '#register-form');
       const u = qs('#reg-username')?.value?.trim();
       const email = qs('#reg-email')?.value?.trim();
@@ -247,10 +279,14 @@
       if (p1.length < 8) { ensureError('密碼至少 8 碼', 'register-error', '#register-form'); return; }
       if (!window.Auth || !window.Auth.register) { ensureError('註冊功能尚未載入', 'register-error', '#register-form'); return; }
       let options = undefined;
-      if (isAdmin) {
+      if (avToggle && avToggle.checked) {
         const code = (avCode?.value || '').trim();
         if (!code) { avStatus && (avStatus.textContent = '請輸入管理者驗證碼'); avCode?.focus(); return; }
         options = { isAdmin: true, adminCode: code };
+      } else if (tvToggle && tvToggle.checked) {
+        const code = (tvCode?.value || '').trim();
+        if (!code) { avStatus && (avStatus.textContent = '請輸入老師驗證碼'); tvCode?.focus(); return; }
+        options = { isTeacher: true, teacherCode: code };
       }
       try {
         setAdminLoading(true);
@@ -263,9 +299,10 @@
           return;
         }
         closeAdminVerify();
-        const role = (r && r.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'member';
-        if (window.Toast && window.Toast.show) window.Toast.show('註冊成功，前往' + (role === 'admin' ? '管理頁' : '個人頁') + '…', 'success', 1500);
-        window.location.href = role === 'admin' ? './member-admin.html' : './member-profile.html';
+        const role = (r && r.role) || (window.Auth && window.Auth.getRole && window.Auth.getRole()) || 'student';
+        const goto = (role === 'admin') ? './admin.html' : (role === 'teacher' ? './member-admin.html' : './member-profile.html');
+        if (window.Toast && window.Toast.show) window.Toast.show('註冊成功，前往' + (role === 'admin' ? '資料管理' : role === 'teacher' ? '老師後台' : '個人頁') + '…', 'success', 1500);
+        window.location.href = goto;
       } catch (err) {
         const msg = '註冊錯誤：' + err.message;
         ensureError(msg, 'register-error', '#register-form');
@@ -279,10 +316,7 @@
     avCancel?.addEventListener('click', () => { // 僅關閉，不送出
       closeAdminVerify();
     });
-    avOk?.addEventListener('click', () => {
-      const wantAdmin = !!avToggle?.checked;
-      proceedRegister(wantAdmin);
-    });
+    avOk?.addEventListener('click', () => { proceedRegister(); });
     avModal?.addEventListener('click', (e) => { const t = e.target; if (t && (t.id === 'admin-verify-modal' || t.classList.contains('overlay-bg'))) { closeAdminVerify(); /* 不自動註冊，使用者可再按註冊 */ } });
     document.addEventListener('keydown', (e) => { if (!avModal || avModal.classList.contains('hidden')) return; if (e.key === 'Escape') { e.preventDefault(); closeAdminVerify(); } if (e.key === 'Enter') { e.preventDefault(); avOk?.click(); } });
 

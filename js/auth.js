@@ -48,6 +48,10 @@
           if (typeof options.isAdmin !== 'undefined') payload.isAdmin = !!options.isAdmin;
           if (options.adminCode) payload.adminCode = String(options.adminCode);
         }
+        if (options && (options.isTeacher || options.teacherCode)) {
+          if (typeof options.isTeacher !== 'undefined') payload.isTeacher = !!options.isTeacher;
+          if (options.teacherCode) payload.teacherCode = String(options.teacherCode);
+        }
         const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         if (!resp.ok) {
           // 嘗試讀取錯誤訊息

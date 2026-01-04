@@ -1,6 +1,8 @@
 import { response } from 'wix-http-functions';
 import wixData from 'wix-data';
-import wixCrmBackend from 'wix-crm-backend';
+import { contacts, triggeredEmails } from 'wix-crm-backend';
+import { getSecret } from 'wix-secrets-backend';
+import { fetch as wixFetch } from 'wix-fetch';
 import {
     findUserByUsername,
     createUser,
@@ -17,26 +19,189 @@ import {
 // SECRET KEY for JWT-like token signature
 const TOKEN_SECRET = 'secretKEY2026'; // ★ IMPORTANT: Change this to a random string!
 const EMAIL_TEMPLATE_ID = 'V73N0RS'; // ★ IMPORTANT: ID of Triggered Email template
-const ADMIN_REGISTER_CODE = 'secretKEY2026'; // ★ IMPORTANT: Code to register as Admin
+const ADMIN_REGISTER_CODE = 'amin'; // ★ IMPORTANT: Code to register as Admin (per user)
+const TEACHER_REGISTER_CODE = 'teacher'; // ★ IMPORTANT: Code to register as Teacher (per user)
 
-// ... (Helper functions from previous step: signToken, verifyToken, jsonResponse, etc.) ...
+// GitHub publishing settings (per user)
+const GH_OWNER = 'jimmy-shian';
+const GH_REPO = 'SocialAssistanceData';
+const GH_BRANCH = 'main';
+const GH_BASE = 'img'; // Datasets JSON folder in repo
+
+// Token helpers without Node Buffer: URL-encode JSON parts, simple signature, and exp check
 function signToken(payload) {
     const header = { alg: "HS256", typ: "JWT" };
-    const strHeader = Buffer.from(JSON.stringify(header)).toString('base64').replace(/=/g, "");
-    const strPayload = Buffer.from(JSON.stringify(payload)).toString('base64').replace(/=/g, "");
-    const signature = simpleHash(strHeader + "." + strPayload + TOKEN_SECRET);
-    return strHeader + "." + strPayload + "." + signature;
+    const h = encodeURIComponent(JSON.stringify(header));
+    const p = encodeURIComponent(JSON.stringify(payload));
+    const signature = simpleHash(h + "." + p + TOKEN_SECRET);
+    return h + "." + p + "." + signature;
+}
+
+// 10.7 Serve uploaded image by ID (HTML wrapper with embedded data URL)
+export async function get_image(request) {
+    try {
+        const url = new URL(request.url);
+        // path like /_functions/image/<id>/<filename>
+        const parts = url.pathname.split('/').filter(Boolean);
+        const idx = parts.indexOf('image');
+        const id = (idx >= 0 && parts[idx + 1]) ? parts[idx + 1] : '';
+        if (!id) {
+            return response({ status: 400, headers: { 'Content-Type': 'text/plain' }, body: 'Missing image id' });
+        }
+        const it = await wixData.query('UploadedImages').eq('imageId', id).limit(1).find({ suppressAuth: true });
+        if (!it || !it.items || it.items.length === 0) {
+            return response({ status: 404, headers: { 'Content-Type': 'text/plain' }, body: 'Not found' });
+        }
+        const img = it.items[0];
+        const mime = img.mimetype || 'image/png';
+        const b64 = img.base64 || '';
+        const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${(img.filename || 'image')}</title></head><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;"><img src="data:${mime};base64,${b64}" alt="image" style="max-width:100%;max-height:100vh;display:block;"></body></html>`;
+        return response({ status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=31536000' }, body: html });
+    } catch (e) {
+        return response({ status: 500, headers: { 'Content-Type': 'text/plain' }, body: 'Server error' });
+    }
+}
+
+// 10.5 Versions (Public GET)
+async function collectVersions() {
+    try {
+        const res = await wixData.query(DATASETS_COLL).limit(1000).find({ suppressAuth: true });
+        const map = {};
+        for (const it of res.items) {
+            map[it.key] = it.version || 0;
+        }
+        // Ensure common keys exist
+        if (map['aboutContent'] === undefined) map['aboutContent'] = 0;
+        if (map['providers'] === undefined) map['providers'] = 0;
+        if (map['siteContent'] === undefined) map['siteContent'] = 0;
+        if (map['blogContent'] === undefined) map['blogContent'] = 0;
+        return map;
+    } catch (e) { return { aboutContent: 0, providers: 0, siteContent: 0, blogContent: 0 }; }
+}
+
+export async function get_version(request) {
+    const versions = await collectVersions();
+    return jsonResponse({ versions });
+}
+
+// ---------- GitHub helpers ----------
+function utf8ToBytes(str) {
+    const bytes = [];
+    for (let i = 0; i < str.length; i++) {
+        let codePoint = str.charCodeAt(i);
+        if (codePoint < 0x80) bytes.push(codePoint);
+        else if (codePoint < 0x800) { bytes.push(0xc0 | (codePoint >> 6), 0x80 | (codePoint & 0x3f)); }
+        else if (codePoint < 0xd800 || codePoint >= 0xe000) {
+            bytes.push(0xe0 | (codePoint >> 12), 0x80 | ((codePoint >> 6) & 0x3f), 0x80 | (codePoint & 0x3f));
+        } else {
+            // surrogate pair
+            i++;
+            const next = str.charCodeAt(i);
+            const cp = 0x10000 + (((codePoint & 0x3ff) << 10) | (next & 0x3ff));
+            bytes.push(0xf0 | (cp >> 18), 0x80 | ((cp >> 12) & 0x3f), 0x80 | ((cp >> 6) & 0x3f), 0x80 | (cp & 0x3f));
+        }
+    }
+    return bytes;
+}
+function base64FromBytes(bytes) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+    let output = '';
+    for (let i = 0; i < bytes.length; i += 3) {
+        const b1 = bytes[i] || 0;
+        const b2 = bytes[i + 1] || 0;
+        const b3 = bytes[i + 2] || 0;
+        const triplet = (b1 << 16) | (b2 << 8) | b3;
+        output += chars[(triplet >> 18) & 0x3f] + chars[(triplet >> 12) & 0x3f] +
+                  chars[(triplet >> 6) & 0x3f] + chars[triplet & 0x3f];
+    }
+    const mod = bytes.length % 3;
+    if (mod === 1) output = output.slice(0, -2) + '==';
+    else if (mod === 2) output = output.slice(0, -1) + '=';
+    return output;
+}
+function toBase64String(str) { return base64FromBytes(utf8ToBytes(str)); }
+
+async function githubGetFileSha(path, token) {
+    const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${encodeURI(path.replace(/^\/+/, ''))}?ref=${encodeURIComponent(GH_BRANCH)}`;
+    const resp = await wixFetch(url, { method: 'GET', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json', 'User-Agent': 'SocialAssistanceBot' } });
+    if (resp.status === 404) return null;
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return data && data.sha ? data.sha : null;
+}
+async function githubUpsertJson(path, obj) {
+    const token = await getSecret('GITHUB_TOKEN');
+    if (!token) return { ok: false, message: 'Missing GITHUB_TOKEN secret' };
+    const content = JSON.stringify(obj || {}, null, 2);
+    const b64 = toBase64String(content);
+    const sha = await githubGetFileSha(path, token);
+    const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${encodeURI(path.replace(/^\/+/, ''))}`;
+    const body = { message: `Update ${path} ${new Date().toISOString()}`, content: b64, branch: GH_BRANCH };
+    if (sha) body.sha = sha;
+    const resp = await wixFetch(url, { method: 'PUT', headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github+json', 'User-Agent': 'SocialAssistanceBot', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!resp.ok) {
+        let msg = 'GitHub commit failed';
+        try { const er = await resp.json(); msg = (er && (er.message || msg)); } catch (e) {}
+        return { ok: false, message: msg };
+    }
+    const data = await resp.json();
+    return { ok: true, content: data && data.content };
+}
+async function buildImagesIndex(origin) {
+    try {
+        const res = await wixData.query('UploadedImages').limit(1000).find({ suppressAuth: true });
+        const arr = (res && res.items) ? res.items : [];
+        return arr.map(it => ({
+            id: it.imageId,
+            filename: it.filename,
+            mimetype: it.mimetype,
+            url: String(origin || '').replace(/\/$/, '') + '/_functions/image/' + encodeURIComponent(it.imageId) + '/' + encodeURIComponent(it.filename || 'image'),
+            createdAt: it.createdAt || it._createdDate || new Date().toISOString()
+        }));
+    } catch (e) { return []; }
+}
+async function publishDatasets(keys) {
+    const results = [];
+    for (const key of keys) {
+        try {
+            const d = await loadDataset(key);
+            const path = `${GH_BASE}/${encodeURIComponent(String(key))}.json`;
+            const r = await githubUpsertJson(path, d && d.data ? d.data : {});
+            results.push({ key, ok: !!(r && r.ok), message: r && r.message });
+        } catch (e) { results.push({ key, ok: false, message: e.message }); }
+    }
+    return results;
+}
+async function publishImages(origin) {
+    const index = await buildImagesIndex(origin);
+    const r = await githubUpsertJson('images/images.json', index);
+    return { ok: !!(r && r.ok), count: index.length, message: r && r.message };
+}
+
+// 10.6 Publish (commit to GitHub)
+export async function post_publish(request) {
+    const body = await getJsonBody(request);
+    const { token, keys } = body || {};
+    const requester = verifyToken(token);
+    if (!requester || requester.role !== 'admin') return jsonResponse({ ok: false, message: '無權限' }, 403);
+    const list = Array.isArray(keys) && keys.length ? keys : ['aboutContent', 'providers', 'siteContent', 'blogContent'];
+    const origin = (() => { try { const u = new URL(request.url); return u.origin; } catch { return ''; } })();
+    const results = await publishDatasets(list);
+    const imgRes = await publishImages(origin);
+    const publishOk = results.every(r => r.ok) && imgRes.ok;
+    return jsonResponse({ ok: true, results, images: imgRes, publishOk });
 }
 function verifyToken(token) {
     if (!token) return null;
     const parts = token.split('.');
     if (parts.length !== 3) return null;
-    const [h, p, s] = parts;
-    const calcSig = simpleHash(h + "." + p + TOKEN_SECRET);
+    const [hEnc, pEnc, s] = parts;
+    const calcSig = simpleHash(hEnc + "." + pEnc + TOKEN_SECRET);
     if (s !== calcSig) return null;
     try {
-        const json = Buffer.from(p, 'base64').toString('utf-8');
-        return JSON.parse(json);
+        const payload = JSON.parse(decodeURIComponent(pEnc));
+        if (payload && payload.exp && Date.now() > Number(payload.exp)) return null; // expired
+        return payload;
     } catch (e) { return null; }
 }
 function simpleHash(str) {
@@ -99,14 +264,37 @@ export function options_membersList(request) { return optionsResponse(); }
 export function options_uploadImage(request) { return optionsResponse(); }
 export function options_read(request) { return optionsResponse(); }
 export function options_update(request) { return optionsResponse(); }
+export function options_login(request) { return optionsResponse(); }
+export function options_publish(request) { return optionsResponse(); }
+export function options_savePublish(request) { return optionsResponse(); }
+export function options_version(request) { return optionsResponse(); }
 export function options_questionnaireCreate(request) { return optionsResponse(); }
 export function options_questionnaireList(request) { return optionsResponse(); }
 export function options_questionnaireResponseSubmit(request) { return optionsResponse(); }
 export function options_questionnaireResponseList(request) { return optionsResponse(); }
 
+// 0. Admin Login (for DataAPI)
+export async function post_login(request) {
+    const body = await getJsonBody(request);
+    const { username, password } = body || {};
+    if (!username || !password) return jsonResponse({ ok: false, message: '請輸入帳號密碼' }, 400);
+
+    try {
+        const user = await findUserByUsername(username);
+        if (!user) return jsonResponse({ ok: false, message: '帳號或密碼錯誤' }, 400);
+        if (!checkPassword(password, user.passHash)) return jsonResponse({ ok: false, message: '帳號或密碼錯誤' }, 400);
+        if ((user.role || 'member') !== 'admin') return jsonResponse({ ok: false, message: '需要管理員權限' }, 403);
+
+        const token = signToken({ username: user.username, role: 'admin', exp: Date.now() + 2 * 60 * 60 * 1000 });
+        return jsonResponse({ ok: true, token, role: 'admin' });
+    } catch (e) {
+        return jsonResponse({ ok: false, message: e.message }, 500);
+    }
+}
+
 // 1. User Login
 export async function post_memberLogin(request) {
-    const ip = request.ip;
+    const ip = (request && request.headers && (request.headers['x-forwarded-for'] || request.headers['X-Forwarded-For'])) || request.ip || 'anon';
     if (!checkRateLimit(ip, 20)) return jsonResponse({ ok: false, message: '請求過於頻繁' }, 429);
 
     const body = await getJsonBody(request);
@@ -122,11 +310,11 @@ export async function post_memberLogin(request) {
 
         const tokenPayload = {
             username: user.username,
-            role: user.role || 'member',
+            role: user.role || 'student',
             exp: Date.now() + (24 * 60 * 60 * 1000) // 24hr exp
         };
         const token = signToken(tokenPayload);
-        return jsonResponse({ ok: true, token, role: user.role });
+        return jsonResponse({ ok: true, token, role: tokenPayload.role });
     } catch (e) {
         return jsonResponse({ ok: false, message: e.message }, 500);
     }
@@ -135,15 +323,17 @@ export async function post_memberLogin(request) {
 // 2. User Register
 export async function post_memberRegister(request) {
     const body = await getJsonBody(request);
-    const { username, email, password, isAdmin, adminCode } = body;
+    const { username, email, password, isAdmin, adminCode, isTeacher, teacherCode } = body;
 
     if (!username || !email || !password) return jsonResponse({ ok: false, message: '資料不完整' }, 400);
     if (username.length < 3) return jsonResponse({ ok: false, message: '帳號太短' }, 400);
 
-    // simple admin code check
-    let role = 'member';
+    // roles: admin / teacher / student (default)
+    let role = 'student';
     if (isAdmin && adminCode === ADMIN_REGISTER_CODE) {
         role = 'admin';
+    } else if (isTeacher && teacherCode === TEACHER_REGISTER_CODE) {
+        role = 'teacher';
     }
 
     try {
@@ -175,14 +365,14 @@ export async function post_memberForgot(request) {
             await saveResetCode(user.username, code);
 
             try {
-                // Use default import object for better compatibility
-                const contact = await wixCrmBackend.createContact({
-                    emails: [{ email: user.email }]
+                // Create contact and send triggered email using named modules
+                const createRes = await contacts.createContact({
+                    info: { emails: [{ email: user.email }] }
                 });
-                const contactId = contact._id || contact.id || contact;
+                const contactId = (createRes && createRes.contact && createRes.contact.id) || createRes._id || createRes.id || createRes;
 
-                await wixCrmBackend.emailContact(EMAIL_TEMPLATE_ID, contactId, {
-                    variables: { code }
+                await triggeredEmails.emailContact(EMAIL_TEMPLATE_ID, contactId, {
+                    variables: { code, resetCode: code, username: user.username }
                 });
                 console.log('[API] Email sent successfully');
             } catch (err) {
@@ -336,19 +526,29 @@ export async function post_uploadImage(request) {
     if (!requester) return jsonResponse({ ok: false, message: '未登入' }, 401);
 
     try {
-        // In real Wix app, use Media Manager. Here we store base64 in 'UploadedImages' collection
-        // Note: Wix text field limit is ~500KB. Large images will fail.
+        // Parse data URL
         const id = Math.random().toString(36).slice(2);
+        let mime = 'image/png';
+        let b64 = '';
+        if (typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
+            const m = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+            if (m) { mime = m[1] || mime; b64 = m[2] || ''; }
+        } else if (typeof dataUrl === 'string') {
+            // Assume pure base64 string
+            b64 = dataUrl;
+        }
+        if (!b64) return jsonResponse({ ok: false, message: '無效的影像資料' }, 400);
 
-        // Only store metadata + base64 (if small enough)
-        // Ideally we would return a presigned URL, but for now we simulate
-        // Only store metadata + base64 (if small enough)
-        // Ideally we would return a presigned URL, but for now we simulate
+        // Basic size guard (~800KB)
+        if (b64.length > 800 * 1024) {
+            return jsonResponse({ ok: false, message: '圖片過大，請壓縮後再上傳' }, 400);
+        }
+
         await saveImage({
             id: id,
             filename: filename || 'upload.png',
-            mimetype: 'image/png', // simplified or extract from dataUrl
-            base64: dataUrl, // careful with size
+            mimetype: mime,
+            base64: b64,
             owner: requester.username
         });
 
@@ -364,8 +564,8 @@ export async function post_read(request) {
     const { key } = body; // e.g. 'aboutContent'
     try {
         const d = await loadDataset(key); // helper
-        return jsonResponse(d || { version: 0, data: {} });
-    } catch (e) { return jsonResponse({ error: e.message }, 500); }
+        return jsonResponse({ ok: true, key: d.key, version: d.version, data: d.data, updatedAt: d.updatedAt });
+    } catch (e) { return jsonResponse({ ok: false, message: e.message }, 500); }
 }
 
 export async function post_update(request) {
@@ -378,6 +578,27 @@ export async function post_update(request) {
         const ver = await saveDataset(key, data);
         return jsonResponse({ ok: true, version: ver });
     } catch (e) { return jsonResponse({ ok: false, message: e.message }, 500); }
+}
+
+// 9.5 Save + Publish (commit to GitHub)
+export async function post_savePublish(request) {
+    const body = await getJsonBody(request);
+    const { token, key, data, keys } = body || {};
+    const requester = verifyToken(token);
+    if (!requester || requester.role !== 'admin') return jsonResponse({ ok: false, message: '無權限' }, 403);
+
+    if (!key) return jsonResponse({ ok: false, message: '缺少 key' }, 400);
+    try {
+        const upd = await saveDataset(key, data);
+        const list = Array.isArray(keys) && keys.length ? keys : [key];
+        const origin = (() => { try { const u = new URL(request.url); return u.origin; } catch { return ''; } })();
+        const results = await publishDatasets(list);
+        const imgRes = await publishImages(origin);
+        const publishOk = results.every(r => r.ok) && imgRes.ok;
+        return jsonResponse({ ok: true, update: upd, results, images: imgRes, publishOk });
+    } catch (e) {
+        return jsonResponse({ ok: false, message: e.message }, 500);
+    }
 }
 
 // 10. Data (Public read)
