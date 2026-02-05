@@ -235,8 +235,8 @@
     } catch (e) { }
   }
 
-  const AppConfig = window.AppConfig || { datasets: { about: 'aboutContent', providers: 'providers', site: 'siteContent' }, versionCacheKey: 'app_data_version' };
-  const DS = AppConfig.datasets || { about: 'aboutContent', providers: 'providers', site: 'siteContent' };
+  const AppConfig = window.AppConfig || { datasets: { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent' }, versionCacheKey: 'app_data_version' };
+  const DS = AppConfig.datasets || { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent' };
   const VERSION_KEY = AppConfig.versionCacheKey || 'app_data_version';
 
   function keyFromSelect() {
@@ -244,6 +244,7 @@
     if (v === 'about') return DS.about;
     if (v === 'providers') return DS.providers;
     if (v === 'site') return DS.site;
+    if (v === 'blog') return DS.blog;
     return v; // fallback
   }
 
@@ -430,13 +431,18 @@
       const url = prompt('要插入的連結網址？(例如 https://example.com)');
       if (!url) return;
       const el = activeEditable;
-      const start = el.selectionStart || 0; const end = el.selectionEnd || start; const val = el.value || '';
+      // Use saved selection (captured in mousedown before focus was lost)
+      const start = (activeSelStart != null ? activeSelStart : (el.selectionStart || 0));
+      const end = (activeSelEnd != null ? activeSelEnd : (el.selectionEnd || start));
+      const val = el.value || '';
       const sel = val.slice(start, end) || url;
       const a = `<a href="${url.replace(/"/g, '%22')}" target="_blank" rel="noopener">${sel}</a>`;
       el.value = val.slice(0, start) + a + val.slice(end);
       try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) { }
       el.focus();
       const pos = start + a.length; el.setSelectionRange(pos, pos);
+      // Clear saved selection
+      activeSelStart = null; activeSelEnd = null;
     });
 
     // Update version label when DataAPI bump
