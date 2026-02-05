@@ -1,3 +1,22 @@
+/**
+ * admin.js
+ * 
+ * [功能說明]
+ * 此檔案是「管理後台」的 UI 邏輯核心。
+ * 1. 管理視覺化編輯器 (Visual Editors)：包含 About, Providers, Site, Blog 等區塊的渲染與事件綁定。
+ * 2. 處理資料收集：將 UI 上的輸入值 (Input/Textarea) 轉換回 JSON 格式 (`collectData`)。
+ * 3. 圖片上傳：處理圖片拖拉、上傳至 GAS 並取得預覽連結。
+ * 4. 預覽功能：即時預覽 (Live Preview) 的邏輯。
+ * 
+ * [關聯檔案]
+ * - 依賴 `js/data-loader.js` (DataAPI) 進行資料儲存與讀取。
+ * - 對應 `admin.html` 的 DOM 結構。
+ * 
+ * [修改指南]
+ * - 若新增資料欄位，需同步修改：
+ *   1. `renderXxxEditor`: 將資料填入 Input。
+ *   2. `collectXxxFromUI`: 將 Input 值存回 JSON。
+ */
 // Admin UI for editing datasets via GAS
 (function () {
   function qs(s, r = document) { return r.querySelector(s); }
@@ -2469,46 +2488,59 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
   } else {
     bindDropdowns(); bindLinkModal(); bindPreviewControls(); bindPreviewLive(); try { renderLivePreview(); } catch (e) { }
   }
-  // ===== Blog Editor Logic =====
+  // ===== Blog Editor Logic (Schema: id, title, date, category, excerpt, image, link, content) =====
   function buildPostItem(p = {}, idx = 0) {
     const wrap = document.createElement('div');
     wrap.className = 'p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow relative';
     wrap.dataset.index = String(idx);
+
+    // Ensure ID exists
+    const pid = p.id || ('post-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5));
+    // Default link to blog.html if empty
+    const plink = p.link || './blog.html';
+
     wrap.innerHTML = `
       <div class="flex items-center justify-between mb-2">
-        <h4 class="font-bold text-gray-700 dark:text-gray-200">#${idx + 1}</h4>
+        <div class="flex items-center gap-2">
+           <h4 class="font-bold text-gray-700 dark:text-gray-200">#${idx + 1}</h4>
+           <span class="text-xs text-gray-400 font-mono">${pid}</span>
+           <input type="hidden" class="bl-id" value="${pid}">
+        </div>
         <div class="flex gap-2">
+            <a href="${plink}" target="_blank" class="btn-soft btn-blue bl-view text-xs no-underline flex items-center" title="查看文章">
+              <i class="fas fa-external-link-alt mr-1"></i> 查看
+            </a>
             <button type="button" class="btn-soft btn-yellow bl-move-up" title="上移">↑</button>
             <button type="button" class="btn-soft btn-yellow bl-move-down" title="下移">↓</button>
             <button type="button" class="btn-soft btn-purple bl-del" title="刪除">×</button>
         </div>
       </div>
       <div class="grid admin-grid gap-4">
-        <label class="text-sm">標題
+        <label class="text-sm">標題 (title)
           <input class="bl-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.title)}">
         </label>
-        <div class="grid grid-cols-2 gap-4">
-            <label class="text-sm">日期
-              <input type="date" class="bl-date w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${p.date || ''}">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <label class="text-sm">日期 (date)
+              <input type="text" class="bl-date w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${p.date || ''}" placeholder="YYYY/MM/DD">
             </label>
-             <label class="text-sm">標籤 (逗號分隔)
-              <input class="bl-tags w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml((Array.isArray(p.tags) ? p.tags : []).join(', '))}">
+             <label class="text-sm">類別 (category)
+              <input class="bl-category w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.category || '')}" placeholder="如：news, daily, interview">
+            </label>
+             <label class="text-sm">連結 (link)
+              <input class="bl-link w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(plink)}" placeholder="./blog.html">
             </label>
         </div>
-         <label class="text-sm">摘要
-          <textarea class="bl-summary w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${escHtml(p.summary)}</textarea>
+         <label class="text-sm">摘要 (excerpt)
+          <textarea class="bl-excerpt w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${escHtml(p.excerpt)}</textarea>
         </label>
-         <label class="text-sm">封面圖
+         <label class="text-sm">圖片 (image)
            <div class="flex gap-2 items-end">
-              <input class="bl-cover flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.cover || '')}" placeholder="./img/... 或上傳">
-              <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden bl-cover-upload" accept="image/*"></label>
+              <input class="bl-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.image || '')}" placeholder="./img/... 或上傳">
+              <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden bl-image-upload" accept="image/*"></label>
               <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden relative shrink-0">
-                 <img src="${p.cover || ''}" class="w-full h-full object-cover bl-cover-preview" onerror="this.style.display='none'">
+                 <img src="${p.image || ''}" class="w-full h-full object-cover bl-image-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
               </div>
            </div>
-        </label>
-        <label class="text-sm">內容 (HTML / Text)
-          <textarea class="bl-content w-full rounded border px-2 py-1 bg-white dark:bg-gray-800 font-mono text-sm" rows="6">${escHtml(p.content || '')}</textarea>
         </label>
       </div>
     `;
@@ -2518,22 +2550,29 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
     wrap.querySelector('.bl-move-up').onclick = () => { if (wrap.previousElementSibling) wrap.parentNode.insertBefore(wrap, wrap.previousElementSibling); };
     wrap.querySelector('.bl-move-down').onclick = () => { if (wrap.nextElementSibling) wrap.parentNode.insertBefore(wrap.nextElementSibling, wrap); };
 
-    // Live preview for cover
-    const coverInput = wrap.querySelector('.bl-cover');
-    const coverPreview = wrap.querySelector('.bl-cover-preview');
-    coverInput.addEventListener('input', () => {
-      coverPreview.src = coverInput.value;
-      coverPreview.style.display = 'block';
+    // Update View button href when link input changes
+    const linkInput = wrap.querySelector('.bl-link');
+    const viewBtn = wrap.querySelector('.bl-view');
+    linkInput.addEventListener('input', () => {
+      viewBtn.href = linkInput.value || '#';
     });
 
-    // Upload handler for cover
-    wrap.querySelector('.bl-cover-upload').addEventListener('change', async (e) => {
+    // Live preview for image
+    const imgInput = wrap.querySelector('.bl-image');
+    const imgPreview = wrap.querySelector('.bl-image-preview');
+    imgInput.addEventListener('input', () => {
+      imgPreview.src = imgInput.value;
+      imgPreview.style.display = 'block';
+    });
+
+    // Upload handler for image
+    wrap.querySelector('.bl-image-upload').addEventListener('change', async (e) => {
       const file = e.target.files?.[0]; if (!file) return;
       try {
         const ph = await uploadFileAndGetPlaceholder(file);
-        coverInput.value = ph;
-        coverPreview.src = previewCache[ph] || ph;
-        coverPreview.style.display = 'block';
+        imgInput.value = ph;
+        imgPreview.src = previewCache[ph] || ph;
+        imgPreview.style.display = 'block';
         if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
       } catch (err) {
         if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000);
@@ -2554,34 +2593,15 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
 
     // Bind Add button
     const addBtn = qs('#bl-add-post');
-    // Remove old listener to avoid duplicates if any (though usually we rely on Id)
-    // Actually, button is outside the list, so we should bind it once or check if bound.
-    // Better: bind it in init(). But here we do it ad-hoc or check.
-    // admin.js style is to bind global listeners in init(), but 'bl-add-post' is new.
-    // I'll bind it here but safeguard? Or better, bind it ONCE in renderBlogEditor is bad if called multiple times.
-    // I'll check if it has a listener? No easy way.
-    // I'll use onclick assignment to be safe.
     if (addBtn) addBtn.onclick = () => {
-      list.prepend(buildPostItem({ title: '新文章', date: new Date().toISOString().split('T')[0] }, 0));
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const dateStr = `${yyyy}/${mm}/${dd}`;
+      list.prepend(buildPostItem({ title: '新文章', date: dateStr, category: 'news', link: './blog.html' }, 0));
     };
   }
-
-  // Hook collect function for saving?
-  // admin.js seems to rely on 'getEditorJSON()' or updating the editor content when inputs change?
-  // Actually admin.js likely *doesn't* auto-update the hidden JSON editor from UI.
-  // It probably does `collect...` on Save. i need to find `onSavePublish`.
-  // Wait, `onSavePublish` calls `getEditorJSON()`.
-  // Does `admin.js` have a "Sync UI to JSON" loop?
-  // I need to find how `admin.js` handles saving. 
-  // It seems `loadDatasetAndRender` populates UI. 
-  // I need to ensure when `btn-save...` is clicked, the UI state is gathered back to JSON.
-  // Let's check `onSavePublish` or `collect...` function in admin.js.
-  // I might have missed that part in my read. 
-  // Re-reading `loadDatasetAndRender`: it calls `setEditor(payload)`. 
-  // So the JSON editor has the Initial state.
-  // When user edits UI, does it update JSON editor?
-  // The provided `admin.js` snippet didn't show `onSavePublish`.
-  // I must check.
 
   function collectBlogFromUI() {
     const list = qs('#bl-post-list');
@@ -2589,12 +2609,13 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
     const posts = Array.from(list.children).map(el => {
       const get = sel => el.querySelector(sel);
       return {
+        id: get('.bl-id')?.value || '',
         title: get('.bl-title')?.value || '',
         date: get('.bl-date')?.value || '',
-        summary: get('.bl-summary')?.value || '',
-        cover: get('.bl-cover')?.value || '',
-        tags: (get('.bl-tags')?.value || '').split(/[,\s]+/).map(s => s.trim()).filter(Boolean),
-        content: get('.bl-content')?.value || ''
+        category: get('.bl-category')?.value || '',
+        excerpt: get('.bl-excerpt')?.value || '',
+        image: get('.bl-image')?.value || '',
+        link: get('.bl-link')?.value || './blog.html'
       };
     });
     return { posts };
