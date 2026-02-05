@@ -1,0 +1,182 @@
+/* 404 Sliding Puzzle Styles */
+
+#puzzle-container {
+    position: relative;
+}
+
+#puzzle-board {
+    position: relative;
+    width: 306px;
+    height: 306px;
+    background: var(--border);
+    border-radius: 0.5rem;
+    touch-action: none;
+    user-select: none;
+}
+
+/* Puzzle Tile */
+.puzzle-tile {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    user-select: none;
+    overflow: hidden;
+    /* Smooth movement animation */
+    transition: transform 0.2s ease-out, box-shadow 0.15s ease;
+    box-shadow:
+        inset 2px 2px 4px rgba(255, 255, 255, 0.25),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.15),
+        1px 1px 4px rgba(0, 0, 0, 0.1);
+    background-size: 300px 300px;
+    background-repeat: no-repeat;
+}
+
+.puzzle-tile:hover {
+    box-shadow:
+        inset 2px 2px 4px rgba(255, 255, 255, 0.25),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.15),
+        2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Active/pressed state */
+.puzzle-tile:active,
+.puzzle-tile.pressed {
+    transform: var(--tile-transform) scale(0.95) !important;
+    box-shadow:
+        inset 2px 2px 4px rgba(255, 255, 255, 0.25),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.15),
+        0 0 2px rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s ease-out, box-shadow 0.1s ease;
+}
+
+/* Movable tile (adjacent to empty) */
+.puzzle-tile.movable {
+    cursor: pointer;
+}
+
+.puzzle-tile.movable:hover {
+    box-shadow:
+        0 0 0 2px var(--primary-light, #9ACD32),
+        inset 2px 2px 4px rgba(255, 255, 255, 0.25),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.15),
+        2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Non-movable tile */
+.puzzle-tile:not(.movable) {
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+/* Empty slot (invisible) */
+.puzzle-tile.empty {
+    background: transparent !important;
+    box-shadow: none;
+    pointer-events: none;
+    opacity: 0;
+}
+
+/* Jigsaw-like edge decorations */
+.puzzle-tile::before,
+.puzzle-tile::after {
+    content: '';
+    position: absolute;
+    background: inherit;
+    background-size: inherit;
+    background-position: inherit;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.puzzle-tile.has-tab-right::before {
+    width: 14px;
+    height: 14px;
+    right: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.puzzle-tile.has-tab-bottom::after {
+    width: 14px;
+    height: 14px;
+    bottom: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Small number indicator */
+.puzzle-tile .tile-number {
+    position: absolute;
+    bottom: 3px;
+    right: 5px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Win state */
+#puzzle-board.solved .puzzle-tile {
+    cursor: default;
+    pointer-events: none;
+    border-radius: 0;
+    box-shadow: none;
+    opacity: 1;
+}
+
+#puzzle-board.solved .puzzle-tile::before,
+#puzzle-board.solved .puzzle-tile::after {
+    display: none;
+}
+
+#puzzle-board.solved .puzzle-tile .tile-number {
+    opacity: 0;
+}
+
+/* Win Overlay */
+#win-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 20;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+#win-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+/* Confetti */
+.confetti {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1000;
+    animation: confettiFall 3s ease-out forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
