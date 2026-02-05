@@ -1,0 +1,116 @@
+/* ==========================================
+   Holographic Interactive Card Styles
+   基於用戶提供的 3D 全息卡片效果
+   ========================================== */
+
+/* Container Perspective */
+.holo-card-container {
+    perspective: 1200px;
+}
+
+/* Base Card Structure */
+.holo-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* Fill the grid cell */
+    border-radius: 18px;
+    background: var(--bg-surface, #1f2937);
+    /* Fallback to dark gray if var missing */
+    transform-style: preserve-3d;
+    will-change: transform;
+    /* transition: transform 0.1s ease-out; Removed for JS LERP smoothness */
+    overflow: hidden;
+    /* CSS Variables for Mouse Position (Updated by JS) */
+    --mx: 50%;
+    --my: 50%;
+    /* Default border color if not overridden */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure content stacking context */
+.holo-card .card-content-layer {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transform: translateZ(20px);
+    /* Lift content slightly */
+    background: transparent;
+    pointer-events: none;
+    /* Let clicks pass through to links inside */
+}
+
+/* Re-enable pointer events for interactive elements inside content */
+.holo-card .card-content-layer a,
+.holo-card .card-content-layer button {
+    pointer-events: auto;
+}
+
+/* 
+   Holo Layers 
+   Placed absolutely covering the card
+*/
+
+/* 1. Card Surface Sheen (Base Reflection) */
+.holo-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx) var(--my),
+            rgba(255, 255, 255, 0.2) 0%,
+            rgba(255, 255, 255, 0.05) 25%,
+            rgba(0, 0, 0, 0.1) 60%);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 2;
+    border-radius: inherit;
+}
+
+/* 2. Holographic Layer (Rainbow Refraction) */
+.holo-layer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(130deg,
+            rgba(255, 0, 255, 0.2),
+            rgba(0, 255, 255, 0.2),
+            rgba(255, 255, 0, 0.2));
+    opacity: 0;
+    /* Hidden by default, shown on hover/move */
+    mix-blend-mode: color-dodge;
+    transform: translateZ(1px);
+    pointer-events: none;
+    z-index: 3;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+}
+
+.holo-card:hover .holo-layer {
+    opacity: 0.4;
+}
+
+/* 3. Glowing Border/Frame */
+.border-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 4;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+    /* Subtle default border */
+    transition: box-shadow 0.3s ease;
+}
+
+.holo-card:hover .border-layer {
+    box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+        0 0 15px rgba(0, 255, 255, 0.2),
+        0 0 30px rgba(255, 0, 255, 0.15);
+}
+
+/* Dark Mode Adjustments */
+html.dark .holo-card {
+    background: #111;
+    border: none;
+}

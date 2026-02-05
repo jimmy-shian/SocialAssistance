@@ -14,37 +14,44 @@
   const dataset = () => (window.providersData || {});
 
   function providerCard(p) {
-    const card = el('div', 'card-dynamic-bg p-6 rounded-xl transition-all duration-300 hover:shadow-lg');
-    // Removed complex hover effects for cleaner editorial feel
+    const wrapper = el('div', 'holo-card-container');
+    const card = el('div', 'holo-card card-dynamic-bg p-6 rounded-xl transition-all duration-300'); // Removed hover:shadow-lg
+
+    // Layers
+    card.appendChild(el('div', 'holo-layer'));
+    card.appendChild(el('div', 'border-layer'));
+    const content = el('div', 'card-content-layer');
+    card.appendChild(content);
 
     const title = el('h3', 'text-xl font-bold mb-2 text-[var(--primary)]');
     title.textContent = p.name;
-    card.appendChild(title);
+    content.appendChild(title);
 
     const cat = el('span', 'inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300');
     cat.textContent = p.category;
-    card.appendChild(cat);
-    card.appendChild(el('div', 'mb-2')); // Spacer
+    content.appendChild(cat);
+    content.appendChild(el('div', 'mb-2')); // Spacer
 
     const paramRow = (label, val) => {
-      const p = el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-1');
-      p.textContent = `${label}：${val || '-'}`;
-      return p;
+      const pEl = el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-1');
+      pEl.textContent = `${label}：${val || '-'}`;
+      return pEl;
     };
 
-    card.appendChild(paramRow('時間', p.schedule));
-    card.appendChild(paramRow('地點', p.location));
+    content.appendChild(paramRow('時間', p.schedule));
+    content.appendChild(paramRow('地點', p.location));
 
     const desc = el('p', 'text-gray-700 dark:text-gray-300 mt-4 mb-4 leading-relaxed line-clamp-3');
     desc.textContent = p.description || '';
-    card.appendChild(desc);
+    content.appendChild(desc);
 
     const link = el('a', 'link-soft text-sm font-medium');
     link.href = `./provider.html?id=${encodeURIComponent(p.id)}`;
     link.innerHTML = '查看詳情';
-    card.appendChild(link);
+    content.appendChild(link);
 
-    return card;
+    wrapper.appendChild(card);
+    return wrapper;
   }
 
   function filterList(list, keyword, category) {
@@ -173,17 +180,24 @@
                   grid.appendChild(empty);
                 } else {
                   filtered.forEach(p => {
-                    const card = document.createElement('div');
-                    card.className = 'card-dynamic-bg p-6 rounded-xl transition-all duration-300 hover:shadow-lg';
-                    card.innerHTML = `
-                    <h3 class="text-xl font-bold mb-2 text-[var(--primary)]">${p.name}</h3>
-                    <span class="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300 py-1">${p.category}</span>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">時間：${p.schedule || '-'}</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">地點：${p.location || '-'}</p>
-                    <p class="text-gray-700 dark:text-gray-300 mt-4 mb-4 leading-relaxed line-clamp-3">${p.description || ''}</p>
-                    <a class="link-soft text-sm font-medium" href="./provider.html?id=${encodeURIComponent(p.id)}">查看詳情</a>
-                  `;
-                    grid.appendChild(card);
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'holo-card-container';
+                    wrapper.innerHTML = `
+                      <div class="holo-card card-dynamic-bg p-6 rounded-xl transition-all duration-300">
+                        <div class="holo-layer"></div>
+                        <div class="border-layer"></div>
+                        <div class="card-content-layer">
+                            <h3 class="text-xl font-bold mb-2 text-[var(--primary)]">${p.name}</h3>
+                            <span class="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300">${p.category}</span>
+                            <div class="mb-2"></div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">時間：${p.schedule || '-'}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">地點：${p.location || '-'}</p>
+                            <p class="text-gray-700 dark:text-gray-300 mt-4 mb-4 leading-relaxed line-clamp-3">${p.description || ''}</p>
+                            <a class="link-soft text-sm font-medium" href="./provider.html?id=${encodeURIComponent(p.id)}">查看詳情</a>
+                        </div>
+                      </div>
+                    `;
+                    grid.appendChild(wrapper);
                   });
                 }
                 grid.setAttribute('aria-busy', 'false');

@@ -1,233 +1,241 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>部落格 | 聽見核心工作室</title>
-    <meta name="description" content="聽見核心工作室的部落格，分享活動紀錄、重要通知、人物專訪與榮耀時刻。">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="./tailwind.config.js"></script>
-    <link href="./css/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>部落格 | 聽見核心工作室</title>
+        <meta name="description" content="聽見核心工作室的部落格，分享活動紀錄、重要通知、人物專訪與榮耀時刻。">
+        <link rel="icon" href="favicon.ico" type="image/x-icon">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="./tailwind.config.js"></script>
+        <link href="./css/style.css" rel="stylesheet">
+        <link href="./css/holo-card.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    </head>
 
-<body class="section-bg-1">
-    <div id="nav-placeholder"></div>
+    <body class="section-bg-1">
+        <div id="nav-placeholder"></div>
 
-    <main class="container mx-auto px-6 py-12">
-        <!-- Hero Banner -->
-        <section class="text-center mb-12">
-            <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">BLOG</span>
-            <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mt-2">部落格</h1>
-            <p class="text-[var(--text-secondary)] mt-3 max-w-xl mx-auto">
-                聽見日常、重要通知、人物專訪、榮耀時刻
-            </p>
-        </section>
+        <main class="container mx-auto px-6 py-12">
+            <!-- Hero Banner -->
+            <section class="text-center mb-12">
+                <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">BLOG</span>
+                <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mt-2">部落格</h1>
+                <p class="text-[var(--text-secondary)] mt-3 max-w-xl mx-auto">
+                    聽見日常、重要通知、人物專訪、榮耀時刻
+                </p>
+            </section>
 
-        <!-- Category Tabs -->
-        <section class="mb-10">
-            <div class="flex flex-wrap justify-center gap-3" id="blog-tabs">
-                <button
-                    class="blog-tab active px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--primary)] text-white font-medium transition-all"
-                    data-category="all">全部</button>
-                <button
-                    class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                    data-category="daily">聽見日常</button>
-                <button
-                    class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                    data-category="news">重要通知</button>
-                <button
-                    class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                    data-category="interview">人物專訪</button>
-                <button
-                    class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                    data-category="glory">榮耀時刻</button>
+            <!-- Category Tabs -->
+            <section class="mb-10">
+                <div class="flex flex-wrap justify-center gap-3" id="blog-tabs">
+                    <button
+                        class="blog-tab active px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--primary)] text-white font-medium transition-all"
+                        data-category="all">全部</button>
+                    <button
+                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
+                        data-category="daily">聽見日常</button>
+                    <button
+                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
+                        data-category="news">重要通知</button>
+                    <button
+                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
+                        data-category="interview">人物專訪</button>
+                    <button
+                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
+                        data-category="glory">榮耀時刻</button>
+                </div>
+            </section>
+
+            <!-- Blog Grid -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="blog-grid">
+                <!-- Posts rendered dynamically by script below -->
+            </section>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12">
+                <button id="btn-load-more"
+                    class="px-8 py-3 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 font-medium group">
+                    顯示更多
+                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                </button>
             </div>
-        </section>
+        </main>
 
-        <!-- Blog Grid -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="blog-grid">
-            <!-- Posts rendered dynamically by script below -->
-        </section>
+        <div id="footer-placeholder"></div>
 
-        <!-- Load More Button -->
-        <div class="text-center mt-12">
-            <button id="btn-load-more"
-                class="px-8 py-3 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 font-medium group">
-                顯示更多
-                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-            </button>
-        </div>
-    </main>
+        <!-- Blog Data -->
+        <script src="./js/data/blogContent.js"></script>
 
-    <div id="footer-placeholder"></div>
+        <!-- Blog Rendering & Tabs Script -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const categoryLabels = {
+                    daily: '聽見日常',
+                    news: '重要通知',
+                    interview: '人物專訪',
+                    glory: '榮耀時刻'
+                };
+                const categoryColors = {
+                    daily: '#6B8E23',
+                    news: '#E67E22',
+                    interview: '#3498DB',
+                    glory: '#9B59B6'
+                };
 
-    <!-- Blog Data -->
-    <script src="./js/data/blogContent.js"></script>
+                const grid = document.getElementById('blog-grid');
+                const tabs = document.querySelectorAll('.blog-tab');
+                let visibleCount = 6; // Initial visible posts
 
-    <!-- Blog Rendering & Tabs Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const categoryLabels = {
-                daily: '聽見日常',
-                news: '重要通知',
-                interview: '人物專訪',
-                glory: '榮耀時刻'
-            };
-            const categoryColors = {
-                daily: '#6B8E23',
-                news: '#E67E22',
-                interview: '#3498DB',
-                glory: '#9B59B6'
-            };
+                function renderPosts(category = 'all') {
+                    if (!window.blogContent || !Array.isArray(window.blogContent.posts)) return;
 
-            const grid = document.getElementById('blog-grid');
-            const tabs = document.querySelectorAll('.blog-tab');
-            let visibleCount = 6; // Initial visible posts
+                    const posts = window.blogContent.posts;
+                    const filtered = category === 'all' ? posts : posts.filter(p => p.category === category);
+                    const toShow = filtered.slice(0, visibleCount);
 
-            function renderPosts(category = 'all') {
-                if (!window.blogContent || !Array.isArray(window.blogContent.posts)) return;
-
-                const posts = window.blogContent.posts;
-                const filtered = category === 'all' ? posts : posts.filter(p => p.category === category);
-                const toShow = filtered.slice(0, visibleCount);
-
-                grid.innerHTML = toShow.map(post => `
-                    <article class="blog-post-card card-dynamic-bg" data-category="${post.category}">
-                        <div class="blog-post-image">
-                            <img src="${post.image}" alt="${post.title}">
-                            <span class="blog-post-tag" style="background: ${categoryColors[post.category] || '#6B8E23'}">
-                                ${categoryLabels[post.category] || post.category}
-                            </span>
-                        </div>
-                        <div class="blog-post-content">
-                            <h3>${post.title}</h3>
-                            <p class="blog-post-date">${post.date}</p>
-                            <p class="blog-post-excerpt">${post.excerpt}</p>
-                        </div>
-                    </article>
+                    grid.innerHTML = toShow.map(post => `
+                    <div class="holo-card-container">
+                        <article class="holo-card blog-post-card card-dynamic-bg" data-category="${post.category}">
+                            <div class="holo-layer"></div>
+                            <div class="border-layer"></div>
+                            <div class="card-content-layer">
+                                <div class="blog-post-image">
+                                    <img src="${post.image}" alt="${post.title}">
+                                    <span class="blog-post-tag" style="background: ${categoryColors[post.category] || '#6B8E23'}">
+                                        ${categoryLabels[post.category] || post.category}
+                                    </span>
+                                </div>
+                                <div class="blog-post-content">
+                                    <h3>${post.title}</h3>
+                                    <p class="blog-post-date">${post.date}</p>
+                                    <p class="blog-post-excerpt">${post.excerpt}</p>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
                 `).join('');
 
-                // Update load more button visibility
-                const loadMoreBtn = document.getElementById('btn-load-more');
-                if (loadMoreBtn) {
-                    loadMoreBtn.style.display = toShow.length < filtered.length ? '' : 'none';
+                    // Update load more button visibility
+                    const loadMoreBtn = document.getElementById('btn-load-more');
+                    if (loadMoreBtn) {
+                        loadMoreBtn.style.display = toShow.length < filtered.length ? '' : 'none';
+                    }
+                }
+
+                // Tab click handling
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        tabs.forEach(t => {
+                            t.classList.remove('active', 'bg-[var(--primary)]', 'text-white');
+                            t.classList.add('bg-[var(--bg-surface)]', 'text-[var(--text-secondary)]');
+                        });
+                        tab.classList.add('active', 'bg-[var(--primary)]', 'text-white');
+                        tab.classList.remove('bg-[var(--bg-surface)]', 'text-[var(--text-secondary)]');
+
+                        visibleCount = 6; // Reset visible count
+                        renderPosts(tab.dataset.category);
+                    });
+                });
+
+                // Load more button
+                document.getElementById('btn-load-more')?.addEventListener('click', () => {
+                    visibleCount += 3;
+                    const activeTab = document.querySelector('.blog-tab.active');
+                    renderPosts(activeTab?.dataset.category || 'all');
+                });
+
+                // Initial render
+                renderPosts();
+            });
+        </script>
+
+        <style>
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
                 }
             }
 
-            // Tab click handling
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => {
-                        t.classList.remove('active', 'bg-[var(--primary)]', 'text-white');
-                        t.classList.add('bg-[var(--bg-surface)]', 'text-[var(--text-secondary)]');
-                    });
-                    tab.classList.add('active', 'bg-[var(--primary)]', 'text-white');
-                    tab.classList.remove('bg-[var(--bg-surface)]', 'text-[var(--text-secondary)]');
-
-                    visibleCount = 6; // Reset visible count
-                    renderPosts(tab.dataset.category);
-                });
-            });
-
-            // Load more button
-            document.getElementById('btn-load-more')?.addEventListener('click', () => {
-                visibleCount += 3;
-                const activeTab = document.querySelector('.blog-tab.active');
-                renderPosts(activeTab?.dataset.category || 'all');
-            });
-
-            // Initial render
-            renderPosts();
-        });
-    </script>
-
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+            .blog-post-card {
+                /* background: var(--bg-surface); Removed to use card-dynamic-bg */
+                border-radius: var(--radius-lg);
+                overflow: hidden;
+                border: 1px solid var(--border);
+                transition: all 0.3s ease;
+                animation: fadeIn 0.4s ease;
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            .blog-post-card:hover {
+                /* transform: translateY(-6px); Handled by holo-card.js */
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             }
-        }
 
-        .blog-post-card {
-            /* background: var(--bg-surface); Removed to use card-dynamic-bg */
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-            animation: fadeIn 0.4s ease;
-        }
+            .blog-post-image {
+                position: relative;
+                height: 200px;
+                overflow: hidden;
+            }
 
-        .blog-post-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
+            .blog-post-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.4s ease;
+            }
 
-        .blog-post-image {
-            position: relative;
-            height: 200px;
-            overflow: hidden;
-        }
+            .blog-post-card:hover .blog-post-image img {
+                transform: scale(1.05);
+            }
 
-        .blog-post-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
+            .blog-post-tag {
+                position: absolute;
+                bottom: 12px;
+                left: 12px;
+                padding: 4px 12px;
+                border-radius: 9999px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: white;
+            }
 
-        .blog-post-card:hover .blog-post-image img {
-            transform: scale(1.05);
-        }
+            .blog-post-content {
+                padding: 1.25rem;
+            }
 
-        .blog-post-tag {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            padding: 4px 12px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: white;
-        }
+            .blog-post-content h3 {
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 0.5rem;
+            }
 
-        .blog-post-content {
-            padding: 1.25rem;
-        }
+            .blog-post-date {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                margin-bottom: 0.5rem;
+            }
 
-        .blog-post-content h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
+            .blog-post-excerpt {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                line-height: 1.5;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+        </style>
 
-        .blog-post-date {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-
-        .blog-post-excerpt {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-    </style>
-
-    <script src="./js/navFooter.js"></script>
-</body>
+        <script src="./js/navFooter.js"></script>
+        <script src="./js/holo-card.js"></script>
+    </body>
 
 </html>

@@ -3079,3 +3079,404 @@ html.dark .sdgs-section {
     font-size: 0.85rem;
   }
 }
+
+/* ==========================================
+   Mobile Optimization - Index Page
+   深度手機版優化
+   ========================================== */
+
+/* --- Small Mobile (375px and below) --- */
+@media (max-width: 375px) {
+  html {
+    font-size: 18px;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+  }
+
+  .section-title::after {
+    width: 40px;
+    margin-top: 0.5rem;
+  }
+
+  .hero-content h1 {
+    font-size: 1.4rem;
+  }
+
+  .hero-content p {
+    font-size: 0.9rem;
+  }
+
+  .team-card {
+    height: 450px;
+  }
+
+  .team-card .team-photo-img,
+  .team-card .team-photo-placeholder {
+    height: 280px;
+  }
+
+  .sdgs-icon-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .sdgs-item h4 {
+    font-size: 0.85rem;
+  }
+
+  .sdgs-item p {
+    font-size: 0.75rem;
+  }
+}
+
+/* --- Mobile Portrait (up to 480px) --- */
+@media (max-width: 480px) {
+
+  /* Container spacing */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Hero Section Mobile */
+  .hero-slider-asym {
+    min-height: 60vh;
+  }
+
+  .hero-content-asym {
+    width: 95%;
+    padding: 1.5rem;
+    margin: -2rem auto 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  .hero-content-asym h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-content-asym p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .hero-content-asym .btn-cta {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Philosophy/About Section Mobile */
+  .philosophy-section.asym-layout {
+    gap: 1.5rem;
+  }
+
+  .philosophy-content {
+    padding: 1.5rem;
+    border-radius: 1rem;
+  }
+
+  .philosophy-content h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .philosophy-content blockquote {
+    font-size: 0.9rem;
+    padding-left: 1rem;
+    border-left-width: 3px;
+  }
+
+  .philosophy-image-box {
+    padding: 1rem;
+  }
+
+  .philosophy-image-box img {
+    box-shadow: 6px 6px 0 var(--primary);
+  }
+
+  /* Services Section Mobile */
+  .services-carousel-wrapper {
+    padding: 5px 0;
+  }
+
+  .service-card-carousel {
+    flex: 0 0 88vw;
+    max-width: 300px;
+  }
+
+  .service-card-img {
+    height: 150px;
+  }
+
+  .service-bubble {
+    padding: 1rem;
+  }
+
+  .service-bubble h3 {
+    font-size: 1rem;
+  }
+
+  .service-bubble p {
+    font-size: 0.85rem;
+  }
+
+  /* SDGs Section Mobile */
+  .sdgs-section {
+    padding: 1.5rem 1rem;
+    margin: 1rem 0;
+    border-radius: 1rem;
+  }
+
+  .sdgs-section h2 {
+    font-size: 1.15rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sdgs-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .sdgs-item {
+    padding: 1rem;
+  }
+
+  .sdgs-icon-img {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 0.5rem;
+  }
+
+  .sdgs-item h4 {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .sdgs-item p {
+    font-size: 0.7rem;
+    line-height: 1.4;
+  }
+
+  /* Team Section Mobile */
+  .team-section {
+    padding: 2rem 0;
+  }
+
+  .team-grid {
+    gap: 1.25rem;
+  }
+
+  .team-card {
+    height: 480px;
+  }
+
+  .team-card .team-photo-img,
+  .team-card .team-photo-placeholder {
+    height: 300px;
+  }
+
+  .team-card .team-info {
+    padding: 1rem;
+  }
+
+  .team-card .team-name {
+    font-size: 1rem;
+  }
+
+  .team-card .team-roles span {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .team-card .motto {
+    font-size: 0.8rem;
+  }
+
+  .team-card .card-face.back {
+    padding: 1rem;
+  }
+
+  .team-card .team-back-content .team-name {
+    font-size: 1.25rem;
+  }
+
+  .team-card .team-back-content p {
+    font-size: 0.9rem;
+  }
+
+  .team-card .team-back-content li {
+    font-size: 0.8rem;
+  }
+
+  /* Resources/Blog Section Mobile */
+  .resources-section {
+    padding: 1.5rem 0;
+  }
+
+  .resources-tags {
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .resource-tag {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .blog-grid {
+    gap: 1rem;
+  }
+
+  .blog-card-image {
+    height: 140px;
+  }
+
+  .blog-card-content {
+    padding: 1rem;
+  }
+
+  .blog-card-date {
+    font-size: 0.75rem;
+  }
+
+  .blog-card-content h4 {
+    font-size: 0.9rem;
+  }
+
+  /* Map Section Mobile */
+  #chiayi-map {
+    height: 300px !important;
+    border-radius: 1rem;
+  }
+
+  #region-ticker {
+    min-width: 180px;
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
+
+  #region-prev,
+  #region-next {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Reduce section gaps */
+  section {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .mt-5 {
+    margin-top: 1.5rem !important;
+  }
+
+  .mt-6 {
+    margin-top: 2rem !important;
+  }
+}
+
+/* --- Mobile Landscape / Small Tablet (481px - 767px) --- */
+@media (min-width: 481px) and (max-width: 767px) {
+  .hero-content-asym {
+    width: 85%;
+    padding: 2rem;
+  }
+
+  .sdgs-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .team-card {
+    height: 520px;
+  }
+
+  .team-card .team-photo-img,
+  .team-card .team-photo-placeholder {
+    height: 340px;
+  }
+
+  .blog-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* --- Touch Device Optimizations --- */
+@media (hover: none) and (pointer: coarse) {
+
+  /* Larger tap targets */
+  .resource-tag,
+  .btn-cta,
+  .btn-soft {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Remove hover effects that don't work well on touch */
+  .service-card-carousel:hover {
+    transform: none;
+  }
+
+  .blog-card:hover {
+    transform: none;
+  }
+
+  .sdgs-item:hover {
+    transform: none;
+  }
+
+  /* Team card tap hint */
+  .team-card::after {
+    content: '👆 點擊翻轉';
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    font-size: 0.65rem;
+    color: var(--text-tertiary);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .team-card.flipped::after {
+    content: '👆 點擊翻回';
+  }
+}
+
+/* --- Safe Area for Notched Phones --- */
+@supports (padding: max(0px)) {
+  @media (max-width: 767px) {
+    body {
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
+    }
+
+    #footer-placeholder {
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* --- Dark Mode Mobile Adjustments --- */
+@media (max-width: 767px) {
+  html.dark .hero-content-asym {
+    background: rgba(45, 42, 36, 0.95);
+    border-color: var(--border);
+  }
+
+  html.dark .philosophy-content {
+    background: rgba(45, 42, 36, 0.9);
+  }
+
+  html.dark .sdgs-section {
+    background: linear-gradient(135deg, rgba(107, 142, 35, 0.1) 0%, rgba(85, 107, 47, 0.08) 100%);
+  }
+}
