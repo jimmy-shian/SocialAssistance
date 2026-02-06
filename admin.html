@@ -104,55 +104,79 @@
       <!-- (removed separate warning section; overlay is inside login wrap) -->
 
       <section id="admin-panel" class="hidden">
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <label class="text-sm">資料集：</label>
-            <div id="ds-dropdown" class="relative">
-              <button id="ds-button"
-                class="px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-600 text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                aria-haspopup="true" aria-expanded="false" aria-controls="ds-menu">
-                <span id="ds-button-label">主畫面（siteContent）</span>
-                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div id="ds-menu"
-                class="absolute z-10 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg origin-top transition transform duration-150 ease-out scale-95 opacity-0 pointer-events-none">
-                <button type="button" data-value="site"
-                  class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">主畫面（siteContent）</button>
-                <button type="button" data-value="about"
-                  class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">關於我們（aboutContent）</button>
-                <button type="button" data-value="providers"
-                  class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">探索資源平台（providers）</button>
-                <button type="button" data-value="blog"
-                  class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">部落格（blogContent）</button>
+        <!-- Sticky Toolbar (Dynamic Island Style) -->
+        <div class="sticky top-4 z-40 mb-6 mx-auto max-w-fit">
+          <div id="admin-toolbar"
+            class="flex flex-wrap items-center justify-between gap-4 px-6 py-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-full border border-gray-200 dark:border-gray-700 transition-all duration-300">
+            <div class="flex items-center gap-3 border-r pr-4 border-gray-300 dark:border-gray-600">
+              <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Dataset</label>
+              <div id="ds-dropdown" class="relative group">
+                <button id="ds-button"
+                  class="flex items-center gap-2 text-sm font-semibold text-gray-800 dark:text-gray-100 hover:text-emerald-600 transition-colors"
+                  aria-haspopup="true" aria-expanded="false">
+                  <span id="ds-button-label">siteContent</span>
+                  <svg class="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <!-- Dropdown Menu -->
+                <div id="ds-menu"
+                  class="absolute left-1/2 -translate-x-1/2 mt-4 w-56 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden origin-top scale-95 opacity-0 invisible group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
+                  <div class="py-1">
+                    <button type="button" data-value="site"
+                      class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400 border-b border-gray-100 dark:border-gray-800">主畫面
+                      <span class="block text-xs text-gray-400 font-normal">siteContent</span></button>
+                    <button type="button" data-value="about"
+                      class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400 border-b border-gray-100 dark:border-gray-800">關於我們
+                      <span class="block text-xs text-gray-400 font-normal">aboutContent</span></button>
+                    <button type="button" data-value="providers"
+                      class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400 border-b border-gray-100 dark:border-gray-800">探索資源
+                      <span class="block text-xs text-gray-400 font-normal">providers</span></button>
+                    <button type="button" data-value="blog"
+                      class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400">部落格
+                      <span class="block text-xs text-gray-400 font-normal">blogContent</span></button>
+                  </div>
+                </div>
+                <select id="ds-select" class="sr-only absolute" aria-hidden="true" tabindex="-1">
+                  <option value="site">siteContent</option>
+                  <option value="about">aboutContent</option>
+                  <option value="providers">providers</option>
+                  <option value="blog">blogContent</option>
+                </select>
               </div>
-              <!-- 保留原生 select 供既有 JS 使用（視覺隱藏） -->
-              <select id="ds-select" class="sr-only absolute -left-[9999px]" aria-hidden="true" tabindex="-1">
-                <option value="site">主畫面（siteContent）</option>
-                <option value="about">關於我們（aboutContent）</option>
-                <option value="providers">探索資源平台（providers）</option>
-                <option value="blog">部落格（blogContent）</option>
-              </select>
             </div>
-            <span id="ds-version" class="text-sm text-gray-500"></span>
-          </div>
-          <div class="flex items-center gap-3 flex-wrap">
-            <div class="inline-flex items-center gap-2" role="group" aria-label="文字編輯">
-              <button id="btn-insert-link" class="btn-soft" title="在目前游標位置插入連結">插入連結</button>
-              <button id="btn-toggle-preview" type="button" class="btn-soft" aria-pressed="false"
-                title="切換顯示即時預覽">預覽</button>
+
+            <div class="flex items-center gap-2">
+              <button id="btn-insert-link"
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-emerald-100 hover:text-emerald-600 dark:hover:bg-emerald-900/40 dark:hover:text-emerald-300 transition-colors"
+                title="插入連結">
+                <i class="fas fa-link text-sm"></i>
+              </button>
+              <button id="btn-toggle-preview"
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-amber-100 hover:text-amber-600 dark:hover:bg-amber-900/40 dark:hover:text-amber-300 transition-colors"
+                title="預覽">
+                <i class="fas fa-eye text-sm"></i>
+              </button>
             </div>
-            <div class="inline-flex items-center gap-2 border-l pl-3" role="group" aria-label="儲存與發佈">
-              <button id="btn-save-only" class="btn-soft" title="僅儲存至 GAS（不發佈網站）">暫存</button>
-              <button id="btn-save-publish" class="btn-soft btn-purple" title="儲存至 GAS 並同步到 GitHub">更新網站</button>
-              <span id="publish-status" class="text-sm text-gray-500"></span>
+
+            <div class="flex items-center gap-2 border-l pl-4 border-gray-300 dark:border-gray-600">
+              <button id="btn-save-only"
+                class="px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">暫存</button>
+              <button id="btn-save-publish"
+                class="px-3 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-amber-600 hover:from-emerald-700 hover:to-amber-700 shadow-md transform hover:scale-105 transition-all">發佈</button>
             </div>
-            <div class="inline-flex items-center gap-2 border-l pl-3" role="group" aria-label="使用者">
+
+            <div class="border-l pl-4 border-gray-300 dark:border-gray-600">
               <button id="btn-logout"
-                class="btn-soft text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">登出</button>
+                class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                title="登出">
+                <i class="fas fa-sign-out-alt text-sm"></i>
+              </button>
             </div>
+          </div>
+          <div id="publish-status"
+            class="absolute left-1/2 -translate-x-1/2 top-full mt-2 text-xs font-medium text-gray-500 bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded-md shadow-sm opacity-0 transition-opacity whitespace-nowrap pointer-events-none">
           </div>
         </div>
         <!-- Live Preview Panel -->

@@ -65,9 +65,50 @@
   }
   // 全域：目前編輯焦點（供插入連結使用）
   let activeEditable = null;
-  // 全域：在開啟 Modal 當下的選取範圍，避免焦點移動導致 selection 消失
+  // 全域：記錄最後焦點的路徑（用於 DOM re-render 後尋回對應元素）
+  let activeSelectorPath = null;
+  // 全域：在開啟 Modal 當下的選取範圍
   let activeSelStart = null;
   let activeSelEnd = null;
+
+  // Helper: 產生元素的 CSS selector path
+  function getSelectorPath(el) {
+    if (!(el instanceof Element)) return '';
+    const path = [];
+    while (el.nodeType === Node.ELEMENT_NODE && el !== document.body) {
+      let selector = el.nodeName.toLowerCase();
+      if (el.id) {
+        selector = '#' + el.id;
+        path.unshift(selector);
+        break; // ID is unique enough
+      } else {
+        let sib = el, nth = 1;
+        while (sib = sib.previousElementSibling) {
+          if (sib.nodeName.toLowerCase() === selector) nth++;
+        }
+        if (nth !== 1) selector += `:nth-of-type(${nth})`;
+      }
+      path.unshift(selector);
+      el = el.parentNode;
+      if (!el) break;
+    }
+    return path.join(' > ');
+  }
+
+  // Fix: Track last focused editable element to handle "insert link" correctly
+  const trackActive = (t) => {
+    if (t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && !['button', 'submit', 'checkbox', 'radio', 'file', 'hidden'].includes(t.type)))) {
+      if (t.closest('#link-modal')) return;
+      activeEditable = t;
+      activeSelectorPath = getSelectorPath(t);
+    }
+  };
+  // Track on focus
+  document.addEventListener('focusin', (e) => trackActive(e.target));
+  // Track on interaction (mousedown/touch) to catch clicks before focus might be lost or shifted
+  // Use capture phase to ensure we register before any other handlers might stop propagation
+  document.addEventListener('mousedown', (e) => trackActive(e.target), true);
+  document.addEventListener('touchstart', (e) => trackActive(e.target), true);
 
   // ===== Utilities: escape + linkify to safe HTML =====
   function escHtml(str) {
@@ -407,43 +448,28 @@
     qs('#btn-save-publish')?.addEventListener('click', onSavePublish);
 
     // 追蹤目前聚焦的輸入元件，供「插入連結」使用
-    activeEditable = null;
-    document.addEventListener('focusin', (e) => {
-      const el = e.target;
-      if (el && (el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && (el.type === 'text' || el.type === 'email' || el.type === 'url')))) {
-        activeEditable = el;
-      }
-    });
-    // 先在 mousedown 時保存目前選取範圍（尚未失焦）
-    qs('#btn-insert-link')?.addEventListener('mousedown', () => {
-      try {
-        const el = activeEditable; if (el) {
-          activeSelStart = typeof el.selectionStart === 'number' ? el.selectionStart : 0;
-          activeSelEnd = typeof el.selectionEnd === 'number' ? el.selectionEnd : activeSelStart;
+    // 追蹤目前聚焦的輸入元件，供「插入連結」使用
+    // Note: trackActive 已在全域宣告並綁定，此處不需要重複綁定
+
+    // Insert Link Button Event Handlers
+    const btnInsert = qs('#btn-insert-link');
+    if (btnInsert) {
+      // 1. Mousedown: 趁焦點還在 editor 時，搶先記下 selection
+      btnInsert.addEventListener('mousedown', (e) => {
+        // 防止按鈕本身的預設行為導致失焦（視瀏覽器而定），但我們主要是為了抓取數據
+        // e.preventDefault(); // 視情況決定是否需要
+        if (activeEditable) {
+          // 即使 activeEditable 已經有點舊，只要它還沒被銷毀，數值就是對的
+          // 若已被銷毀，則數值可能為 0，等到 click/openModal 時再嘗試救回
+          activeSelStart = activeEditable.selectionStart;
+          activeSelEnd = activeEditable.selectionEnd;
         }
-      } catch (e) { }
-    });
-    qs('#btn-insert-link')?.addEventListener('click', () => {
-      // 若有 Modal，改用 Modal 流程
-      if (qs('#link-modal')) { openLinkModal(); return; }
-      // Fallback：舊的 prompt 流程
-      if (!activeEditable) { alert('請先點選文字輸入區，選取要加連結的文字'); return; }
-      const url = prompt('要插入的連結網址？(例如 https://example.com)');
-      if (!url) return;
-      const el = activeEditable;
-      // Use saved selection (captured in mousedown before focus was lost)
-      const start = (activeSelStart != null ? activeSelStart : (el.selectionStart || 0));
-      const end = (activeSelEnd != null ? activeSelEnd : (el.selectionEnd || start));
-      const val = el.value || '';
-      const sel = val.slice(start, end) || url;
-      const a = `<a href="${url.replace(/"/g, '%22')}" target="_blank" rel="noopener">${sel}</a>`;
-      el.value = val.slice(0, start) + a + val.slice(end);
-      try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) { }
-      el.focus();
-      const pos = start + a.length; el.setSelectionRange(pos, pos);
-      // Clear saved selection
-      activeSelStart = null; activeSelEnd = null;
-    });
+      });
+      // 2. Click: 開啟視窗
+      btnInsert.addEventListener('click', (e) => {
+        openLinkModal();
+      });
+    }
 
     // Update version label when DataAPI bump
     try {
@@ -465,6 +491,20 @@
       gmapEl.value = url;
       if (window.Toast) Toast.show('已生成地圖連結', 'success', 2000);
     });
+
+    // Toolbar Shadow Logic
+    const toolbar = qs('#admin-toolbar');
+    if (toolbar) {
+      const updateShadow = () => {
+        const scrolled = window.scrollY > 10;
+        // 寬度變淡 + 陰影出現
+        toolbar.classList.toggle('shadow-lg', scrolled);
+        toolbar.classList.toggle('border-opacity-60', scrolled);
+        toolbar.classList.toggle('dark:border-opacity-60', scrolled);
+      };
+      window.addEventListener('scroll', updateShadow, { passive: true });
+      updateShadow(); // init check
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -2038,21 +2078,54 @@
   // 插入連結 Modal
   function openLinkModal() {
     const modal = qs('#link-modal'); if (!modal) return;
-    const url = qs('#link-url'); const txt = qs('#link-text');
-    // 預填選取文字
-    try {
-      const el = activeEditable; if (el) {
-        const s = typeof el.selectionStart === 'number' ? el.selectionStart : 0;
-        const e = typeof el.selectionEnd === 'number' ? el.selectionEnd : s;
-        activeSelStart = s; activeSelEnd = e;
-        const val = el.value || ''; const sel = val.slice(s, e);
-        if (txt) txt.value = sel;
+    const urlInput = qs('#link-url');
+    const txtInput = qs('#link-text');
+
+    // --- 關鍵修正：檢查並恢復 activeEditable ---
+    // 1. 檢查目前的 activeEditable 是否還活著（存在於 document 中）
+    if (activeEditable && !activeEditable.isConnected) {
+      console.warn('AdminJS: activeEditable is detached (ghost element). Attempting recovery via path:', activeSelectorPath);
+      // 嘗試透過 activeSelectorPath 找回新的 DOM 節點
+      if (activeSelectorPath) {
+        const recovered = document.querySelector(activeSelectorPath);
+        if (recovered) {
+          activeEditable = recovered;
+          console.log('AdminJS: Successfully recovered activeEditable.', recovered);
+        } else {
+          console.error('AdminJS: Failed to recover activeEditable.');
+          // 無法救援時，考慮重置（或讓使用者重新點擊）
+        }
       }
-    } catch (err) { }
+    }
+
+    // 2. 準備 Selection 數據
+    // 若 mousedown 時有抓到 selection，優先使用
+    // 若無（例如直接點擊按鈕而未經過 mousedown，雖然少見），則嘗試從 activeEditable 讀取
+    let selStart = activeSelStart;
+    let selEnd = activeSelEnd;
+
+    // 如果 current activeEditable 是活的，且 selStart 無效，嘗試讀取目前的（雖然此時焦點可能在按鈕上，但某些瀏覽器會保留 selection）
+    if (activeEditable && activeEditable.isConnected && (selStart == null)) {
+      selStart = activeEditable.selectionStart || 0;
+      selEnd = activeEditable.selectionEnd || selStart;
+    }
+
+    // 儲存最終決定使用的 selection，供 insert 時使用
+    activeSelStart = selStart || 0;
+    activeSelEnd = (selEnd != null) ? selEnd : activeSelStart;
+
+    // 3. 抓取選取文字填入 Modal
+    let selectedText = '';
+    if (activeEditable && activeEditable.value) {
+      selectedText = activeEditable.value.slice(activeSelStart, activeSelEnd);
+    }
+    if (txtInput) txtInput.value = selectedText;
+    if (urlInput) urlInput.value = ''; // Reset URL
+
     modal.classList.remove('hidden');
     setTimeout(() => { modal.classList.add('open'); }, 0);
     document.documentElement.classList.add('overflow-hidden');
-    url?.focus();
+    urlInput?.focus();
   }
   function closeLinkModal() {
     const modal = qs('#link-modal'); if (!modal) return;
@@ -2063,32 +2136,62 @@
     document.documentElement.classList.remove('overflow-hidden');
   }
   function insertLinkFromModal() {
-    if (!activeEditable) { if (window.Toast) Toast.show('請先點選文字輸入區，選取要加連結的文字', 'warning', 2500); closeLinkModal(); return; }
+    // 再次檢查與救援（防呆）
+    if (activeEditable && !activeEditable.isConnected && activeSelectorPath) {
+      const rec = document.querySelector(activeSelectorPath);
+      if (rec) activeEditable = rec;
+    }
+
+    if (!activeEditable || !activeEditable.isConnected) {
+      if (window.Toast) Toast.show('無法定位編輯區域，請重新點選文字輸入框', 'warning', 2500);
+      closeLinkModal();
+      return;
+    }
+
     const el = activeEditable;
-    const url = (qs('#link-url')?.value || '').trim(); if (!url) { if (window.Toast) Toast.show('請輸入連結網址', 'error', 2200); return; }
-    const textVal = (qs('#link-text')?.value || '').trim();
+    const url = (qs('#link-url')?.value || '').trim();
+    if (!url) { if (window.Toast) Toast.show('請輸入連結網址', 'error', 2200); return; }
+
+    const textVal = (qs('#link-text')?.value || ''); // Allow empty to fallback
     const color = qs('#link-color')?.value || '';
     const font = qs('#link-font')?.value || '';
     const sizeKey = qs('#link-size')?.value || '';
     // 將小/中/大映射為實際像素
     const sizePxMap = { sm: 14, md: 16, lg: 18 };
     const sizePx = sizePxMap[sizeKey];
-    const start = (activeSelStart != null ? activeSelStart : (el.selectionStart || 0));
-    const end = (activeSelEnd != null ? activeSelEnd : (el.selectionEnd || start));
+
     const val = el.value || '';
-    const sel = textVal || val.slice(start, end) || url;
-    const safeHref = url.replace(/"/g, '%22');
+    // 安全檢核：確保索引在合理範圍
+    let start = activeSelStart;
+    let end = activeSelEnd;
+    if (start > val.length) start = val.length;
+    if (end > val.length) end = val.length;
+    if (end < start) end = start;
+
+    const selText = textVal || val.slice(start, end) || url;
+    const safeHref = url.replace(/"/g, '%22'); // Basic escape
+
     const styles = [];
     if (color) styles.push(`color:${color}`);
     if (font) styles.push(`font-family:${font}`);
     if (sizePx) styles.push(`font-size:${sizePx}px`);
     const styleAttr = styles.length ? ` style="${styles.join(';')}"` : '';
-    const a = `<a href="${safeHref}" target="_blank" rel="noopener"${styleAttr}>${sel}</a>`;
-    el.value = val.slice(0, start) + a + val.slice(end);
+
+    const aTag = `<a href="${safeHref}" target="_blank" rel="noopener"${styleAttr}>${selText}</a>`;
+
+    // 執行插入
+    const newVal = val.slice(0, start) + aTag + val.slice(end);
+    el.value = newVal;
+
+    // 觸發 input 事件以讓其他監聽器（如預覽）更新
     try { el.dispatchEvent(new Event('input', { bubbles: true })); } catch (e) { }
+
+    // 恢復焦點並將游標移至連結後
     el.focus();
-    const pos = start + a.length; el.setSelectionRange(pos, pos);
-    // 清除暫存選取範圍
+    const newPos = start + aTag.length;
+    try { el.setSelectionRange(newPos, newPos); } catch (e) { }
+
+    // 清除暫存
     activeSelStart = null; activeSelEnd = null;
     closeLinkModal();
   }
