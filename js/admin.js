@@ -48,20 +48,51 @@
   function flash(el) { if (!el) return; el.classList.add('swap-highlight'); setTimeout(() => el.classList.remove('swap-highlight'), 700); }
   // Preview cache for gas://image placeholders
   const previewCache = (window.__imgPreviewCache = window.__imgPreviewCache || {});
-  // 全域：透過 GAS 上傳圖片並回傳 gas://image 佔位符（同時寫入 previewCache 以便預覽）
+  
+  // 判斷是否使用 Wix 模式
+  function isWixMode() {
+    return window.AppConfig && window.AppConfig.isWixMode && window.AppConfig.isWixMode();
+  }
+  
+  // 全域：上傳圖片並回傳 URL（Wix 直接回傳 CDN URL，GAS 回傳 gas:// 佔位符）
   async function uploadFileAndGetPlaceholder(file) {
-    const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
-    const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.uploadImage) || '';
     const t = (window.DataAPI && window.DataAPI.token && window.DataAPI.token()) || '';
-    if (!base || !ep || !t) throw new Error('未登入或未設定 GAS');
-    const fr = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(new Error('讀檔失敗')); r.readAsDataURL(file); });
-    const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
-    if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
-    const data = await resp.json();
-    if (!data || !data.ok || !data.id) throw new Error(data && data.message || '上傳失敗');
-    const ph = `gas://image/${data.id}/${data.filename}`;
-    previewCache[ph] = fr; // 立刻可見縮圖
-    return ph;
+    if (!t) throw new Error('未登入');
+    
+    const fr = await new Promise((resolve, reject) => { 
+      const r = new FileReader(); 
+      r.onload = () => resolve(r.result); 
+      r.onerror = () => reject(new Error('讀檔失敗')); 
+      r.readAsDataURL(file); 
+    });
+    
+    if (isWixMode()) {
+      // Wix 模式：直接回傳 Wix CDN URL
+      const base = (window.AppConfig && window.AppConfig.WIX_BASE_URL) || '';
+      const ep = (window.AppConfig && window.AppConfig.wixEndpoints && window.AppConfig.wixEndpoints.uploadImage) || '';
+      if (!base || !ep) throw new Error('未設定 Wix');
+      
+      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
+      if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
+      const data = await resp.json();
+      if (!data || !data.ok) throw new Error(data?.message || '上傳失敗');
+      
+      // Wix 直接回傳 CDN URL
+      return data.url;
+    } else {
+      // GAS 模式：回傳 gas:// 佔位符
+      const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
+      const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.uploadImage) || '';
+      if (!base || !ep) throw new Error('未登入或未設定 GAS');
+      
+      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
+      if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
+      const data = await resp.json();
+      if (!data || !data.ok || !data.id) throw new Error(data && data.message || '上傳失敗');
+      const ph = `gas://image/${data.id}/${data.filename}`;
+      previewCache[ph] = fr; // 立刻可見縮圖
+      return ph;
+    }
   }
   // 全域：目前編輯焦點（供插入連結使用）
   let activeEditable = null;

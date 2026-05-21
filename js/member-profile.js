@@ -14,28 +14,32 @@
 
   function card(title, bodyHTML, actionsHTML = '') {
     const wrap = document.createElement('section');
-    wrap.className = `card-dynamic-bg rounded-xl p-6 fade-appear`;
+    wrap.className = `ui-card card-dynamic-bg fade-appear flex flex-col`;
     wrap.innerHTML = `
-      <header class="mb-4 flex items-center justify-between">
+      <header class="mb-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-3">
         <h2 class="text-xl font-semibold text-[var(--primary)]">${title}</h2>
         <div>${actionsHTML}</div>
       </header>
-      <div>${bodyHTML}</div>
+      <div class="flex-1">${bodyHTML}</div>
     `;
     return wrap;
   }
 
   function textInput(id, label, value, type = 'text', extra = '') {
     return `
-      <label class="block mb-2 text-sm text-gray-700 dark:text-gray-300" for="${id}">${label}</label>
-      <input id="${id}" type="${type}" value="${value || ''}" class="w-full mb-4 rounded border px-3 py-2 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400" ${extra} />
+      <div>
+        <label class="ui-field-label" for="${id}">${label}</label>
+        <input id="${id}" type="${type}" value="${value || ''}" class="ui-input w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all" ${extra} />
+      </div>
     `;
   }
 
   function textArea(id, label, value, rows = 3) {
     return `
-      <label class="block mb-2 text-sm text-gray-700 dark:text-gray-300" for="${id}">${label}</label>
-      <textarea id="${id}" rows="${rows}" class="w-full mb-4 rounded border px-3 py-2 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400">${value || ''}</textarea>
+      <div>
+        <label class="ui-field-label" for="${id}">${label}</label>
+        <textarea id="${id}" rows="${rows}" class="ui-input w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">${value || ''}</textarea>
+      </div>
     `;
   }
 
@@ -191,11 +195,13 @@
 
     // Basic
     const basicBody = `
-      ${textInput('pf-name', '姓名', profile.basic?.name)}
-      ${textInput('pf-email', 'Email', profile.basic?.email, 'email')}
-      ${textInput('pf-phone', '電話', profile.basic?.phone, 'tel')}
-      ${textInput('pf-birthday', '生日', profile.basic?.birthday, 'date')}
-      ${textInput('pf-address', '地址', profile.basic?.address)}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        ${textInput('pf-name', '姓名', profile.basic?.name)}
+        ${textInput('pf-email', 'Email', profile.basic?.email, 'email')}
+        ${textInput('pf-phone', '電話', profile.basic?.phone, 'tel')}
+        ${textInput('pf-birthday', '生日', profile.basic?.birthday, 'date')}
+        <div class="md:col-span-2">${textInput('pf-address', '地址', profile.basic?.address)}</div>
+      </div>
     `;
     const basicActions = '';
     const basicCard = card('基本資料', basicBody, basicActions);
@@ -203,9 +209,11 @@
 
     // Self Evaluation
     const evalBody = `
-      ${textArea('pf-interests', '興趣/志向', profile.selfEvaluation?.interests, 3)}
-      ${textArea('pf-strengths', '優勢/擅長', profile.selfEvaluation?.strengths, 3)}
-      ${textArea('pf-goals', '短中期目標', profile.selfEvaluation?.goals, 3)}
+      <div class="grid grid-cols-1 gap-4">
+        ${textArea('pf-interests', '興趣/志向', profile.selfEvaluation?.interests, 3)}
+        ${textArea('pf-strengths', '優勢/擅長', profile.selfEvaluation?.strengths, 3)}
+        ${textArea('pf-goals', '短中期目標', profile.selfEvaluation?.goals, 3)}
+      </div>
     `;
     const evalActions = '';
     const evalCard = card('自立評估', evalBody, evalActions);
@@ -336,16 +344,10 @@
 
     // Change Password card
     const pwdBody = `
-      <div class="grid flex-wrap gap-3">
-        <label class="text-sm">當前密碼
-          <input id="pwd-current" type="password" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
-        </label>
-        <label class="text-sm">新密碼
-          <input id="pwd-new" type="password" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
-        </label>
-        <label class="text-sm">確認新密碼
-          <input id="pwd-confirm" type="password" class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100">
-        </label>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        ${textInput('pwd-current', '當前密碼', '', 'password')}
+        ${textInput('pwd-new', '新密碼', '', 'password')}
+        ${textInput('pwd-confirm', '確認新密碼', '', 'password')}
       </div>`;
     const pwdActions = `<button id="btn-change-pwd" class="btn-soft btn-purple"><i class="fas fa-key mr-2"></i> 修改密碼</button>`;
     const pwdCard = card('修改密碼', pwdBody, pwdActions);

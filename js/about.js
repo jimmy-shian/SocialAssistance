@@ -103,20 +103,23 @@
     root.innerHTML = `
       <header class="mb-12 text-center">
         <h1 class="heading-display"><span id="hero-typed"></span></h1>
-        <p class="mt-3 lead-text text-gray-700 dark:text-gray-300"><span id="lead-typed"></span></p>
+        <p class="mt-3 lead-text text-[var(--text-primary)]"><span id="lead-typed"></span></p>
       </header>
 
       <section class="mt-12">
         <h2 class="heading-section mb-6">${data.modelTitle || '四階段引導模型'}</h2>
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          ${(data.model || []).map(m => {
-      const link = (m && m.href) ? `<a class=\"link-cta small\" href=\"${m.href}\" target=\"_blank\" rel=\"noopener\">${m.linkText || '前往連結'} <span class=\"arrow\">→</span></a>` : '';
+        <div class="model-steps" id="model-steps">
+          ${(data.model || []).map((m, index) => {
+      const link = (m && m.href) ? `<a class="model-link" href="${m.href}" target="_blank" rel="noopener">${m.linkText || '前往連結'} <span class="arrow">→</span></a>` : '';
       return `
-            <div class=\"about-card p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800 transition-transform duration-150 hover:-translate-y-0.5\">
-              <h3 class=\"font-semibold mb-2\">${m.title}</h3>
-                <p class=\"text-gray-700 dark:text-gray-300 text-sm\">${m.desc || ''}</p>
-                ${link ? `<div class=\"mt-3\">${link}</div>` : ''}
-              </div>`;
+            <div class="model-step model-step-${index + 1}" data-index="${index + 1}">
+              <div class="model-marker">${index + 1}</div>
+              <div class="model-card">
+                <h3 class="model-title">${m.title}</h3>
+                <p class="model-desc">${m.desc || ''}</p>
+                ${link}
+              </div>
+            </div>`;
     }).join('')}
           </div>
       </section>
@@ -126,10 +129,10 @@
         <h2 class=\"heading-section mb-8 text-center\">Our Team.</h2>
         <div class=\"team-grid\">
           ${data.team.map(t => {
-      const roles = (t.roles || []).map(r => `<span class=\"inline-block px-2 py-0.5 rounded-full text-xl bg-[var(--primary)]/20 text-[var(--primary)] mr-1\">${r}</span>`).join('');
-      const motto = t.motto ? `<p class=\"motto italic text-xl text-gray-600 dark:text-gray-300 mt-2\">\"${t.motto}\"</p>` : '';
-      const edu = (t.education || []).map(d => `<li class=\"text-xl\">${d}</li>`).join('');
-      const exp = (t.experience || []).map(d => `<li class=\"text-xl\">${d}</li>`).join('');
+      const roles = (t.roles || []).map(r => `<span class=\"inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--primary)]/10 text-[var(--primary)] mr-1 mb-1 border border-[var(--primary)]/20\">${r}</span>`).join('');
+      const motto = t.motto ? `<p class=\"motto italic text-sm text-gray-500 dark:text-gray-400 mt-3\">\"${t.motto}\"</p>` : '';
+      const edu = (t.education || []).map(d => `<li class=\"text-sm text-gray-600 dark:text-gray-300 mb-1\">${d}</li>`).join('');
+      const exp = (t.experience || []).map(d => `<li class=\"text-sm text-gray-600 dark:text-gray-300 mb-1\">${d}</li>`).join('');
       const socials = (t.socials || []).map(s => {
         const key = String(s.name || '').toLowerCase();
         let icon = '';
@@ -173,8 +176,8 @@
                 <div class=\"card-face back\">
                   <div class=\"team-back-content\">
                     <h4 class=\"team-name mb-2\">${t.name || ''}</h4>
-                    ${edu ? `<div class=\"mb-2\"><p class=\"text-xl font-semibold mb-1\">學歷</p><ul class=\"list-disc pl-4 text-gray-600 dark:text-gray-300\">${edu}</ul></div>` : ''}
-                    ${exp ? `<div class=\"mb-2\"><p class=\"text-xl font-semibold mb-1\">經歷</p><ul class=\"list-disc pl-4 text-gray-600 dark:text-gray-300\">${exp}</ul></div>` : ''}
+                      ${edu ? `<div class="mb-4"><p class="text-sm font-bold text-[var(--primary)] mb-2 tracking-wider">學歷</p><ul class="list-disc pl-4">${edu}</ul></div>` : ''}
+                      ${exp ? `<div class="mb-4"><p class="text-sm font-bold text-[var(--primary)] mb-2 tracking-wider">經歷</p><ul class="list-disc pl-4">${exp}</ul></div>` : ''}
                     ${socials ? `<div class=\"team-socials flex gap-3 mt-3\">${socials}</div>` : ''}
                   </div>
                 </div>
@@ -187,7 +190,7 @@
 
       <section class="mt-16">
         <h2 class="heading-section mb-6">${data.achievementsTitle || '成就經歷'}</h2>
-        <ul class="space-y-2 text-lg text-gray-700 dark:text-gray-300">
+        <ul class="space-y-2 text-lg text-[var(--text-primary)]">
           ${(data.achievements || []).map(a => {
       if (typeof a === 'string') {
         const { html } = numberSpan(a);
@@ -250,7 +253,7 @@
       cards.forEach(card => {
         card.addEventListener('click', (e) => {
           if (e.target.closest('a,button,input,textarea,select,label')) return; // 讓互動元素照常運作
-          card.classList.toggle('is-flipped');
+          card.classList.toggle('flipped');
         });
       });
     } catch (e) { }
