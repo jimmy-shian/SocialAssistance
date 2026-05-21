@@ -8,6 +8,21 @@
   let allUsers = [];                 // raw users (exclude admins + self)
   let currentViewUsers = [];         // after search/sort/filter
 
+  // 判斷是否使用 Wix 模式
+  function isWixMode() {
+    return window.AppConfig && window.AppConfig.isWixMode && window.AppConfig.isWixMode();
+  }
+
+  // Wix 模式的 HTTP 請求
+  async function wixRequest(endpoint, payload) {
+    const base = (window.AppConfig && window.AppConfig.WIX_BASE_URL) || '';
+    const url = base + endpoint;
+    const body = typeof payload === 'string' ? payload : JSON.stringify(payload || {});
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body, credentials: 'omit' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
+  }
+
   function fmtDate(d) {
     try {
       if (!d) return '';
@@ -57,6 +72,16 @@
   }
 
   async function membersList() {
+    // 支援 Wix 模式
+    if (isWixMode()) {
+      try {
+        const endpoint = window.AppConfig.getEndpoint('membersList');
+        const token = localStorage.getItem('auth_token') || '';
+        const resp = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token }), credentials: 'omit' });
+        return await resp.json();
+      } catch (e) { return { ok: false, message: e.message }; }
+    }
+    // GAS 模式
     const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
     const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.membersList) || '';
     const token = localStorage.getItem('auth_token') || '';
@@ -68,6 +93,16 @@
   }
 
   async function profileRead(username) {
+    // 支援 Wix 模式
+    if (isWixMode()) {
+      try {
+        const endpoint = window.AppConfig.getEndpoint('profileRead');
+        const token = localStorage.getItem('auth_token') || '';
+        const resp = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token, username }), credentials: 'omit' });
+        return await resp.json();
+      } catch (e) { return { ok: false, message: e.message }; }
+    }
+    // GAS 模式
     const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
     const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.profileRead) || '';
     const token = localStorage.getItem('auth_token') || '';

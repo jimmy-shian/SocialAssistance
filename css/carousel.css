@@ -88,54 +88,21 @@
 }
 
 
-/* Desktop: Uniform Horizontal Carousel */
+/* Desktop: Uniform Horizontal Grid */
 @media (min-width: 768px) {
     .services-carousel.masonry-mode {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        /* Uniform height */
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
         gap: 24px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        /* Padding for shadow and spacing */
         padding: 20px 10px 40px;
-        scroll-behavior: smooth;
-        scrollbar-width: auto;
     }
 
-    /* Remove old masonry specific overrides */
     .services-carousel.masonry-mode .service-card-carousel {
-        flex: 0 0 300px;
-        /* Fixed width */
-        width: 300px;
+        width: 100%;
         margin: 0 !important;
-        /* Reset any margin-top */
         min-height: 380px;
     }
-
-    /* Custom Scrollbar */
-    .services-carousel.masonry-mode::-webkit-scrollbar {
-        height: 8px;
-        display: block;
-    }
-
-    .services-carousel.masonry-mode::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.05);
-        border-radius: 4px;
-        margin: 0 20px;
-    }
-
-    .services-carousel.masonry-mode::-webkit-scrollbar-thumb {
-        background: rgba(107, 142, 35, 0.3);
-        border-radius: 4px;
-    }
-
-    .services-carousel.masonry-mode::-webkit-scrollbar-thumb:hover {
-        background: rgba(107, 142, 35, 0.6);
-    }
 }
-
 
 /* Mobile: Swipe Carousel */
 @media (max-width: 767px) {
@@ -172,60 +139,4 @@
     .service-bubble {
         padding: 1.25rem;
     }
-}
-
-
-/* Navigation Buttons */
-.sc-nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    color: var(--text-primary);
-    font-size: 1rem;
-    cursor: pointer;
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    opacity: 0;
-    visibility: hidden;
-}
-
-/* Show buttons on hover of wrapper (Desktop only ideally) */
-@media (min-width: 768px) {
-
-    .services-carousel-wrapper:hover .sc-nav-btn,
-    .sc-nav-btn:focus {
-        opacity: 1;
-        visibility: visible;
-    }
-}
-
-.sc-nav-btn:hover {
-    background: var(--primary, #6B8E23);
-    color: white;
-    box-shadow: 0 6px 16px rgba(107, 142, 35, 0.3);
-}
-
-.sc-nav-btn.prev {
-    left: -20px;
-}
-
-.sc-nav-btn.next {
-    right: -20px;
-}
-
-/* Animations */
-/* Focus highlight for autoplay - subtle scale */
-.services-carousel.masonry-mode .service-card-carousel.focus {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(107, 142, 35, 0.2);
-    border: 1px solid rgba(107, 142, 35, 0.3);
 }

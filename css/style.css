@@ -1121,45 +1121,51 @@ textarea:focus {
 }
 
 /* ==============================
-   會員｜登入/註冊翻轉特效
+   會員｜登入/註冊滑動過渡特效
    用法：外層 .auth-flip；內層 .auth-face.front / .auth-face.back
 ============================== */
 .auth-flip {
-  perspective: 1200px;
   position: relative;
-  display: grid;
+  overflow: hidden;
+  /* 不使用 grid，改由 JS 動態設定高度以適應最高表單 */
 }
 
-/* 說明：改用 CSS Grid 疊放兩面，容器高度會依最大內容自動撐高，避免覆蓋 footer */
+/* 滑動過渡：兩面疊加，透過 translateX 滑入滑出 */
 .auth-face {
-  grid-area: 1 / 1;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  transition: transform .6s ease, opacity .6s ease;
+  transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1), opacity .4s ease;
   display: flex;
   flex-direction: column;
   width: 100%;
 }
 
+/* 登入表單（前方）：預設在可見位置 */
 .auth-face.front {
-  transform: rotateY(0deg);
-  z-index: 2;
-}
-
-.auth-face.back {
-  transform: rotateY(180deg);
-  pointer-events: none;
-}
-
-.auth-flip.flipped .auth-face.front {
-  transform: rotateY(-180deg);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.auth-flip.flipped .auth-face.back {
-  transform: rotateY(0deg);
   opacity: 1;
+  transform: translateX(0);
+}
+
+/* 註冊表單（後方）：預設在右側外圍不可見 */
+.auth-face.back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transform: translateX(100%);
+  pointer-events: none;
+}
+
+/* 翻轉後：登入表單滑向左側外圍 */
+.auth-flip.flipped .auth-face.front {
+  opacity: 0;
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+/* 翻轉後：註冊表單從右側滑入 */
+.auth-flip.flipped .auth-face.back {
+  opacity: 1;
+  transform: translateX(0);
   pointer-events: auto;
 }
 
@@ -1526,32 +1532,163 @@ textarea:focus {
    說明：reveal 進場／is-open 展開詳細內容
 ============================== */
 /* ==============================
-   About｜四階段引導模型（階梯）
+   About｜四階段引導模型（階梯 + 追光）
 ============================== */
-.model-stairs {
-  position: relative;
-  overflow: visible;
-}
-
 .model-steps {
   display: flex;
-  align-items: flex-end;
-  gap: 18px;
+  align-items: flex-start;
+  gap: 24px;
+  padding-bottom: 30px;
+  overflow: visible;
 }
 
 .model-step {
   position: relative;
+  flex: 1;
+  min-width: 0;
   transform: translateY(var(--offset, 0px));
-  min-width: 200px;
-  background: #fed7aa;
-  /* amber-200 */
-  border: 1px solid #fdba74;
-  /* orange-300 */
+  transition: transform 0.3s ease;
 }
 
-.dark .model-step {
-  background: #88513e;
-  border-color: #9a3412;
+/* 階梯遞減效果：步1最上、步4最下 */
+.model-step-1 { --offset: 0px; }
+.model-step-2 { --offset: 40px; }
+.model-step-3 { --offset: 80px; }
+.model-step-4 { --offset: 120px; }
+
+/* 響應式階梯偏移量 */
+@media (max-width: 767px) {
+  .model-steps {
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 0;
+  }
+  .model-step {
+    width: 100%;
+    flex: none;
+    --offset: 0px !important;
+  }
+}
+
+/* 數字標記 */
+.model-marker {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.model-step:hover .model-marker {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 卡片本體 - 追光效果 */
+.model-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.model-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 60%
+  );
+  transition: left 0.6s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.model-step:hover .model-card::before {
+  left: 100%;
+}
+
+.model-step:hover .model-card {
+  transform: translateY(-4px);
+  border-color: var(--primary-light);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.dark .model-card::before {
+  background: linear-gradient(
+    110deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 60%
+  );
+}
+
+.dark .model-card {
+  background: var(--bg-surface);
+  border-color: var(--border-strong);
+}
+
+.model-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* 標題與描述 */
+.model-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.model-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* 連結樣式 */
+.model-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.model-link:hover {
+  color: var(--primary-light);
+}
+
+.model-link .arrow {
+  transition: transform 0.2s ease;
+}
+
+.model-link:hover .arrow {
+  transform: translateX(4px);
 }
 
 /* 小型階梯線條（位於卡片左上外側） */
@@ -1564,7 +1701,6 @@ textarea:focus {
   width: 12px;
   height: 12px;
   border-left: 2px solid rgba(234, 88, 12, .7);
-  /* orange-600 */
   border-top: 2px solid rgba(234, 88, 12, .7);
   transform: rotate(0deg);
   border-radius: 2px;
@@ -1581,7 +1717,6 @@ textarea:focus {
 .dark .model-step.has-corner::before,
 .dark .model-step.has-corner::after {
   border-color: rgba(253, 186, 116, .85);
-  /* orange-300 */
 }
 
 .team-section {
@@ -1879,18 +2014,111 @@ textarea:focus {
 }
 
 .nav-brand .brand-title-text {
+  position: absolute;
+  left: calc(100% + 0.75rem);
+  top: 50%;
   opacity: 0;
-  transform: translateY(4px);
-  max-width: 0;
-  overflow: hidden;
+  transform: translateY(calc(-50% + 4px));
   white-space: nowrap;
-  transition: opacity .25s ease, transform .25s ease, max-width .25s ease;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  /* ===== Icy Crystal Glass ===== */
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(255, 255, 255, 0.35) 40%,
+      rgba(255, 255, 255, 0.15) 100%
+    );
+  color: var(--text-primary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 14px;
+  /* Crystal border: outer glow + inner reflection */
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  /* Multi-layer shadow for depth and icy feel */
+  box-shadow:
+    /* Outer ambient soft glow */
+    0 8px 32px rgba(31, 38, 135, .14),
+    /* Sharp outer edge highlight */
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    /* Top bright light reflection */
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.7),
+    /* Bottom subtle depth shadow */
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.15),
+    /* Left soft ice refraction */
+    inset 1px 0 0 rgba(255, 255, 255, 0.35),
+    /* Right soft ice refraction */
+    inset -1px 0 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px) saturate(220%);
+  -webkit-backdrop-filter: blur(24px) saturate(220%);
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Specular highlight — diagonal shine reflection */
+.nav-brand .brand-title-text::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.35) 48%,
+    rgba(255, 255, 255, 0.5) 52%,
+    transparent 65%
+  );
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Top edge ice glow */
+.nav-brand .brand-title-text::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.9) 45%,
+    rgba(255, 255, 255, 0.9) 55%,
+    transparent 100%
+  );
+  filter: blur(0.5px);
+  pointer-events: none;
+}
+
+.dark .nav-brand .brand-title-text {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.06) 40%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1.5px 0 rgba(255, 255, 255, 0.06),
+    inset 1px 0 0 rgba(255, 255, 255, 0.15),
+    inset -1px 0 0 rgba(255, 255, 255, 0.04);
 }
 
 .nav-brand:hover .brand-title-text {
   opacity: 1;
-  transform: translateY(0);
-  max-width: 280px;
+  transform: translateY(-50%);
+}
+
+/* Mobile: hide brand title text */
+@media (max-width: 767px) {
+  .nav-brand .brand-title-text {
+    display: none;
+  }
 }
 
 /* ==============================

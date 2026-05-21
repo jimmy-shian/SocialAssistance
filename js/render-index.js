@@ -44,7 +44,7 @@
       c.innerHTML = `
         <span class="block text-[var(--primary)] font-bold mb-2 tracking-widest text-sm">${h.label || 'SOUND CORE STUDIO'}</span>
         <h1 class="text-4xl md:text-5xl font-black mb-4 leading-tight">${h.title || ''}</h1>
-        <p class="text-lg text-gray-700 mb-6 italic">${h.subtitle || ''}</p>
+        <p class="text-lg text-gray-700 dark:text-red-300 mb-6 italic">${h.subtitle || ''}</p>
         ${h.info ? `<div class="mb-6 text-base text-gray-800 dark:text-gray-200 font-semibold leading-relaxed">${h.info}</div>` : ''}
         <div class="flex gap-4">${btns}</div>
       `;
@@ -85,43 +85,9 @@
 
       box.innerHTML = items;
 
-      // Desktop: Enable horizontal masonry mode with autoplay & navigation
+      // Desktop: Enable horizontal masonry mode (grid)
       if (window.innerWidth >= 768) {
         box.classList.add('masonry-mode');
-
-        // Autoplay Loop
-        const cards = box.querySelectorAll('.service-card-carousel');
-        if (cards.length > 0) {
-          let focusIndex = 0;
-          cards[0].classList.add('focus');
-          setInterval(() => {
-            cards[focusIndex].classList.remove('focus');
-            focusIndex = (focusIndex + 1) % cards.length;
-            cards[focusIndex].classList.add('focus');
-          }, 3000);
-        }
-
-        // Add Navigation Buttons
-        const wrapper = box.parentElement;
-        if (wrapper && !wrapper.querySelector('.sc-nav-btn')) {
-          const btnPrev = document.createElement('button');
-          btnPrev.className = 'sc-nav-btn prev';
-          btnPrev.innerHTML = '<i class="fas fa-chevron-left"></i>';
-
-          const btnNext = document.createElement('button');
-          btnNext.className = 'sc-nav-btn next';
-          btnNext.innerHTML = '<i class="fas fa-chevron-right"></i>';
-
-          wrapper.appendChild(btnPrev);
-          wrapper.appendChild(btnNext);
-
-          btnPrev.addEventListener('click', () => {
-            box.scrollBy({ left: -300, behavior: 'smooth' });
-          });
-          btnNext.addEventListener('click', () => {
-            box.scrollBy({ left: 300, behavior: 'smooth' });
-          });
-        }
       }
     }
   }
@@ -148,13 +114,13 @@
     const grid = document.getElementById('blog-posts');
     if (grid) {
       grid.innerHTML = data.blogPosts.slice(0, 3).map(post => `
-        <a href="${post.link || './blog.html'}" class="blog-card card-dynamic-bg">
-          <div class="blog-card-image">
-            <img src="${post.image}" alt="${post.title}">
+        <a href="${post.link || './blog.html'}" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
+          <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
+            <img src="${post.image}" alt="${post.title}" class="w-full h-48 object-cover">
           </div>
-          <div class="blog-card-content">
-            <p class="blog-card-date">${post.date}</p>
-            <h4>${post.title}</h4>
+          <div class="blog-card-content flex flex-col flex-1">
+            <p class="blog-card-date ui-eyebrow">${post.date}</p>
+            <h4 class="ui-card-title">${post.title}</h4>
           </div>
         </a>
       `).join('');

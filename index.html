@@ -70,11 +70,11 @@
 
     <div class="container mx-auto px-6 relative z-10">
       <!-- Philosophy / About Section - Dynamically rendered from siteContent.js -->
-      <section class="philosophy-section asym-layout mt-5" id="about">
+      <section class="philosophy-section asym-layout mt-24 mb-16" id="about">
         <div class="philosophy-image-box">
           <!-- Image rendered by render-index.js -->
         </div>
-        <div class="philosophy-content offset-border p-8 bg-white/80 backdrop-blur-sm rounded-xl">
+        <div class="philosophy-content offset-border p-8 rounded-xl">
           <!-- Content rendered by render-index.js -->
         </div>
       </section>
@@ -99,7 +99,7 @@
       </section>
 
       <!-- SDGs Section - Dynamically rendered from siteContent.js -->
-      <section class="sdgs-section" id="sdgs">
+      <section class="sdgs-section mt-24 mb-16" id="sdgs">
         <h2>🌱 符合聯合國永續發展目標 (SDGs)</h2>
         <div class="sdgs-grid">
           <!-- Rendered dynamically by render-index.js from siteContent.js -->
@@ -175,7 +175,7 @@
       </script>
 
       <!-- Resources / Blog Section -->
-      <section class="resources-section" id="resources">
+      <section class="resources-section mb-12" id="resources">
         <h2 class="section-title">資源與部落格</h2>
         <div class="resources-tags">
           <a href="./member.html" class="resource-tag">問卷與回饋</a>
@@ -185,31 +185,31 @@
         </div>
         <div class="blog-grid" id="blog-posts">
           <!-- Blog posts will be loaded dynamically or can be static -->
-          <a href="./member.html" class="blog-card">
-            <div class="blog-card-image">
-              <img src="./img/DSC01739__8a8686e4b1.jpg" alt="活動紀錄">
+          <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
+            <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
+              <img src="./img/DSC01739__8a8686e4b1.jpg" alt="活動紀錄" class="w-full h-48 object-cover">
             </div>
-            <div class="blog-card-content">
-              <p class="blog-card-date">2025/12/15</p>
-              <h4>冬季攀樹營隊精彩回顧</h4>
-            </div>
-          </a>
-          <a href="./member.html" class="blog-card">
-            <div class="blog-card-image">
-              <img src="./img/1000010964_bdb0404a99.jpg" alt="活動紀錄">
-            </div>
-            <div class="blog-card-content">
-              <p class="blog-card-date">2025/11/28</p>
-              <h4>自立生活技能工作坊成果發表</h4>
+            <div class="blog-card-content flex flex-col flex-1">
+              <p class="blog-card-date ui-eyebrow">2025/12/15</p>
+              <h4 class="ui-card-title">冬季攀樹營隊精彩回顧</h4>
             </div>
           </a>
-          <a href="./member.html" class="blog-card">
-            <div class="blog-card-image">
-              <img src="./img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg" alt="活動紀錄">
+          <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
+            <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
+              <img src="./img/1000010964_bdb0404a99.jpg" alt="活動紀錄" class="w-full h-48 object-cover">
             </div>
-            <div class="blog-card-content">
-              <p class="blog-card-date">2025/10/20</p>
-              <h4>與在地產業夥伴的合作交流</h4>
+            <div class="blog-card-content flex flex-col flex-1">
+              <p class="blog-card-date ui-eyebrow">2025/11/28</p>
+              <h4 class="ui-card-title">自立生活技能工作坊成果發表</h4>
+            </div>
+          </a>
+          <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
+            <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
+              <img src="./img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg" alt="活動紀錄" class="w-full h-48 object-cover">
+            </div>
+            <div class="blog-card-content flex flex-col flex-1">
+              <p class="blog-card-date ui-eyebrow">2025/10/20</p>
+              <h4 class="ui-card-title">與在地產業夥伴的合作交流</h4>
             </div>
           </a>
         </div>

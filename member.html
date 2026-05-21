@@ -40,7 +40,7 @@
   <main class="container mx-auto px-6 pt-12 flex items-center justify-center">
     <div class="auth-flip w-full max-w-xl md:max-w-2xl">
       <form id="login-form"
-        class="auth-face front bg-[var(--bg-surface)] shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 max-w-md mx-auto">
+        class="auth-face front ui-card mb-4 max-w-md mx-auto flex flex-col">
         <h1 id="login-title" class="text-2xl font-bold text-center mb-8 text-gradient">會員登入</h1>
         <script>
           (function () {
@@ -64,7 +64,7 @@
           <div class="mb-4">
             <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="username">帳號</label>
             <input id="username" name="username" type="text" autocomplete="username" placeholder="請輸入帳號"
-              class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+              class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
               required>
           </div>
 
@@ -72,7 +72,7 @@
             <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="password">密碼</label>
             <div class="relative overflow-visible">
               <input id="password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼"
-                class="appearance-none border rounded w-full py-2 px-3 pr-16 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 has-toggle"
+                class="appearance-none border rounded w-full py-2 px-3 pr-16 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 has-toggle focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                 required>
               <button type="button" id="toggle-password" aria-label="顯示/隱藏密碼"
                 class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md text-gray-600 dark:text-gray-200 bg-white dark:bg-gray-700 ring-1 ring-gray-300 dark:ring-gray-600 flex items-center justify-center z-20">
@@ -105,34 +105,34 @@
 
       <!-- Register Form -->
       <form id="register-form"
-        class="auth-face back bg-[var(--bg-surface)] shadow-md rounded-lg px-8 pt-6 pb-8 mb-4 hidden max-w-md mx-auto">
+        class="auth-face back ui-card max-w-md mx-auto flex flex-col">
         <h1 class="text-2xl font-bold text-center mb-8 text-gradient">會員註冊</h1>
 
         <div class="mb-4">
           <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-username">帳號</label>
           <input id="reg-username" name="username" type="text" autocomplete="username" placeholder="請輸入帳號"
-            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
             required>
         </div>
 
         <div class="mb-4">
           <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-email">Email</label>
           <input id="reg-email" name="email" type="email" autocomplete="email" placeholder="your@email.com"
-            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
             required>
         </div>
 
         <div class="mb-2">
           <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-password">密碼</label>
           <input id="reg-password" name="password" type="password" autocomplete="new-password" placeholder="請輸入密碼"
-            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
             required>
         </div>
 
         <div class="mb-4">
           <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="reg-confirm">確認密碼</label>
           <input id="reg-confirm" name="confirm" type="password" autocomplete="new-password" placeholder="再次輸入密碼"
-            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+            class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
             required>
           <div class="mt-2 text-xs text-gray-600 dark:text-gray-300" id="reg-pwd-hint">至少 8 碼，建議同時包含大小寫、數字與符號。</div>
         </div>
@@ -143,8 +143,8 @@
             <span id="reg-strength-label" class="text-gray-600 dark:text-gray-300">密碼強度：-</span>
             <span id="reg-strength-score" class="text-gray-500 dark:text-gray-400">0/5</span>
           </div>
-          <div class="h-2 bg-gray-200 dark:bg-gray-600 rounded overflow-hidden mt-2">
-            <div id="reg-strength-bar" class="h-full w-0 bg-red-500 transition-all duration-300"></div>
+          <div class="h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden mt-2 border border-gray-300 dark:border-gray-500 shadow-inner">
+            <div id="reg-strength-bar" class="h-full w-0 bg-red-500 transition-all duration-500 ease-out"></div>
           </div>
           <div class="mt-2 text-xs text-gray-600 dark:text-gray-300" id="reg-strength-rules">
             <ul class="grid grid-cols-2 gap-x-4 gap-y-1">

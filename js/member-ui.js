@@ -79,6 +79,23 @@
       }
     } catch (e) { }
 
+    // 計算並設置容器高度為兩個表單的最大高度
+    function updateFlipHeight() {
+      if (!flip || !form || !regForm) return;
+      const wasHidden = regForm.classList.contains('hidden');
+      if (wasHidden) regForm.classList.remove('hidden');
+      const h1 = form.offsetHeight;
+      const h2 = regForm.offsetHeight;
+      const max = Math.max(h1, h2);
+      flip.style.height = max + 'px';
+      if (wasHidden) regForm.classList.add('hidden');
+    }
+
+    // 初始化和切換時更新高度
+    updateFlipHeight();
+    // 监听窗口大小变化，重新计算高度
+    window.addEventListener('resize', updateFlipHeight);
+
     // Apply Font Awesome icons to buttons/links for consistency
     try {
       const icon = (html) => html; // helper placeholder
@@ -212,14 +229,16 @@
     });
 
     // Switch to register / login
-    // 翻轉切換（登入 <-> 註冊）
+    // 滑動過渡（登入 <-> 註冊）
     qs('#switch-to-register')?.addEventListener('click', () => {
-      if (regForm) regForm.classList.remove('hidden');
       flip?.classList.add('flipped');
+      // 切換後重新計算高度（因元素可能因css变化而高度改變）
+      setTimeout(updateFlipHeight, 400);
     });
     qs('#switch-to-login')?.addEventListener('click', () => {
       flip?.classList.remove('flipped');
-      // 不再加 hidden，保留兩面以供翻轉
+      // 切換後重新計算高度
+      setTimeout(updateFlipHeight, 400);
     });
 
     // Admin verify modal（用於註冊時選擇是否升級管理者並輸入驗證碼）

@@ -1,6 +1,15 @@
-// Member data access layer (localStorage demo; optional GAS backend)
+/**
+ * member-data.js
+ * 會員資料存取層
+ * 支援 GAS 和 Wix 兩種後端模式
+ */
 (function () {
   const AppConfig = window.AppConfig || { GAS_BASE_URL: '', endpoints: { profileRead: '/profileRead', profileUpdate: '/profileUpdate' } };
+  
+  // 判斷是否使用 Wix 模式
+  const USE_WIX = AppConfig.isWixMode ? AppConfig.isWixMode() : false;
+  const WIX_BASE = AppConfig.WIX_BASE_URL || '';
+  const WIX_EP = AppConfig.wixEndpoints || {};
 
   function key(username) { return `profile:${username}`; }
 
@@ -26,8 +35,36 @@
     } catch(e){ return false; }
   }
 
+  // Wix 模式的 HTTP 請求
+  async function wixRequest(endpoint, payload) {
+    const url = WIX_BASE + endpoint;
+    const body = typeof payload === 'string' ? payload : JSON.stringify(payload || {});
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body, credentials: 'omit' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
+  }
+
   async function loadProfile(username) {
     username = username || (localStorage.getItem('auth_user') || 'guest');
+    
+    if (USE_WIX) {
+      try {
+        const token = localStorage.getItem('auth_token') || '';
+        const res = await wixRequest(WIX_EP.profileRead, { token });
+        if (res && res.ok && res.data) {
+          // 快取到 localStorage
+          localStorage.setItem(key(username), JSON.stringify(res.data));
+          return res.data;
+        }
+      } catch (e) {
+        console.warn('Wix profile fetch failed, falling back to local', e);
+      }
+      // Fallback to local
+      const raw = localStorage.getItem(key(username));
+      return raw ? JSON.parse(raw) : defaultProfile(username);
+    }
+    
+    // GAS 模式
     const base = AppConfig.GAS_BASE_URL || '';
     if (base) {
       try {
@@ -38,13 +75,12 @@
           const data = await resp.json();
           if (data && data.ok) {
             const remote = data.profile || data;
-            // 若遠端是空白，但本地有資料，則自動上傳一次做遷移
             try {
               const localRaw = localStorage.getItem(key(username));
               if (!hasMeaningfulContent(remote) && localRaw){
                 const localObj = JSON.parse(localRaw);
                 if (hasMeaningfulContent(localObj)) {
-                  await saveProfile(username, localObj); // 嘗試同步到 GAS
+                  await saveProfile(username, localObj);
                   return localObj;
                 }
               }
@@ -63,6 +99,25 @@
 
   async function saveProfile(username, profile) {
     username = username || (localStorage.getItem('auth_user') || 'guest');
+    
+    if (USE_WIX) {
+      try {
+        const token = localStorage.getItem('auth_token') || '';
+        const res = await wixRequest(WIX_EP.profileUpdate, { token, data: profile });
+        if (res && res.ok) {
+          // 同步到 localStorage
+          localStorage.setItem(key(username), JSON.stringify(profile));
+          return { ok: true };
+        }
+        return res;
+      } catch (e) {
+        console.warn('Wix profile save failed, saving local instead', e);
+      }
+      localStorage.setItem(key(username), JSON.stringify(profile));
+      return { ok: true };
+    }
+    
+    // GAS 模式
     const base = AppConfig.GAS_BASE_URL || '';
     if (base) {
       try {

@@ -30,21 +30,11 @@
             <!-- Category Tabs -->
             <section class="mb-10">
                 <div class="flex flex-wrap justify-center gap-3" id="blog-tabs">
-                    <button
-                        class="blog-tab active px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--primary)] text-white font-medium transition-all"
-                        data-category="all">全部</button>
-                    <button
-                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                        data-category="daily">聽見日常</button>
-                    <button
-                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                        data-category="news">重要通知</button>
-                    <button
-                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                        data-category="interview">人物專訪</button>
-                    <button
-                        class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--primary)]/10 font-medium transition-all"
-                        data-category="glory">榮耀時刻</button>
+                    <button class="blog-tab active px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="all">全部</button>
+                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="daily">聽見日常</button>
+                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="news">重要通知</button>
+                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="interview">人物專訪</button>
+                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="glory">榮耀時刻</button>
                 </div>
             </section>
 
@@ -127,12 +117,8 @@
                 // Tab click handling
                 tabs.forEach(tab => {
                     tab.addEventListener('click', () => {
-                        tabs.forEach(t => {
-                            t.classList.remove('active', 'bg-[var(--primary)]', 'text-white');
-                            t.classList.add('bg-[var(--bg-surface)]', 'text-[var(--text-secondary)]');
-                        });
-                        tab.classList.add('active', 'bg-[var(--primary)]', 'text-white');
-                        tab.classList.remove('bg-[var(--bg-surface)]', 'text-[var(--text-secondary)]');
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
 
                         visibleCount = 6; // Reset visible count
                         renderPosts(tab.dataset.category);
@@ -162,6 +148,22 @@
                     opacity: 1;
                     transform: translateY(0);
                 }
+            }
+
+            .blog-tab {
+                background-color: var(--bg-surface);
+                color: var(--text-secondary);
+            }
+
+            .blog-tab:hover {
+                background-color: color-mix(in srgb, var(--primary) 10%, var(--bg-surface));
+            }
+
+            .blog-tab.active {
+                background-color: var(--primary);
+                color: white;
+                border-color: var(--primary);
+                box-shadow: var(--ui-shadow-soft);
             }
 
             .blog-post-card {

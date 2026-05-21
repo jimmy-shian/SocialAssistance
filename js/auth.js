@@ -1,6 +1,15 @@
-// Authentication helpers (ready for future GAS backend)
+/**
+ * auth.js
+ * 會員認證模組
+ * 支援 GAS 和 Wix 兩種後端模式
+ */
 (function () {
   const AppConfig = window.AppConfig || { GAS_BASE_URL: '', endpoints: { memberLogin: '/memberLogin', memberRegister: '/memberRegister', memberForgot: '/memberForgot', profileRead: '/profileRead', profileUpdate: '/profileUpdate' } };
+  
+  // 判斷是否使用 Wix 模式
+  const USE_WIX = AppConfig.isWixMode ? AppConfig.isWixMode() : false;
+  const WIX_BASE = AppConfig.WIX_BASE_URL || '';
+  const WIX_EP = AppConfig.wixEndpoints || {};
 
   function evaluatePasswordStrength(pwd) {
     const max = 5;
@@ -28,8 +37,31 @@
     return { score, label, color, max, rules: { length8, length12, mixcase, digit, symbol } };
   }
 
+  // Wix 模式的 HTTP 請求
+  async function wixRequest(endpoint, payload) {
+    const url = WIX_BASE + endpoint;
+    const body = typeof payload === 'string' ? payload : JSON.stringify(payload || {});
+    const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body, credentials: 'omit' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    return await resp.json();
+  }
+
   async function register(username, email, password, options) {
     if (!username || !email || !password) return { ok: false, message: '請完整填寫資料' };
+    
+    if (USE_WIX) {
+      try {
+        const res = await wixRequest(WIX_EP.memberRegister, { username, email, password });
+        if (res && res.ok) {
+          // 註冊成功後自動登入
+          return { ok: true, role: 'member' };
+        }
+        return { ok: false, message: res?.message || '註冊失敗' };
+      } catch (e) {
+        return { ok: false, message: '註冊錯誤：' + e.message };
+      }
+    }
+    
     const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
     if (base) {
       try {
@@ -53,7 +85,7 @@
         return { ok:false, message: '註冊錯誤：' + e.message };
       }
     }
-    // Demo local registration: ensure unique username in localStorage
+    // Demo local registration
     const key = 'registered_users';
     const list = JSON.parse(localStorage.getItem(key) || '[]');
     if (list.some(u => u.username === username)) return { ok:false, message: '此帳號已被註冊' };
@@ -67,6 +99,22 @@
 
   async function login(username, password) {
     if (!username || !password) return { ok: false, message: '請輸入帳號與密碼' };
+    
+    if (USE_WIX) {
+      try {
+        const res = await wixRequest(WIX_EP.memberLogin, { username, password });
+        if (res && res.ok && res.token) {
+          localStorage.setItem('auth_token', res.token);
+          localStorage.setItem('auth_user', username);
+          if (res.role) localStorage.setItem('auth_role', res.role);
+          return { ok: true, token: res.token, role: res.role || 'member' };
+        }
+        return { ok: false, message: res?.message || '帳號或密碼錯誤' };
+      } catch (e) {
+        return { ok: false, message: '登入錯誤：' + e.message };
+      }
+    }
+    
     const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
     if (base) {
       try {
@@ -82,7 +130,6 @@
           const msg = (data && (data.message || data.error)) || '帳號或密碼錯誤';
           return { ok: false, message: msg };
         }
-        // 後端可能以 200 回傳但 ok:false 或未帶 token，優先顯示後端訊息
         if (data && data.ok === false) {
           const msg = data.message || '帳號或密碼錯誤';
           return { ok: false, message: msg };
@@ -99,7 +146,7 @@
         return { ok: false, message: '登入錯誤：' + e.message };
       }
     }
-    // Demo mode (no backend): accept demo users
+    // Demo mode
     if (password.length >= 6) {
       const token = 'demo-token';
       localStorage.setItem('auth_token', token);
@@ -117,6 +164,16 @@
   }
 
   async function forgot(usernameOrEmail){
+    if (USE_WIX) {
+      try {
+        const email = usernameOrEmail.includes('@') ? usernameOrEmail : null;
+        const res = await wixRequest(WIX_EP.memberForgot, { email });
+        return res;
+      } catch (e) {
+        return { ok: false, message: '忘記密碼錯誤：' + e.message };
+      }
+    }
+    
     const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
     if (!base) return { ok:false, message: '未設定後端' };
     try {
@@ -130,6 +187,20 @@
   }
 
   async function changePassword(currentPassword, newPassword){
+    if (USE_WIX) {
+      try {
+        const token = localStorage.getItem('auth_token') || '';
+        const res = await wixRequest(WIX_EP.memberChangePassword, { 
+          token, 
+          oldPassword: currentPassword, 
+          newPassword 
+        });
+        return res;
+      } catch (e) {
+        return { ok: false, message: '修改密碼錯誤：' + e.message };
+      }
+    }
+    
     const base = (AppConfig && AppConfig.GAS_BASE_URL) || '';
     if (!base) return { ok:false, message: '未設定後端' };
     try {

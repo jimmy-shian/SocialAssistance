@@ -80,6 +80,11 @@
     box-shadow: 15px 15px 0 rgba(0, 0, 0, 0.1);
 }
 
+/* Dark mode for hero-content-asym */
+html.dark .hero-content-asym {
+    background: rgba(45, 42, 36, 0.95);
+}
+
 /* Responsive adjustment */
 @media (max-width: 768px) {
     .hero-slider-asym {
@@ -132,6 +137,21 @@
     gap: 4rem;
 }
 
+/* Philosophy content card styling */
+.philosophy-content {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius, 1rem);
+    border: 1px solid var(--border);
+    box-shadow: var(--ui-shadow-soft, 0 8px 28px rgba(45, 42, 36, 0.06));
+    padding: 1.5rem;
+}
+
+/* Dark mode for philosophy-content */
+html.dark .philosophy-content {
+    background: rgba(45, 42, 36, 0.9);
+}
+
 /* Mobile: Stack vertically and keep text readable */
 @media (max-width: 768px) {
     .philosophy-section.asym-layout {
@@ -144,6 +164,8 @@
         text-orientation: mixed !important;
         word-break: break-word;
         overflow-wrap: break-word;
+        padding: 1rem;
+        border-radius: 0.75rem;
     }
 
     .philosophy-content blockquote {
