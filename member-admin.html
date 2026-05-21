@@ -49,7 +49,7 @@
     </header>
 
     <section class="grid md:grid-cols-3 gap-6 items-start">
-      <aside class="md:col-span-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <aside class="md:col-span-1 ui-panel flex flex-col gap-3">
         <div class="flex items-center gap-2 mb-3">
           <input id="search-user" type="text" placeholder="搜尋帳號或 Email"
             class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]">
@@ -99,9 +99,8 @@
         <ul id="users-list" class="space-y-2 max-h-[60vh] overflow-auto" aria-live="polite"></ul>
       </aside>
 
-      <section
-        class="md:col-span-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-        <header class="mb-2 flex items-center justify-between">
+      <section class="md:col-span-2 ui-card min-h-[60vh]">
+        <header class="mb-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 pb-3">
           <h2 class="text-xl font-semibold text-[var(--primary)]">學員資料</h2>
           <div class="text-sm text-gray-500" id="selected-user-label">未選擇</div>
         </header>

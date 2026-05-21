@@ -1,0 +1,80 @@
+/* 服務項目卡片網格 */
+.services-section {
+  position: relative;
+  width: 100%;
+  height: auto;
+  background: transparent;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 服務卡片樣式 */
+.service-card {
+  background-color: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+}
+
+.service-icon {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 1.25rem;
+  background-color: #6b8e23;
+  color: #fff;
+  margin-bottom: 0.75rem;
+}
+
+.service-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.service-desc {
+  font-size: 0.875rem;
+  color: #606060;
+  line-height: 1.5;
+}
+
+.service-action {
+  margin-top: 1rem;
+}
+
+.service-action a {
+  display: inline-flex;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  background-color: #6b8e23;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.service-action a:hover {
+  background-color: #556b2f;
+}

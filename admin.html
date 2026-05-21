@@ -77,19 +77,19 @@
         </div>
       </div>
       <section id="admin-login" class="w-full max-w-md mx-auto">
-        <div class="rounded-lg shadow p-6 bg-white dark:bg-gray-800">
+        <div class="ui-card card-dynamic-bg p-8">
           <h2 class="text-xl font-semibold mb-4">管理員登入</h2>
           <div class="space-y-3">
             <div>
               <label class="block text-sm mb-1">帳號</label>
               <input id="adm-usr" type="text"
-                class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                class="ui-input w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                 placeholder="admin">
             </div>
             <div>
               <label class="block text-sm mb-1">密碼</label>
               <input id="adm-pwd" type="password"
-                class="w-full rounded border px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                class="ui-input w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                 placeholder="請輸入密碼">
             </div>
             <div class="flex items-center gap-2">
@@ -180,7 +180,7 @@
           </div>
         </div>
         <!-- Live Preview Panel -->
-        <section id="preview-panel" class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow hidden">
+        <section id="preview-panel" class="mt-4 ui-card card-dynamic-bg p-4 hidden">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <h3 class="font-semibold">即時預覽（嵌入實際頁面）</h3>
             <div class="flex gap-2 items-center text-sm text-gray-500">
@@ -218,7 +218,7 @@
             </label>
           </div>
 
-          <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="font-semibold">四階段模型（model）</h4>
               <button id="ab-add-model" class="btn-soft btn-purple">新增卡片</button>
@@ -226,7 +226,7 @@
             <div id="ab-model-list" class="space-y-3"></div>
           </div>
 
-          <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4 mb-2">
               <label class="text-sm">成就區塊標題（achievementsTitle）
                 <input id="ab-ach-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
@@ -240,7 +240,7 @@
             <div id="ab-ach-list" class="space-y-3"></div>
           </div>
 
-          <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="font-semibold">Our Team（team）</h4>
               <button id="ab-add-team" class="btn-soft btn-purple">新增成員</button>
@@ -260,7 +260,7 @@
           </header>
 
           <!-- Hero Section -->
-          <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
             <h4 class="font-semibold mb-3">Hero 區塊 (Hero Slider)</h4>
             <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
               <label class="text-sm block">主標題 (Hero Title)<textarea id="sc-hero-title" rows="2"
@@ -280,7 +280,7 @@
           </div>
 
           <!-- Philosophy Section -->
-          <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
             <h4 class="font-semibold mb-3">理念區塊 (About/Philosophy)</h4>
             <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
               <label class="text-sm block">標籤 (Label)<input id="sc-phil-label"
@@ -306,7 +306,7 @@
           </div>
 
           <!-- Services Section -->
-          <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="font-semibold">服務項目 (Services)</h4>
               <button id="sc-add-service" class="btn-soft btn-purple">新增服務</button>
@@ -322,7 +322,7 @@
             <p class="text-sm text-gray-600 dark:text-gray-300">管理最新消息與文章。</p>
           </header>
 
-          <div class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="font-semibold">文章列表 (posts)</h4>
               <button id="bl-add-post" class="btn-soft btn-purple">新增文章</button>
@@ -369,7 +369,7 @@
 
           <!-- 基本資料 -->
           <div id="pv-basic"
-            class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+            class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-4 mt-4 ui-card card-dynamic-bg p-4">
             <div>
               <label class="text-sm">name（顯示名稱）
                 <input id="pv-name" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
@@ -434,7 +434,7 @@
           </div>
 
           <!-- 時間軸（timeline） -->
-          <div id="pv-timeline" class="mt-4 p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div id="pv-timeline" class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="font-semibold">課程安排（timeline）</h4>
               <button id="pv-add-tl" class="btn-soft btn-purple">新增時段</button>

@@ -1,0 +1,378 @@
+/* Mature SaaS layout refinement layer. Keeps existing brand colors intact. */
+:root {
+  --ui-container: min(1120px, calc(100vw - 32px));
+  --ui-container-wide: min(1280px, calc(100vw - 32px));
+  --ui-radius: 12px;
+  --ui-radius-sm: 8px;
+  --ui-shadow: 0 16px 48px rgba(45, 42, 36, 0.08);
+  --ui-shadow-soft: 0 8px 28px rgba(45, 42, 36, 0.06);
+}
+
+body {
+  letter-spacing: 0;
+}
+
+#nav-placeholder > header {
+  position: sticky;
+  top: 0;
+  background: color-mix(in srgb, var(--bg-surface) 94%, transparent);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+#nav-placeholder nav,
+main.container,
+.container.mx-auto {
+  max-width: var(--ui-container-wide);
+}
+
+#nav-placeholder nav {
+  min-height: 64px;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+.nav-link {
+  font-size: 0.92rem;
+}
+
+.nav-cta,
+.btn-soft,
+.btn-cta {
+  border-radius: var(--ui-radius-sm) !important;
+  min-height: 40px;
+  gap: 0.4rem;
+  font-weight: 650;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.btn-soft:hover,
+.btn-cta:hover,
+.nav-cta:hover {
+  filter: brightness(0.98);
+  transform: none !important;
+}
+
+.ui-card,
+.ui-panel,
+.card-dynamic-bg,
+.auth-face,
+#admin-login .rounded-lg,
+#survey-modal .relative.bg-white,
+aside.bg-white,
+section.bg-white {
+  border-radius: var(--ui-radius) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.card-dynamic-bg {
+  backdrop-filter: none;
+  background: color-mix(in srgb, var(--bg-surface) 94%, white 6%);
+}
+
+html.dark .card-dynamic-bg {
+  background: color-mix(in srgb, var(--bg-surface) 92%, black 8%);
+}
+
+.card-dynamic-bg::before {
+  display: none;
+}
+
+.ui-card {
+  background: var(--bg-surface);
+  padding: 1.25rem;
+}
+
+.ui-panel {
+  background: color-mix(in srgb, var(--bg-surface) 96%, var(--bg-highlight) 4%);
+  padding: 1rem;
+}
+
+.ui-survey-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ui-eyebrow,
+.ui-section-kicker {
+  color: var(--text-tertiary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.ui-card-title {
+  color: var(--text-primary);
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  font-weight: 750;
+  line-height: 1.35;
+  margin-top: 0.25rem;
+}
+
+.ui-card-desc {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin-top: 0.35rem;
+}
+
+.ui-empty-state,
+.ui-loading-state {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--ui-radius);
+  background: color-mix(in srgb, var(--bg-surface) 88%, var(--bg-highlight) 12%);
+  color: var(--text-secondary);
+  padding: 2rem;
+  text-align: center;
+}
+
+.ui-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 0.75rem;
+  color: var(--primary);
+}
+
+.ui-list-row {
+  border: 1px solid var(--border);
+  border-radius: var(--ui-radius-sm);
+  background: color-mix(in srgb, var(--bg-surface) 96%, var(--bg-highlight) 4%);
+  padding: 0.75rem 0.85rem;
+}
+
+.ui-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.55rem 0;
+}
+
+.ui-detail-row:last-child {
+  border-bottom: 0;
+}
+
+.ui-field-label {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.ui-input,
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
+textarea,
+select {
+  border-radius: var(--ui-radius-sm) !important;
+  border-color: var(--border-strong) !important;
+  min-height: 42px;
+}
+
+.ui-form-section {
+  border: 1px solid var(--border);
+  border-radius: var(--ui-radius);
+  padding: 1rem;
+  background: color-mix(in srgb, var(--bg-surface) 96%, var(--bg-highlight) 4%);
+}
+
+.ui-section-title {
+  color: var(--primary);
+  font-size: 1.05rem;
+  font-weight: 750;
+  margin-bottom: 1rem;
+}
+
+.ui-option-grid {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.ui-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--ui-radius-sm);
+  cursor: pointer;
+  padding: 0.65rem 0.75rem;
+  background: var(--bg-surface);
+}
+
+.ui-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.rating-star {
+  color: var(--text-tertiary);
+  border-radius: 999px;
+  padding: 0.25rem;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.rating-star.is-active {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.auth-flip {
+  max-width: 520px;
+}
+
+.auth-face {
+  padding: 1.5rem !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--ui-shadow-soft) !important;
+}
+
+html.dark .auth-face {
+  background: rgba(45, 42, 36, 0.9) !important;
+  border-color: var(--border) !important;
+}
+
+.auth-face h1,
+main > header h1 {
+  line-height: 1.25;
+}
+
+#profile-sections {
+  max-width: var(--ui-container-wide);
+  margin-inline: auto;
+}
+
+#profile-sections .grid {
+  gap: 1rem;
+}
+
+#admin-toolbar {
+  border-radius: 16px !important;
+  max-width: var(--ui-container-wide);
+}
+
+.hero-slider-asym {
+  min-height: clamp(560px, 72vh, 760px);
+}
+
+.hero-content-asym {
+  border-radius: 20px !important;
+  border: 1px solid var(--border-strong) !important;
+  box-shadow: var(--ui-shadow);
+  max-width: 560px;
+}
+
+.philosophy-section.asym-layout,
+.resources-section,
+.team-section,
+.sdgs-section {
+  margin-top: clamp(2rem, 5vw, 4rem);
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+}
+
+.philosophy-content.offset-border::before {
+  display: none;
+}
+
+.philosophy-content {
+  border: 1px solid var(--border);
+  border-radius: var(--ui-radius) !important;
+  box-shadow: var(--ui-shadow-soft);
+}
+
+.philosophy-image-box img {
+  transform: none !important;
+  border-radius: var(--ui-radius) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--ui-shadow-soft) !important;
+}
+
+.services-carousel-wrapper,
+.blog-grid,
+.resources-tags {
+  margin-top: 1.25rem;
+}
+
+#provider-root > header {
+  margin-bottom: 1.5rem;
+}
+
+#provider-root section {
+  scroll-margin-top: 84px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --ui-container: min(100vw - 24px, 100%);
+    --ui-container-wide: min(100vw - 24px, 100%);
+  }
+
+  #nav-placeholder nav {
+    min-height: 56px;
+    padding-inline: 1rem;
+  }
+
+  .brand-title-text {
+    display: none;
+  }
+
+  main.container {
+    padding-inline: 1rem !important;
+    padding-top: 1.5rem !important;
+  }
+
+  .ui-survey-card,
+  main > header.flex,
+  #profile-sections header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ui-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .ui-modal-actions .btn-soft,
+  .ui-survey-card .btn-soft {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-slider-asym {
+    min-height: auto;
+  }
+
+  .hero-content-asym {
+    width: calc(100% - 24px);
+    margin-top: -2rem;
+  }
+}
+
+/* Footer dark mode text color fix */
+html.dark footer#contact,
+html.dark #contact footer,
+footer .text-gray-300 {
+  color: var(--text-secondary) !important;
+}
+
+html.dark footer .text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+html.dark footer .group-hover\:text-white:hover {
+  color: var(--text-primary) !important;
+}
