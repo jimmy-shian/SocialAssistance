@@ -17,7 +17,7 @@
 
 // ==================== 後端模式切換 ==================== 
 // true = 使用 Wix 後端, false = 使用 GAS 後端 
-const USE_WIX_BACKEND = true;
+const USE_WIX_BACKEND = false;
 
 // Global configuration 
 window.AppConfig = {
