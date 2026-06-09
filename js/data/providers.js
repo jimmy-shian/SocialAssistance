@@ -51,13 +51,6 @@ window.providersData = {
         "detail": "簡易海鮮料理與分享"
       }
     ],
-    "contact": {
-      "phone": "05-3731234",
-      "email": "dongshi@example.com",
-      "contactPerson": "陳班長",
-      "line": "@dongshifish",
-      "hours": "週六 09:00–12:00"
-    },
     "cases": [
       {
         "id": "case-1",
@@ -133,13 +126,6 @@ window.providersData = {
         "detail": "表面處理與完成作品展示"
       }
     ],
-    "contact": {
-      "phone": "05-2756789",
-      "email": "woodwork@example.com",
-      "contactPerson": "林師傅",
-      "line": "@woodday",
-      "hours": "週日 13:30–17:30"
-    },
     "cases": [
       {
         "id": "case-1",
@@ -211,13 +197,6 @@ window.providersData = {
         "detail": "基本圖案練習與服務流程"
       }
     ],
-    "contact": {
-      "phone": "05-2834567",
-      "email": "coffee@example.com",
-      "contactPerson": "王店長",
-      "line": "@coffeestarter",
-      "hours": "週三 15:00–18:00"
-    },
     "cases": [
       {
         "id": "case-1",
@@ -282,13 +261,6 @@ window.providersData = {
         "detail": "參觀史蹟資料館"
       }
     ],
-    "contact": {
-      "phone": "05-3798888",
-      "email": "dijabu@example.com",
-      "contactPerson": "黃教練",
-      "line": "@dijabu",
-      "hours": "週一至週日 9:00–12:00、13:30–16:30"
-    },
     "featuredOnIndex": true,
     "schedule": "星期一至星期日9:00-12:00；13:30-16:30",
     "id": "佇嘉木DI-JA-BU"

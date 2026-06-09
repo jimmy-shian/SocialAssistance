@@ -1,3 +1,19 @@
+// 全站統一聯絡資料 — 放在最頂端，navFooter 執行時立即寫入 window
+const CONTACT = {
+  name: '聽見核心工作室',
+  phone: '0988-368-450',
+  phoneRaw: '0988368450',
+  email: 'soundcore.3co@gmail.com',
+  address: '嘉義市西區車店里蘭州五街66號',
+  taxId: '94369582',
+  line: 'https://lin.ee/1C3roAfA',
+  facebook: 'https://www.facebook.com/profile.php?id=61571413520720&locale=zh_TW',
+  instagram: 'https://instagram.com/soundcore_2025/',
+  threads: 'https://www.threads.net/@soundcore_2025?hl=zh-tw',
+  gmap: 'https://maps.google.com/?q=嘉義市西區車店里蘭州五街66號'
+};
+window.contactData = CONTACT;
+
 // 動態插入 nav 與 footer 統一元件
 function renderNavFooter() {
   // nav 統一元件 - Sticky Header with warm styling
@@ -85,13 +101,13 @@ function renderNavFooter() {
             
             <div class="space-y-5">
               <!-- Address -->
-              <a href="https://maps.google.com/?q=嘉義市西區車店里蘭州五街66號" target="_blank" rel="noopener" class="group flex items-start gap-3 text-gray-300 transition-all duration-300 hover:translate-x-1">
+              <a href="${CONTACT.gmap}" target="_blank" rel="noopener" class="group flex items-start gap-3 text-gray-300 transition-all duration-300 hover:translate-x-1">
                 <div class="w-10 h-10 rounded-full bg-[#9ACD32]/10 flex items-center justify-center shrink-0 group-hover:bg-[#9ACD32] transition-colors duration-300">
                   <i class="fas fa-map-marker-alt text-[#9ACD32] group-hover:text-white transition-colors"></i>
                 </div>
                 <div class="pt-1">
                   <p class="text-xs text-[#9ACD32]/80 mb-0.5 uppercase tracking-wider font-bold">Address</p>
-                  <span class="group-hover:text-white transition-colors text-sm leading-relaxed">嘉義市西區車店里蘭州五街66號</span>
+                  <span class="group-hover:text-white transition-colors text-sm leading-relaxed">${CONTACT.address}</span>
                 </div>
               </a>
 
@@ -103,7 +119,7 @@ function renderNavFooter() {
                   </div>
                   <div>
                     <p class="text-xs text-[#9ACD32]/80 mb-0.5 uppercase tracking-wider font-bold">Contact</p>
-                    <span class="group-hover:text-white transition-colors text-sm font-mono tracking-wide">0988-368-450</span>
+                    <span class="group-hover:text-white transition-colors text-sm font-mono tracking-wide">${CONTACT.phone}</span>
                   </div>
                 </button>
                 <span class="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-[#9ACD32] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -112,20 +128,20 @@ function renderNavFooter() {
               </div>
 
               <!-- Email -->
-              <a href="mailto:soundcore.3co@gmail.com" class="group flex items-center gap-3 text-gray-300 transition-all duration-300 hover:translate-x-1">
+              <a href="mailto:${CONTACT.email}" class="group flex items-center gap-3 text-gray-300 transition-all duration-300 hover:translate-x-1">
                 <div class="w-10 h-10 rounded-full bg-[#9ACD32]/10 flex items-center justify-center shrink-0 group-hover:bg-[#9ACD32] transition-colors duration-300">
                   <i class="fas fa-envelope text-[#9ACD32] group-hover:text-white transition-colors"></i>
                 </div>
                 <div>
                    <p class="text-xs text-[#9ACD32]/80 mb-0.5 uppercase tracking-wider font-bold">Email</p>
-                   <span class="group-hover:text-white transition-colors text-sm break-all">soundcore.3co@gmail.com</span>
+                   <span class="group-hover:text-white transition-colors text-sm break-all">${CONTACT.email}</span>
                 </div>
               </a>
 
               <!-- Tax ID -->
               <div class="pt-4 mt-2 border-t border-white/10 flex items-center gap-2 text-xs text-gray-500">
                  <i class="fas fa-id-badge"></i>
-                 <span>統編：94369582</span>
+                 <span>統編：${CONTACT.taxId}</span>
               </div>
             </div>
           </div>
@@ -147,25 +163,25 @@ function renderNavFooter() {
             <h3 class="text-lg font-semibold mb-4 text-[#9ACD32]">追蹤我們</h3>
             <div class="flex items-center gap-4">
               <!-- Facebook -->
-              <a href="https://www.facebook.com/profile.php?id=61571413520720&locale=zh_TW" target="_blank" aria-label="Facebook" class="text-gray-300 hover:text-[#1877F2] transition-colors duration-300">
+              <a href="${CONTACT.facebook}" target="_blank" aria-label="Facebook" class="text-gray-300 hover:text-[#1877F2] transition-colors duration-300">
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/>
                 </svg>
               </a>
               <!-- Instagram -->
-              <a href="https://instagram.com/soundcore_2025/" target="_blank" aria-label="Instagram" class="text-gray-300 hover:text-[#E4405F] transition-colors duration-300">
+              <a href="${CONTACT.instagram}" target="_blank" aria-label="Instagram" class="text-gray-300 hover:text-[#E4405F] transition-colors duration-300">
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/>
                 </svg>
               </a>
               <!-- Line -->
-              <a href="https://lin.ee/1C3roAfA" target="_blank" aria-label="Line" class="text-gray-300 hover:text-[#00C300] transition-colors duration-300">
+              <a href="${CONTACT.line}" target="_blank" aria-label="Line" class="text-gray-300 hover:text-[#00C300] transition-colors duration-300">
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
                 </svg>
               </a>
               <!-- Threads -->
-              <a href="https://www.threads.net/@soundcore_2025?hl=zh-tw" target="_blank" aria-label="Threads" class="text-gray-300 hover:text-black transition-colors duration-300">
+              <a href="${CONTACT.threads}" target="_blank" aria-label="Threads" class="text-gray-300 hover:text-black transition-colors duration-300">
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z"/>
                 </svg>
@@ -176,10 +192,6 @@ function renderNavFooter() {
 
         <!-- 底部版權 -->
         <div class="mt-10 pt-6 border-t border-gray-600 text-center text-sm text-gray-400">
-          <div class="mb-4 flex flex-wrap justify-center gap-3">
-            <button type="button" class="footer-drawer-trigger px-4 py-2 rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15 transition" data-footer-drawer="details">詳細資訊</button>
-            <button type="button" class="footer-drawer-trigger px-4 py-2 rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15 transition" data-footer-drawer="inquiry">最終詢問</button>
-          </div>
           Copyright &copy; 2025 Sound Core 聽見核心工作室. All Rights Reserved.
         </div>
       </div>
@@ -228,24 +240,25 @@ function renderNavFooter() {
     const drawer = ensureFooterDrawer();
     const content = drawer.querySelector('.footer-info-content');
     const isInquiry = type === 'inquiry';
+    const c = CONTACT;
     content.innerHTML = isInquiry ? `
       <p class="footer-info-kicker">Final Check</p>
       <h2 id="footer-info-title">最終詢問</h2>
       <p>想安排課程、合作場域或確認孩子適合的探索形式，可以直接留下需求，我們會協助整理下一步。</p>
       <div class="footer-info-grid">
-        <a href="tel:0988368450"><strong>電話</strong><span>0988-368-450</span></a>
-        <a href="mailto:soundcore.3co@gmail.com"><strong>Email</strong><span>soundcore.3co@gmail.com</span></a>
-        <a href="https://lin.ee/1C3roAfA" target="_blank" rel="noopener"><strong>LINE</strong><span>加入官方帳號</span></a>
+        <a href="tel:${c.phoneRaw || ''}"><strong>電話</strong><span>${c.phone || ''}</span></a>
+        <a href="mailto:${c.email || ''}"><strong>Email</strong><span>${c.email || ''}</span></a>
+        <a href="${c.line || '#'}" target="_blank" rel="noopener"><strong>LINE</strong><span>加入官方帳號</span></a>
       </div>
     ` : `
       <p class="footer-info-kicker">Contact Detail</p>
       <h2 id="footer-info-title">詳細資訊</h2>
       <p>聽見核心工作室以青少年生涯探索、自立培養與體驗教育為核心，串連在地產業、家庭與社福系統。</p>
       <dl class="footer-info-list">
-        <div><dt>地址</dt><dd>嘉義市西區車店里蘭州五街66號</dd></div>
-        <div><dt>電話</dt><dd>0988-368-450</dd></div>
-        <div><dt>Email</dt><dd>soundcore.3co@gmail.com</dd></div>
-        <div><dt>統編</dt><dd>94369582</dd></div>
+        <div><dt>地址</dt><dd>${c.address || ''}</dd></div>
+        <div><dt>電話</dt><dd>${c.phone || ''}</dd></div>
+        <div><dt>Email</dt><dd>${c.email || ''}</dd></div>
+        <div><dt>統編</dt><dd>${c.taxId || ''}</dd></div>
       </dl>
     `;
     drawer.classList.add('open');
@@ -263,7 +276,7 @@ function renderNavFooter() {
     const copyPhoneBtn = document.getElementById('copy-phone-btn');
     if (copyPhoneBtn) {
       copyPhoneBtn.addEventListener('click', async () => {
-        const phone = '0988368450';
+        const phone = CONTACT.phoneRaw;
         try {
           await navigator.clipboard.writeText(phone);
           if (window.Toast) {

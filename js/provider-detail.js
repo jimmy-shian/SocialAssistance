@@ -189,7 +189,7 @@
     });
   }
 
-  function ensureContactFlip(provider) {
+  function ensureContactFlip() {
     let overlay = document.getElementById('contact-flip-overlay');
     if (overlay) return overlay.__open;
     overlay = document.createElement('div');
@@ -199,49 +199,13 @@
       <div class="contact-flip-backdrop"></div>
       <div class="contact-flip-stage">
         <div class="contact-flip-card">
-          <div class="contact-flip-face contact-flip-front">
-            <div class="contact-flip-loading">載入中⋯</div>
+          <button class="contact-flip-close" aria-label="關閉">×</button>
+          <div class="contact-flip-header">
+            <div class="contact-flip-kicker">聯絡資訊</div>
+            <h2>聯絡我們</h2>
           </div>
-          <div class="contact-flip-face contact-flip-back">
-            <button class="contact-flip-close" aria-label="關閉">×</button>
-            <div class="contact-flip-header">
-              <div class="contact-flip-kicker">聯絡資訊</div>
-              <h2>${provider.name}</h2>
-            </div>
-            <div class="contact-flip-body">
-              ${provider.contact ? `
-                <div class="contact-flip-grid">
-                  ${provider.contact.phone ? `<div class="contact-flip-item">
-                    <strong>📞 電話</strong>
-                    <span>${provider.contact.phone}</span>
-                  </div>` : ''}
-                  ${provider.contact.email ? `<div class="contact-flip-item">
-                    <strong>✉️ 電子郵件</strong>
-                    <span>${provider.contact.email}</span>
-                  </div>` : ''}
-                  ${provider.contact.contactPerson ? `<div class="contact-flip-item">
-                    <strong>👤 聯絡人</strong>
-                    <span>${provider.contact.contactPerson}</span>
-                  </div>` : ''}
-                  ${provider.contact.line ? `<div class="contact-flip-item">
-                    <strong>💬 LINE</strong>
-                    <span>${provider.contact.line}</span>
-                  </div>` : ''}
-                  ${provider.contact.hours ? `<div class="contact-flip-item">
-                    <strong>🕐 營業時間</strong>
-                    <span>${provider.contact.hours}</span>
-                  </div>` : ''}
-                  ${provider.schedule ? `<div class="contact-flip-item">
-                    <strong>📅 活動時段</strong>
-                    <span>${provider.schedule}</span>
-                  </div>` : ''}
-                  ${provider.location || provider.address ? `<div class="contact-flip-item">
-                    <strong>📍 地址</strong>
-                    <span>${[provider.location || '', provider.address || ''].filter(Boolean).join(' ')}</span>
-                  </div>` : ''}
-                </div>
-              ` : '<p class="text-gray-500">暫無聯絡資訊</p>'}
-            </div>
+          <div class="contact-flip-body">
+            <div class="contact-flip-grid"></div>
           </div>
         </div>
       </div>
@@ -250,20 +214,49 @@
 
     const backdrop = overlay.querySelector('.contact-flip-backdrop');
     const card = overlay.querySelector('.contact-flip-card');
+    const title = overlay.querySelector('.contact-flip-header h2');
+    const grid = overlay.querySelector('.contact-flip-grid');
     const closeBtn = overlay.querySelector('.contact-flip-close');
+    let closeTimer = null;
 
-    function open() {
+    function renderContent() {
+      const c = window.contactData || {};
+      title.textContent = c.name || '聯絡我們';
+      const items = [
+        [`tel:${c.phoneRaw || ''}`, '📞 電話', c.phone || ''],
+        [`mailto:${c.email || ''}`, '✉️ 電子郵件', c.email || ''],
+        [c.line || '#', '💬 LINE', '加入官方帳號'],
+        [c.gmap || '#', '📍 地址', c.address || ''],
+        [c.facebook || '#', '📘 Facebook', '粉絲專頁'],
+        [c.instagram || '#', '📸 Instagram', c.instagramHandle || '@soundcore_2025']
+      ];
+      grid.innerHTML = items.map(([href, label, value]) => `
+        <a href="${href}" target="_blank" rel="noopener" class="contact-flip-item">
+          <strong>${label}</strong>
+          <span>${value}</span>
+        </a>
+      `).join('');
+    }
+
+function open() {
+      clearTimeout(closeTimer);
+      card.classList.remove('show', 'hide');
+      renderContent();
+      document.body.classList.add('contact-flip-active');
       document.getElementById('provider-root')?.classList.add('contact-content-dim');
       overlay.classList.add('open');
-      requestAnimationFrame(() => {
-        card.classList.add('flipped');
-      });
+      backdrop.classList.add('show');
+      card.classList.add('show');
     }
 
     function close() {
-      card.classList.remove('flipped');
-      overlay.classList.remove('open');
-      document.getElementById('provider-root')?.classList.remove('contact-content-dim');
+      card.classList.remove('show');
+      backdrop.classList.remove('show');
+      setTimeout(() => {
+        overlay.classList.remove('open');
+        document.body.classList.remove('contact-flip-active');
+        document.getElementById('provider-root')?.classList.remove('contact-content-dim');
+      }, 350);
     }
 
     backdrop.addEventListener('click', close);
@@ -434,41 +427,12 @@
           <strong>${provider.schedule || '-'}</strong>
         </article>
         <article>
-          <span>地點</span>
-          ${(() => {
-        const lat = provider.coords?.lat;
-        const lng = provider.coords?.lng;
-        const url = provider.gmapUrl || (lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null);
-        const name = [provider.location || '', provider.address || ''].filter(Boolean).join(' ');
-        const coord = (lat && lng) ? `${lat.toFixed(3)}, ${lng.toFixed(3)}` : '';
-        const display = [name, coord ? `（${coord}）` : ''].join('');
-        if (!url) return `<div class=\"font-bold text-lg\">${display || '-'}</div>`;
-        return `<a class=\"font-bold text-lg hover:text-[var(--primary)] transition-colors flex items-center gap-2 group\" href=\"${url}\" target=\"_blank\" rel=\"noopener\">
-                  ${display || '查看地圖'} 
-                  <i class="fas fa-external-link-alt text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                </a>`;
-      })()}
-        </article>
-        <article>
           <span>聯絡方式</span>
           <button class="contact-flip-trigger font-bold text-lg" aria-label="查看聯絡詳情">
             <span>📞 查看聯絡詳情</span>
             <i class="fas fa-chevron-right text-xs ml-1"></i>
           </button>
         </article>
-      </section>
-
-      <section aria-labelledby="sec-map" class="mb-12">
-        <h2 id="sec-map" class="text-2xl font-bold mb-4">地圖標示地點</h2>
-        <div class="flex items-center gap-3 mb-3">
-          <div class="inline-flex rounded-md border border-gray-300 dark:border-gray-700 overflow-hidden" role="group" aria-label="地圖鎖定方式">
-            <button id="lock-county" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200" aria-pressed="false">縣市</button>
-            <button id="lock-site" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200" aria-pressed="false">場域</button>
-            <button id="lock-none" class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200" aria-pressed="false">自由</button>
-          </div>
-          <span id="lock-label" class="text-sm text-gray-600 dark:text-gray-300">鎖定：初始化中…</span>
-        </div>
-        <div id="provider-map" class="w-full h-72 rounded-lg shadow"></div>
       </section>
 
       <section aria-labelledby="sec-timeline" class="mb-12">
@@ -549,9 +513,9 @@
     attachInteractiveChecklist(root);
     // Contact flip trigger
     try {
-      const trigger = root.querySelector('.contact-flip-trigger');
-      if (trigger && provider.contact) {
-        const openContact = ensureContactFlip(provider);
+const trigger = root.querySelector('.contact-flip-trigger');
+      if (trigger) {
+        const openContact = ensureContactFlip();
         trigger.addEventListener('click', (e) => {
           e.preventDefault();
           openContact();

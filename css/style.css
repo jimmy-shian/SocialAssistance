@@ -19,7 +19,7 @@ body {
 
 @font-face {
   font-family: 'ChenYuluoyan';
-  src: url('../assets/font/ChenYuluoyan-2.0-Thin.ttf') format('truetype');
+  src: url('../assets/font/ChenYuluoyan-2.0-Thin.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -882,6 +882,53 @@ textarea:focus {
   transform: translateY(-1px);
 }
 
+/* Admin panel inputs and modals: match member.html input styling */
+#admin-panel input[type="text"],
+#admin-panel input[type="password"],
+#admin-panel input[type="email"],
+#admin-panel input[type="url"],
+#admin-panel input[type="number"],
+#admin-panel select,
+#admin-panel textarea,
+#link-modal input[type="text"],
+#link-modal input[type="url"],
+#link-modal select {
+  appearance: none;
+  -webkit-appearance: none;
+  color: #1f2937;
+  transition: all 0.2s ease;
+}
+.dark #admin-panel input[type="text"],
+.dark #admin-panel input[type="password"],
+.dark #admin-panel input[type="email"],
+.dark #admin-panel input[type="url"],
+.dark #admin-panel input[type="number"],
+.dark #admin-panel select,
+.dark #admin-panel textarea,
+.dark #link-modal input[type="text"],
+.dark #link-modal input[type="url"],
+.dark #link-modal select {
+  color: #f3f4f6;
+}
+#admin-panel input:focus,
+#admin-panel select:focus,
+#admin-panel textarea:focus,
+#link-modal input:focus,
+#link-modal select:focus {
+  box-shadow: 0 0 0 2px var(--primary), 0 8px 16px rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+}
+#admin-panel input::placeholder,
+#admin-panel textarea::placeholder,
+#link-modal input::placeholder {
+  color: #9ca3af;
+}
+.dark #admin-panel input::placeholder,
+.dark #admin-panel textarea::placeholder,
+.dark #link-modal input::placeholder {
+  color: #9ca3af;
+}
+
 /* Admin｜動態補上的欄位小標題 */
 .field-caption {
   font-size: 12px;
@@ -1481,13 +1528,11 @@ textarea:focus {
 .tm-photo-preview,
 .sc-intro-preview,
 .sc-svc-preview {
-  min-height: 12rem;
-  /* 預設高度較大，避免看起來過矮 */
-  background-size: cover;
+  min-height: 16rem;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
   transition: height .22s ease;
-  /* JS 計算高度時平滑過度 */
 }
 
 @media (min-width: 768px) {
@@ -1495,7 +1540,7 @@ textarea:focus {
   .tm-photo-preview,
   .sc-intro-preview,
   .sc-svc-preview {
-    min-height: 14rem;
+    min-height: 18rem;
   }
 }
 
@@ -3801,6 +3846,26 @@ html.dark .sdgs-section {
   font-weight: 850;
 }
 
+html.dark .provider-simple-hero {
+  background: var(--bg-surface);
+  border-color: var(--border);
+  box-shadow: var(--surface-shadow);
+}
+
+html.dark .provider-simple-info article {
+  background: var(--bg-surface);
+  border-color: var(--border);
+}
+
+html.dark .team-card .team-back-content {
+  color: var(--text-primary);
+}
+
+html.dark .team-card .team-back-content p,
+html.dark .team-card .team-back-content li {
+  color: var(--text-secondary);
+}
+
 .footer-info-drawer {
   position: fixed;
   inset: 0;
@@ -3934,6 +3999,55 @@ html.dark .sdgs-section {
 }
 
 /* ==============================
+   Admin 輸入框統一風格（比照 member.html）
+============================== */
+#admin-panel input[type="text"],
+#admin-panel input[type="password"],
+#admin-panel input[type="number"],
+#admin-panel input[type="url"],
+#admin-panel select,
+#admin-panel textarea,
+#link-modal input[type="text"],
+#link-modal input[type="url"],
+#link-modal select {
+  appearance: none;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--ui-radius-sm, 0.375rem);
+  background: var(--bg-surface, #fff);
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.2s ease;
+  min-height: 42px;
+  font-size: 0.95rem;
+}
+#admin-panel input[type="text"]:focus,
+#admin-panel input[type="password"]:focus,
+#admin-panel input[type="number"]:focus,
+#admin-panel input[type="url"]:focus,
+#admin-panel select:focus,
+#admin-panel textarea:focus,
+#link-modal input[type="text"]:focus,
+#link-modal input[type="url"]:focus,
+#link-modal select:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--primary);
+}
+html.dark #admin-panel input[type="text"],
+html.dark #admin-panel input[type="password"],
+html.dark #admin-panel input[type="number"],
+html.dark #admin-panel input[type="url"],
+html.dark #admin-panel select,
+html.dark #admin-panel textarea,
+html.dark #link-modal input[type="text"],
+html.dark #link-modal input[type="url"],
+html.dark #link-modal select {
+  background: #374151;
+  color: #f3f4f6;
+}
+
+/* ==============================
    聯絡詳情 3D 翻轉燈箱
    Contact Flip Lightbox
 ============================== */
@@ -3966,7 +4080,8 @@ html.dark .sdgs-section {
   place-items: center;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  perspective: 1400px;
+  transition: opacity 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .contact-flip-overlay.open {
   pointer-events: auto;
@@ -3979,73 +4094,52 @@ html.dark .sdgs-section {
   inset: 0;
   background: rgba(14, 24, 19, 0.55);
   backdrop-filter: blur(0px);
-  transition: backdrop-filter 0.35s ease;
+  transition:
+    background-color 0.45s ease,
+    backdrop-filter 0.45s ease;
 }
-.contact-flip-overlay.open .contact-flip-backdrop {
+.contact-flip-backdrop.show {
   backdrop-filter: blur(8px);
+  background: rgba(14, 24, 19, 0.42);
 }
 
 /* 3D Stage */
 .contact-flip-stage {
   position: relative;
   z-index: 1;
-  perspective: 1200px;
+  perspective: 1400px;
+  transform-style: preserve-3d;
   width: min(92vw, 640px);
   max-height: min(88vh, 700px);
 }
 
-/* Card with 3D flip */
+/* Card with 3D flip 180° entrance — flips from back face to front */
 .contact-flip-card {
-  position: relative;
-  width: 100%;
-  min-height: 420px;
-  transform-style: preserve-3d;
-  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform: rotateY(15deg) scale(0.88);
-  opacity: 0;
-}
-.contact-flip-overlay.open .contact-flip-card {
-  opacity: 1;
-  transform: rotateY(0deg) scale(1);
-}
-.contact-flip-card.flipped {
-  transform: rotateY(180deg) scale(1);
-}
-
-/* Face base */
-.contact-flip-face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-/* Front face (shown during animation start) */
-.contact-flip-front {
-  background: var(--bg-surface, #fff);
-  border: 1px solid var(--border);
-  display: grid;
-  place-items: center;
-}
-.contact-flip-loading {
-  color: var(--text-tertiary);
-  font-size: 1rem;
-}
-
-/* Back face (the actual content) */
-.contact-flip-back {
-  transform: rotateY(180deg);
-  background: var(--bg-surface, #fff);
-  border: 1px solid var(--border);
-  box-shadow: 0 24px 80px rgba(10, 20, 16, 0.25);
-  padding: 1.75rem;
-  overflow-y: auto;
-  min-height: 420px;
-  display: flex;
-  flex-direction: column;
-}
+   position: relative;
+   width: 100%;
+   min-height: 420px;
+   padding: 1.75rem;
+   background: var(--bg-surface, #fff);
+   border: 1px solid var(--border);
+   border-radius: 12px;
+   box-shadow: 0 24px 80px rgba(10, 20, 16, 0.25);
+   overflow-y: auto;
+   display: flex;
+   flex-direction: column;
+   opacity: 0;
+   transform: scale(0.85) translateY(20px);
+   transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+   will-change: transform, opacity;
+ }
+ .contact-flip-card.show {
+   opacity: 1;
+   transform: scale(1) translateY(0);
+ }
+ .contact-flip-card.hide {
+   opacity: 0;
+   transform: scale(0.9) translateY(10px);
+   transition: opacity 0.3s ease, transform 0.3s ease;
+ }
 
 /* Close button */
 .contact-flip-close {
@@ -4065,6 +4159,7 @@ html.dark .sdgs-section {
   place-items: center;
   transition: background 0.2s ease;
   z-index: 2;
+  transform: translateZ(30px);
 }
 .contact-flip-close:hover {
   background: rgba(0, 0, 0, 0.12);
@@ -4074,6 +4169,7 @@ html.dark .sdgs-section {
 .contact-flip-header {
   margin-bottom: 1.25rem;
   padding-right: 2.5rem;
+  transform: translateZ(20px);
 }
 .contact-flip-kicker {
   color: var(--primary);
@@ -4094,6 +4190,7 @@ html.dark .sdgs-section {
 /* Body - contact grid */
 .contact-flip-body {
   flex: 1;
+  transform: translateZ(10px);
 }
 .contact-flip-grid {
   display: grid;
@@ -4108,10 +4205,14 @@ html.dark .sdgs-section {
   border-radius: 10px;
   background: var(--bg-base);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 .contact-flip-item:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: var(--primary-light);
 }
 .contact-flip-item strong {
   font-size: 0.78rem;
@@ -4126,10 +4227,22 @@ html.dark .sdgs-section {
 }
 
 /* Dim effect on background content */
+.contact-flip-active #nav-placeholder,
+.contact-flip-active #provider-root,
+.contact-flip-active #footer-placeholder {
+  transform: scale(0.94);
+  filter: blur(3px);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.45s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
 .contact-content-dim {
   transform: scale(0.94);
   filter: blur(3px);
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.45s ease;
   pointer-events: none;
   user-select: none;
 }
@@ -4141,9 +4254,6 @@ html.dark .sdgs-section {
   }
   .contact-flip-card {
     min-height: 340px;
-  }
-  .contact-flip-back {
-    min-height: 340px;
     padding: 1.25rem;
   }
   .contact-flip-grid {
@@ -4154,11 +4264,25 @@ html.dark .sdgs-section {
 
 @media (prefers-reduced-motion: reduce) {
   .contact-flip-card {
-    transition: none;
-    transform: none;
+    animation: none !important;
+    opacity: 0;
+    transform: rotateY(0deg) scale(1);
+    transform-style: flat;
+  }
+  .contact-flip-card.show {
     opacity: 1;
   }
+  .contact-flip-card.hide {
+    opacity: 0;
+  }
   .contact-content-dim {
+    transition: none;
+    transform: none;
+    filter: none;
+  }
+  .contact-flip-active #nav-placeholder,
+  .contact-flip-active #provider-root,
+  .contact-flip-active #footer-placeholder {
     transition: none;
     transform: none;
     filter: none;
@@ -4170,4 +4294,3 @@ html.dark .sdgs-section {
     transition: none;
   }
 }
-
