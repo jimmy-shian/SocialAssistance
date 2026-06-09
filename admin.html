@@ -77,29 +77,28 @@
         </div>
       </div>
       <section id="admin-login" class="w-full max-w-md mx-auto">
-        <div class="ui-card card-dynamic-bg p-8">
-          <h2 class="text-xl font-semibold mb-4">管理員登入</h2>
-          <div class="space-y-3">
+        <div class="ui-card card-dynamic-bg flex flex-col gap-6 p-6">
+          <h2 class="text-2xl font-bold text-center text-gradient">管理員登入</h2>
+          <div class="flex flex-col gap-4">
             <div>
-              <label class="block text-sm mb-1">帳號</label>
+              <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="adm-usr">帳號</label>
               <input id="adm-usr" type="text"
-                class="ui-input w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+                class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                 placeholder="admin">
             </div>
             <div>
-              <label class="block text-sm mb-1">密碼</label>
+              <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="adm-pwd">密碼</label>
               <input id="adm-pwd" type="password"
-                class="ui-input w-full bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
+                class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                 placeholder="請輸入密碼">
             </div>
             <div class="flex items-center gap-2">
-              <button id="adm-login" class="btn-soft btn-purple">登入</button>
+              <button id="adm-login" class="btn-soft btn-purple w-full justify-center">登入</button>
               <span id="adm-status" class="text-sm text-gray-600 dark:text-gray-300" aria-live="polite"></span>
             </div>
           </div>
         </div>
       </section>
-      </div>
 
       <!-- (removed separate warning section; overlay is inside login wrap) -->
 
@@ -202,7 +201,7 @@
         <div id="admin-loading" class="hidden space-y-4"></div>
         <!-- 隱藏的 JSON 編輯器（僅供內部狀態存放，不對外顯示） -->
         <textarea id="ds-editor" rows="24"
-          class="hidden w-full rounded border px-3 py-2 font-mono text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+          class="hidden appearance-none border rounded w-full py-2 px-3 font-mono text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
           aria-hidden="true"></textarea>
 
         <!-- About 視覺化編輯器 -->
@@ -214,11 +213,11 @@
 
           <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
             <label class="text-sm">主標題（heroTitle）
-              <input id="ab-hero-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+              <input id="ab-hero-title" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
             </label>
             <label class="text-sm">導語（lead）
               <textarea id="ab-lead" rows="3"
-                class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+                class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea>
             </label>
           </div>
 
@@ -233,7 +232,7 @@
           <div class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4 mb-2">
               <label class="text-sm">成就區塊標題（achievementsTitle）
-                <input id="ab-ach-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+                <input id="ab-ach-title" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
               </label>
             </div>
             <div class="flex items-center justify-between mb-2">
@@ -268,11 +267,11 @@
             <h4 class="font-semibold mb-3">Hero 區塊 (Hero Slider)</h4>
             <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
               <label class="text-sm block">主標題 (Hero Title)<textarea id="sc-hero-title" rows="2"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea></label>
               <label class="text-sm block">副標題 (Hero Subtitle)<textarea id="sc-hero-subtitle" rows="2"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea></label>
               <label class="text-sm block md:col-span-2">聯絡資訊 (Info)<textarea id="sc-hero-info" rows="3"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea></label>
             </div>
             <div class="mt-4">
               <div class="flex items-center justify-between mb-2">
@@ -288,21 +287,21 @@
             <h4 class="font-semibold mb-3">理念區塊 (About/Philosophy)</h4>
             <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
               <label class="text-sm block">標籤 (Label)<input id="sc-phil-label"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></label>
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></label>
               <label class="text-sm block">標題 (Title)<textarea id="sc-phil-title" rows="2"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea></label>
               <label class="text-sm block md:col-span-2">內容 (Content/Quote)<textarea id="sc-phil-content" rows="4"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea></label>
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea></label>
               <div class="md:col-span-2">
                 <div class="flex items-center gap-2">
                   <label class="text-sm flex-1">圖片網址 (Image URL)<input id="sc-phil-img"
-                      class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></label>
+                      class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></label>
                   <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0 self-end mb-[2px]">上傳<input
                       type="file" id="sc-phil-upload" class="hidden" accept="image/*"></label>
                 </div>
                 <div id="sc-phil-preview"
-                  class="mt-2 h-32 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden relative">
-                  <img id="sc-phil-preview-img" class="w-full h-full object-cover" onerror="this.style.display='none'"
+                  class="mt-2 h-48 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden relative">
+                  <img id="sc-phil-preview-img" class="w-full h-full object-contain" onerror="this.style.display='none'"
                     onload="this.style.display='block'">
                 </div>
               </div>
@@ -328,10 +327,10 @@
 
           <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
             <label class="text-sm">頁面標題
-              <input id="svc-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+              <input id="svc-title" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
             </label>
             <label class="text-sm">導語
-              <textarea id="svc-lead" rows="3" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+              <textarea id="svc-lead" rows="3" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea>
             </label>
           </div>
 
@@ -340,21 +339,21 @@
               <h4 class="font-semibold">7 大服務項目</h4>
               <button id="svc-add-item" class="btn-soft btn-purple">新增服務</button>
             </div>
-            <div id="svc-item-list" class="space-y-3"></div>
+            <div id="svc-item-list" class="space-y-3 rounded bg-gray-100/50 dark:bg-gray-800/40"></div>
           </div>
 
           <div class="mt-4 ui-card card-dynamic-bg p-4">
             <label class="text-sm">成就區塊標題
-              <input id="svc-ach-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+              <input id="svc-ach-title" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
             </label>
             <label class="text-sm block mt-3">成就清單（每行一筆）
-              <textarea id="svc-achievements" rows="5" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+              <textarea id="svc-achievements" rows="5" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea>
             </label>
           </div>
 
           <div class="mt-4 ui-card card-dynamic-bg p-4">
             <label class="text-sm block">底部輪播照片（每行一張圖片路徑）
-              <textarea id="svc-gallery" rows="5" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+              <textarea id="svc-gallery" rows="5" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea>
             </label>
           </div>
         </section>
@@ -372,7 +371,7 @@
               <button id="bl-add-post" class="btn-soft btn-purple">新增文章</button>
             </div>
             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">每篇文章包含標題、日期、摘要、封面圖、類別與內容。</p>
-            <div id="bl-post-list" class="space-y-4"></div>
+            <div id="bl-post-list" class="space-y-4 rounded bg-gray-100/50 dark:bg-gray-800/40"></div>
           </div>
         </section>
 
@@ -416,36 +415,36 @@
             class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-4 mt-4 ui-card card-dynamic-bg p-4">
             <div>
               <label class="text-sm">name（顯示名稱）
-                <input id="pv-name" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+                <input id="pv-name" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
               </label>
             </div>
             <div>
               <label class="text-sm">category（類別）
-                <input id="pv-category" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
+                <input id="pv-category" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                   placeholder="如：養殖/食農加工">
               </label>
             </div>
             <div>
               <label class="text-sm">schedule（課程/營運時間）
-                <input id="pv-schedule" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
+                <input id="pv-schedule" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                   placeholder="如：每週六 09:00–12:00">
               </label>
             </div>
             <div>
               <label class="text-sm">location（地區）
-                <input id="pv-location" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"
+                <input id="pv-location" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                   placeholder="如：嘉義縣 東石鄉">
               </label>
             </div>
             <div>
               <label class="text-sm">address（地址）
-                <input id="pv-address" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+                <input id="pv-address" class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
               </label>
             </div>
             <div>
               <label class="text-sm">gmapUrl（Google 地圖網址）
                 <div class="flex gap-2 items-end">
-                  <input id="pv-gmap" class="flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800"
+                  <input id="pv-gmap" class="flex-1 appearance-none border rounded py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"
                     placeholder="輸入網址或點擊按鈕自動生成">
                   <button type="button" id="pv-gen-gmap" class="btn-soft btn-blue text-xs shrink-0"
                     title="根據地址自動生成 Google 地圖連結">🗺️ 生成連結</button>
@@ -455,11 +454,11 @@
             <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 gap-3">
               <label class="text-sm">coords.lat
                 <input id="pv-lat" type="number" step="0.000001"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
               </label>
               <label class="text-sm">coords.lng
                 <input id="pv-lng" type="number" step="0.000001"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
               </label>
             </div>
             <div class="flex items-center gap-2">
@@ -472,7 +471,7 @@
             <div class="sm:col-span-2">
               <label class="text-sm">description（簡介）
                 <textarea id="pv-desc" rows="3"
-                  class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+                  class="appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all"></textarea>
               </label>
             </div>
           </div>
@@ -487,7 +486,7 @@
             <div id="pv-tl-list" class="space-y-3"></div>
           </div>
 
-          <div id="pv-cases" class="mt-4">
+          <div id="pv-cases" class="mt-4 ui-card card-dynamic-bg p-4">
             <div class="flex items-center justify-between mb-2">
               <h4 class="font-semibold">精選案例（cases）</h4>
               <button id="pv-add-case" class="btn-soft btn-purple">新增案例</button>
@@ -514,11 +513,11 @@
           <div class="space-y-4">
             <label class="block text-sm">連結網址（URL）
               <input id="link-url" type="url" placeholder="https://example.com"
-                class="w-full mt-1 rounded border px-3 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100" />
+                class="appearance-none border rounded w-full mt-1 px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all" />
             </label>
             <label class="block text-sm">顯示文字（可選）
               <input id="link-text" type="text" placeholder="若空白則使用網址"
-                class="w-full mt-1 rounded border px-3 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100" />
+                class="appearance-none border rounded w-full mt-1 px-3 py-2 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all" />
             </label>
             <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-3 gap-4">
               <label class="block text-sm">文字顏色
@@ -526,7 +525,7 @@
               </label>
               <label class="block text-sm">字體
                 <select id="link-font"
-                  class="mt-1 w-full rounded border px-2 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+                  class="mt-1 appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
                   <option value="">（跟隨預設）</option>
                   <option value="'Microsoft JhengHei', 'Noto Sans TC', sans-serif">黑體（微軟正黑/Noto Sans TC）</option>
                   <option value="'PMingLiU', 'DFKai-SB', serif">明體／楷體（PMingLiU/DFKai）</option>
@@ -537,7 +536,7 @@
               </label>
               <label class="block text-sm">字級
                 <select id="link-size"
-                  class="mt-1 w-full rounded border px-2 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100">
+                  class="mt-1 appearance-none border rounded w-full py-2 px-3 text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent outline-none transition-all">
                   <option value="sm">小</option>
                   <option value="md" selected>中</option>
                   <option value="lg">大</option>
