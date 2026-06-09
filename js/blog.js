@@ -84,7 +84,7 @@
     glorySection.innerHTML = `
       <div class="blog-glory-header">
         <span>榮耀時刻</span>
-        <h2>條列式成長時間軸</h2>
+        <h2>成長時間軸</h2>
       </div>
       <div class="blog-glory-stack">
         ${gloryPosts.map((post, index) => renderGloryPost(post, index)).join('')}

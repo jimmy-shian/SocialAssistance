@@ -22,20 +22,25 @@
         <p class="lead-text mt-4 text-[var(--text-secondary)]">${esc(data.lead || '')}</p>
       </header>
 
-      <section class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        ${items.map((item, i) => `
-          <article class="service-feature-card glass-surface rounded-xl overflow-hidden">
-            <div class="service-feature-image">
-              ${item.image ? `<img src="${esc(item.image)}" alt="${esc(item.title)}">` : ''}
-            </div>
-            <div class="p-6">
-              <div class="text-sm font-mono text-[var(--primary)] mb-2">${String(i + 1).padStart(2, '0')}</div>
-              <h2 class="text-xl font-bold mb-3">${esc(item.title)}</h2>
-              <p class="text-[var(--text-secondary)] leading-relaxed">${esc(item.desc)}</p>
-            </div>
-          </article>
-        `).join('')}
-      </section>
+<section class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+  ${items.map((item, i) => {
+    const spanMap = {0:'md:col-span-8',1:'md:col-span-4',2:'md:col-span-4',3:'md:col-span-8',4:'md:col-span-6',5:'md:col-span-3',6:'md:col-span-3'};
+    const span = spanMap[i] || 'md:col-span-1';
+    const delay = (i * 0.05).toFixed(2);
+    return `
+      <article class="service-feature-card glass-surface rounded-xl overflow-hidden ${span} transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-6 hover:scale-105 active:scale-97" style="animation-delay:${delay}s">
+        <div class="service-feature-image">
+          ${item.image ? `<img src="${esc(item.image)}" alt="${esc(item.title)}">` : ''}
+        </div>
+        <div class="p-6">
+          <div class="text-sm font-mono text-[var(--primary)] mb-2">${String(i + 1).padStart(2, '0')}</div>
+          <h2 class="text-xl font-bold mb-3">${esc(item.title)}</h2>
+          <p class="text-[var(--text-secondary)] leading-relaxed">${esc(item.desc)}</p>
+        </div>
+      </article>
+    `;
+  }).join('')}
+</section>
 
       <section class="mt-16 glass-surface rounded-xl p-6 md:p-8">
         <h2 class="heading-section mb-6">${esc(data.achievementsTitle || about.achievementsTitle || '成就經歷')}</h2>

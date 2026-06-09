@@ -194,11 +194,11 @@
     } catch (e) { }
   }
 
-  // Helper: 根據原圖比例計算預覽高度（約為原圖在目前寬度下高度的 70%）
+  // Helper: 根據原圖比例計算預覽高度，讓編輯區縮圖比原本更好辨識。
   function setPreviewHeightFromImage(pv, url, factor) {
     try {
       if (!pv || !url) return;
-      factor = factor || 0.7;
+      factor = factor || 0.9;
       const img = new Image();
       img.onload = function () {
         const ar = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 0.5625;
@@ -217,7 +217,7 @@
         const ar = parseFloat(pv.dataset.ar || '');
         if (!isFinite(ar) || !ar) return;
         const w = pv.clientWidth || pv.offsetWidth || 300;
-        pv.style.height = Math.round(w * ar * 0.7) + 'px';
+        pv.style.height = Math.round(w * ar * 0.9) + 'px';
       });
     } catch (e) { }
   }
@@ -233,8 +233,8 @@
     let url = val;
     if (/^gas:\/\/image\//.test(val)) { const p = previewCache[val]; if (p) url = p; }
     pv.style.backgroundImage = `url('${url}')`;
-    pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
-    setPreviewHeightFromImage(pv, url, 0.7);
+    pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+    setPreviewHeightFromImage(pv, url, 0.9);
   }
 
   // ===== Site：Story 多圖預覽與上傳 =====
@@ -251,10 +251,10 @@
       cell.draggable = true;
       cell.dataset.index = String(i);
       cell.innerHTML = preview
-        ? `<img src="${preview}" alt="story${i + 1}" class="w-full h-full object-cover opacity-90">
+        ? `<img src="${preview}" alt="story${i + 1}" class="w-full h-full object-contain opacity-90">
             <div class="absolute inset-0 grid place-items-center bg-black/10 text-[10px] text-white">待發佈</div>`
         : url
-          ? `<img src="${url}" alt="story${i + 1}" class="w-full h-full object-cover">`
+          ? `<img src="${url}" alt="story${i + 1}" class="w-full h-full object-contain">`
           : `<div class="w-full h-full grid place-items-center bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300">無圖片</div>`;
       const ctrls = document.createElement('div');
       ctrls.className = 'absolute top-1 right-1 flex gap-1';
@@ -264,9 +264,9 @@
         <button type="button" class="sc-story-del bg-rose-600 hover:bg-rose-700 text-white rounded px-1 text-xs">×</button>`;
       cell.appendChild(ctrls);
       list.appendChild(cell);
-      // 動態依原圖比例設定高度（約 70%）
+      // 動態依原圖比例設定高度。
       const calcSrc = preview || url;
-      if (calcSrc) setPreviewHeightFromImage(cell, calcSrc, 0.7);
+      if (calcSrc) setPreviewHeightFromImage(cell, calcSrc, 0.9);
     });
   }
 
@@ -278,8 +278,8 @@
       const val = (input.value || '').trim();
       if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
-      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
-      setPreviewHeightFromImage(pv, url, 0.7);
+      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      setPreviewHeightFromImage(pv, url, 0.9);
     } catch (e) { }
   }
 
@@ -291,8 +291,8 @@
       const val = (input.value || '').trim();
       if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
-      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
-      setPreviewHeightFromImage(pv, url, 0.7);
+      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      setPreviewHeightFromImage(pv, url, 0.9);
     } catch (e) { }
   }
   function updateServicePreview(item) {
@@ -302,8 +302,8 @@
       const val = (input.value || '').trim();
       if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
-      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'cover'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
-      setPreviewHeightFromImage(pv, url, 0.7);
+      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      setPreviewHeightFromImage(pv, url, 0.9);
     } catch (e) { }
   }
 
@@ -1040,7 +1040,7 @@
       const preview = isGas ? previewCache[url] : null;
       if (isGas && preview) {
         cell.innerHTML = `
-          <img src="${preview}" alt="pending" class="w-full h-full object-cover opacity-90">
+          <img src="${preview}" alt="pending" class="w-full h-full object-contain opacity-90">
           <span class="absolute left-1 bottom-1 text-[10px] px-1 rounded bg-amber-500 text-white">待發佈</span>
           <div class="absolute top-1 right-1 flex gap-1">
             <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
@@ -1059,7 +1059,7 @@
         `;
       } else {
         cell.innerHTML = `
-          <img src="${url}" alt="img${i + 1}" class="w-full h-full object-cover">
+          <img src="${url}" alt="img${i + 1}" class="w-full h-full object-contain">
           <div class="absolute top-1 right-1 flex gap-1">
             <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
             <button type="button" class="pv-img-down bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↓</button>
@@ -1652,8 +1652,8 @@
         <label class="text-sm">替代文字 (Alt)
           <input class="sc-slide-alt w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.alt || ''}">
         </label>
-        <div class="h-24 bg-gray-100 dark:bg-gray-800 rounded mt-1 overflow-hidden relative sc-slide-preview-box">
-           <img src="${row.img || ''}" class="sc-slide-preview w-full h-full object-cover" onerror="this.style.display='none'" onload="this.style.display='block'">
+        <div class="h-36 bg-gray-100 dark:bg-gray-800 rounded mt-1 overflow-hidden relative sc-slide-preview-box">
+           <img src="${row.img || ''}" class="sc-slide-preview w-full h-full object-contain" onerror="this.style.display='none'" onload="this.style.display='block'">
            <div class="sc-slide-uploading hidden absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs">上傳中...</div>
         </div>
       </div>`;
@@ -1712,8 +1712,8 @@
           <div class="flex gap-2 items-end mt-1">
             <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.image || row.img || ''}" placeholder="./img/... 或上傳">
             <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
-            <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden shrink-0">
-              <img src="${row.image || row.img || ''}" class="w-full h-full object-cover sc-svc-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
+            <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden shrink-0">
+              <img src="${row.image || row.img || ''}" class="w-full h-full object-contain sc-svc-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
             </div>
           </div>
         </div>
@@ -2764,8 +2764,8 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
            <div class="flex gap-2 items-end">
               <input class="bl-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.image || '')}" placeholder="./img/... 或上傳">
               <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden bl-image-upload" accept="image/*"></label>
-              <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden relative shrink-0">
-                 <img src="${p.image || ''}" class="w-full h-full object-cover bl-image-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
+              <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden relative shrink-0">
+                 <img src="${p.image || ''}" class="w-full h-full object-contain bl-image-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
               </div>
            </div>
         </label>
