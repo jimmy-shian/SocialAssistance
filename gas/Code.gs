@@ -71,20 +71,23 @@ function _handleSavePublish(e){
   if (!_rateLimit('update:' + ver.user, RL.UPDATE_PER_MIN, 60)) return _badRequest('請求過於頻繁，稍後再試');
   var n = _useNonce(nonce); if (!n.ok) return _badRequest(n.message);
 
-  var key = body.key || '';
+  var key = _normalizeDatasetKey(body.key || '');
   var updated = null;
+  var provided = {};
   if (key) {
-    if (!ALLOWED_KEYS[key]) return _badRequest('不允許的 key');
+    if (!ALLOWED_KEYS[key]) return _badRequest('不允許的 key: ' + String(body.key || key));
     var data = body.data;
     if (typeof data === 'undefined') return _badRequest('缺少 data');
     try { var sz = JSON.stringify(data).length; if (sz > 200000) return _badRequest('資料過大'); } catch(err){}
-    updated = _setDataset(key, data);
+    provided[key] = data;
+    updated = { key: key, version: Date.now() };
   }
 
-  // publish（若 GitHub 未設定，也回 ok:true 並附帶錯誤訊息）
-  var keys = body && body.keys; if (!Array.isArray(keys) || !keys.length) keys = key ? [key] : Object.keys(ALLOWED_KEYS);
+  // publish（資料由前端本機草稿送入，不再寫入 Google Sheet 暫存）
+  var keys = _normalizeDatasetKeys(body && body.keys, key ? [key] : Object.keys(ALLOWED_KEYS));
   for (var ki=0; ki<keys.length; ki++) {
     if (!ALLOWED_KEYS[String(keys[ki])]) return _badRequest('不允許的 key: ' + String(keys[ki]));
+    if (!provided[String(keys[ki])]) return _badRequest('缺少 data: ' + String(keys[ki]));
   }
   var conf = _ghConf();
   var results = [];
@@ -95,10 +98,11 @@ function _handleSavePublish(e){
   var quota = _dailyPublishQuota(ver.user);
   if (!quota.ok) return _badRequest(quota.message);
   // 有 GitHub 設定：對 providers 的圖片占位（gas://image/<id>/<filename>）進行處理後再發佈
+  var publishedData = null;
   for (var i=0;i<keys.length;i++){
     try {
       var k = String(keys[i]);
-      var dsObj = _getDataset(k).data;
+      var dsObj = provided[k];
       var processed = _processImagesForPublish(conf, dsObj);
       // 發佈資料集（使用處理後的資料）
       var pub = _publishOneWithData(conf, k, processed.data);
@@ -111,20 +115,13 @@ function _handleSavePublish(e){
       } else {
         result.imageReplaced = processed && processed.replaced || 0;
       }
-      // 完全成功：將處理後 JSON 回寫到 datasets，讓路徑從 gas:// 改成 img/
-      if (result && result.ok) {
-        try { _setDataset(k, processed.data); } catch(writeErr){}
-      }
-      // 發佈成功後清空暫存資料（datasets 表），以便下次預設為空
-      if (pub && pub.ok) {
-        try { _clearDataset(k); } catch(clearErr){}
-      }
+      if (result && result.ok && k === key) publishedData = processed.data;
       results.push(result);
     } catch(err){ results.push({ ok:false, key:k, message:String(err) }); }
   }
   var publishOk = results.every(function(r){ return r && r.ok; });
   var used = publishOk ? _markPublishUsed(ver.user) : quota.used;
-  return _jsonOutput({ ok: true, update: updated, results: results, publishOk: publishOk, publishQuota: { limit: DAILY_PUBLISH_LIMIT, used: used, remaining: Math.max(0, DAILY_PUBLISH_LIMIT - used) } });
+  return _jsonOutput({ ok: true, update: updated, data: publishedData, results: results, publishOk: publishOk, publishQuota: { limit: DAILY_PUBLISH_LIMIT, used: used, remaining: Math.max(0, DAILY_PUBLISH_LIMIT - used) } });
 }
 // GET  ?action=data&key=<dataset-key>   -> { ok:true, key, version, data }
 // POST ?action=login    body: { username, password }       -> { ok:true, token, exp }
@@ -160,6 +157,20 @@ var ALLOWED_KEYS = Object.freeze({
   'blogContent': true,
   'servicesContent': true
 });
+
+function _normalizeDatasetKey(key){
+  key = String(key || '').trim();
+  if (key === 'about') return 'aboutContent';
+  if (key === 'site') return 'siteContent';
+  if (key === 'providersData') return 'providers';
+  if (key === 'blog') return 'blogContent';
+  if (key === 'services') return 'servicesContent';
+  return key;
+}
+function _normalizeDatasetKeys(keys, fallback){
+  if (!Array.isArray(keys) || !keys.length) keys = fallback || Object.keys(ALLOWED_KEYS);
+  return keys.map(function(k){ return _normalizeDatasetKey(k); });
+}
 
 // Simple rate limits per minute (approx)
 var RL = Object.freeze({
@@ -267,9 +278,23 @@ function _jsonOutput(obj){
 function _badRequest(msg){ return _jsonOutput({ ok:false, message: msg || 'Bad Request' }); }
 
 function _getBodyObject(e){
-  if (!e || !e.postData || !e.postData.contents) return {};
-  var text = e.postData.contents;
-  try { return JSON.parse(text); } catch(err) { return {}; }
+  if (!e) return {};
+  if (e.postData && e.postData.contents) {
+    var text = e.postData.contents;
+    try { return JSON.parse(text); } catch(err) {
+      try {
+        var obj = {};
+        text.split('&').forEach(function(part){
+          var kv = part.split('=');
+          if (!kv[0]) return;
+          obj[decodeURIComponent(kv[0])] = decodeURIComponent((kv.slice(1).join('=') || '').replace(/\+/g, ' '));
+        });
+        if (obj.payload) return JSON.parse(obj.payload);
+        return obj;
+      } catch(parseErr) { return {}; }
+    }
+  }
+  return (e.parameter && Object.keys(e.parameter).length) ? e.parameter : {};
 }
 
 function _getPropOrDefault(key, fallback){
@@ -385,6 +410,8 @@ function _ghPutContent(conf, filepath, contentStr, message, prevSha){
   var code = resp.getResponseCode();
   var text = resp.getContentText();
   if (code >= 200 && code < 300) return { ok:true, data: JSON.parse(text) };
+  if (code === 401) return { ok:false, message:'GitHub Token 無效或權限不足（401 Bad credentials）' };
+  if (code === 403) return { ok:false, message:'GitHub 權限不足或已達限制（403）' };
   return { ok:false, message: 'GitHub PUT 失敗: ' + code + ' ' + text };
 }
 function _datasetFilename(key){
@@ -473,8 +500,8 @@ function _handleRead(e){
   if (!ver.ok) return _badRequest(ver.message || '未授權');
   if (!_rateLimit('read:' + ver.user, RL.READ_PER_MIN, 60)) return _badRequest('請求過於頻繁，稍後再試');
   var n = _useNonce(nonce); if (!n.ok) return _badRequest(n.message);
-  var key = body.key || '';
-  if (!key || !ALLOWED_KEYS[key]) return _badRequest('不允許的 key');
+  var key = _normalizeDatasetKey(body.key || '');
+  if (!key || !ALLOWED_KEYS[key]) return _badRequest('不允許的 key: ' + String(body.key || key));
   var ds = _getDataset(key);
   var hasData = false; try { hasData = ds && ds.data && typeof ds.data === 'object' && Object.keys(ds.data).length > 0; } catch(err) { hasData = false; }
   return _jsonOutput({ ok:true, key: key, version: ds.version, updatedAt: ds.updatedAt, data: ds.data, hasData: hasData });
@@ -487,8 +514,8 @@ function _handleUpdate(e){
   if (!ver.ok) return _badRequest(ver.message || '未授權');
   if (!_rateLimit('update:' + ver.user, RL.UPDATE_PER_MIN, 60)) return _badRequest('請求過於頻繁，稍後再試');
   var n = _useNonce(body.nonce || ''); if (!n.ok) return _badRequest(n.message);
-  var key = body.key || '';
-  if (!key || !ALLOWED_KEYS[key]) return _badRequest('不允許的 key');
+  var key = _normalizeDatasetKey(body.key || '');
+  if (!key || !ALLOWED_KEYS[key]) return _badRequest('不允許的 key: ' + String(body.key || key));
   var data = body.data;
   if (typeof data === 'undefined') return _badRequest('缺少 data');
   try { var sz = JSON.stringify(data).length; if (sz > 200000) return _badRequest('資料過大'); } catch(err){}
@@ -512,7 +539,7 @@ function _handlePublish(e){
   if (!quota.ok) return _badRequest(quota.message);
   var n = _useNonce(nonce); if (!n.ok) return _badRequest(n.message);
   var conf = _ghConf(); if (!conf.ok) return _badRequest(conf.message);
-  var keys = body && body.keys; if (!Array.isArray(keys) || !keys.length) keys = Object.keys(ALLOWED_KEYS);
+  var keys = _normalizeDatasetKeys(body && body.keys, Object.keys(ALLOWED_KEYS));
   for (var ki=0; ki<keys.length; ki++) {
     if (!ALLOWED_KEYS[String(keys[ki])]) return _badRequest('不允許的 key: ' + String(keys[ki]));
   }
@@ -830,7 +857,9 @@ function _parseDataUrl(dataUrl){
 }
 function _safeFilename(name){
   name = String(name||'').trim() || ('img_'+Date.now());
-  name = name.replace(/[^\w\-.]+/g, '_');
+  name = name.replace(/[\\\/:*?"<>|#%&{}$!`'@+=]+/g, '_').replace(/\s+/g, '_');
+  name = name.replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+  if (!name) name = 'img_' + Date.now();
   if (!/\.[A-Za-z0-9]+$/.test(name)) name += '.png';
   return name;
 }
@@ -838,12 +867,18 @@ function _uniqueImagePath(conf, filename){
   var base = 'img/';
   var name = _safeFilename(filename);
   var path = base + name;
-  // 檢查是否存在，存在則加時間戳
   var cur = _ghGetContent(conf, path);
   if (cur) {
-    var ts = Utilities.formatDate(new Date(), 'Asia/Taipei', "yyyyMMdd_HHmmss");
-    var parts = name.split('.'); var ext = parts.pop(); var stem = parts.join('.');
-    name = stem + '_' + ts + '.' + ext; path = base + name;
+    var parts = name.split('.');
+    var ext = parts.length > 1 ? parts.pop() : 'jpg';
+    var stem = parts.join('.') || 'image';
+    var n = 1;
+    do {
+      name = stem + n + '.' + ext;
+      path = base + name;
+      cur = _ghGetContent(conf, path);
+      n++;
+    } while (cur && n < 1000);
   }
   return path;
 }
@@ -913,6 +948,8 @@ function _ghPutBinary(conf, filepath, bytes, message, prevSha){
   });
   var code = resp.getResponseCode(); var text = resp.getContentText();
   if (code >= 200 && code < 300) return { ok:true, data: JSON.parse(text) };
+  if (code === 401) return { ok:false, message:'GitHub Token 無效或權限不足（401 Bad credentials）' };
+  if (code === 403) return { ok:false, message:'GitHub 權限不足或已達限制（403）' };
   return { ok:false, message: 'GitHub PUT(binary) 失敗: ' + code + ' ' + text };
 }
 function _handleUploadImage(e){
@@ -940,9 +977,14 @@ function _handleUploadImage(e){
     if (mt === 'image/svg+xml') return 'svg';
     return 'jpg';
   })(filename, parsed.mimetype);
-  var hashedName = _nameWithHash(filename, ext, bytes);
-  var path = _uniqueImagePath(conf, hashedName);
-  var put = _ghPutBinary(conf, path, bytes, 'feat(image): upload ' + hashedName);
+  var outputName = _safeFilename(filename);
+  if (ext) {
+    var stemParts = outputName.split('.');
+    if (stemParts.length > 1) stemParts.pop();
+    outputName = (stemParts.join('.') || 'image') + '.' + ext;
+  }
+  var path = _uniqueImagePath(conf, outputName);
+  var put = _ghPutBinary(conf, path, bytes, 'feat(image): upload ' + outputName);
   if (!put || !put.ok) return _badRequest((put && put.message) || '圖片寫入 GitHub 失敗');
   _putImageRow({ id: id, filename: filename, mimetype: parsed.mimetype, base64: '' });
   try { _markImageCommitted(_getImageById(id).row, path, (put.data && put.data.content && put.data.content.sha) || ''); } catch(err){}
@@ -992,9 +1034,14 @@ function _processImagesForPublish(conf, obj){
               return 'jpg';
             })(rec.filename, rec.mimetype);
             var outBytes = bytes;
-            var hashedName = _nameWithHash(rec.filename || 'image', ext, outBytes);
-            var path = _uniqueImagePath(conf, hashedName);
-            var put = _ghPutBinary(conf, path, outBytes, 'feat(image): upload '+hashedName);
+            var outputName = _safeFilename(rec.filename || 'image');
+            if (ext) {
+              var stemParts = outputName.split('.');
+              if (stemParts.length > 1) stemParts.pop();
+              outputName = (stemParts.join('.') || 'image') + '.' + ext;
+            }
+            var path = _uniqueImagePath(conf, outputName);
+            var put = _ghPutBinary(conf, path, outBytes, 'feat(image): upload '+outputName);
             if (put && put.ok){
               _markImageCommitted(rec.row, path, (put.data && put.data.content && put.data.content.sha) || '');
               replaced++;

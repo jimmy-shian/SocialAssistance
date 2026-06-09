@@ -23,6 +23,16 @@
   const VERSION_KEY = AppConfig.versionCacheKey || 'app_data_version';
   const EVT = 'data:updated';
 
+  function normalizeKey(key) {
+    const k = String(key || '');
+    if (k === 'about') return DS.about || 'aboutContent';
+    if (k === 'site') return DS.site || 'siteContent';
+    if (k === 'providersData') return DS.providers || 'providers';
+    if (k === 'blog') return DS.blog || 'blogContent';
+    if (k === 'services') return DS.services || 'servicesContent';
+    return k;
+  }
+
   function getCache() {
     try { return JSON.parse(localStorage.getItem(VERSION_KEY) || '{}'); } catch (e) { return {}; }
   }
@@ -33,7 +43,9 @@
     const body = typeof payload === 'string' ? payload : JSON.stringify(payload || {});
     const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body, credentials: 'omit' });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    return await resp.json();
+    const res = await resp.json();
+    if (!res || res.ok === false) throw new Error((res && res.message) || 'API 回傳失敗');
+    return res;
   }
 
   // Wix 模式的 HTTP 請求
@@ -43,6 +55,7 @@
   }
 
   function applyData(key, data) {
+    key = normalizeKey(key);
     if (!data) return;
     if (key === DS.about || key === 'aboutContent') {
       window.aboutContent = data;
@@ -62,6 +75,7 @@
   }
 
   async function secureRead(key, authToken) {
+    key = normalizeKey(key);
     const t = authToken || token();
     if (!t) throw new Error('未登入');
     
@@ -108,6 +122,7 @@
   }
 
   async function fetchData(key) {
+    key = normalizeKey(key);
     if (USE_WIX) {
       // Wix 模式下需要先登入才能讀取（透過 secureRead）
       // 公開頁面從 localStorage 讀取
@@ -173,6 +188,7 @@
   }
 
   async function update(key, dataObj, authToken) {
+    key = normalizeKey(key);
     const t = authToken || token();
     if (!t) throw new Error('未登入');
     
@@ -212,23 +228,24 @@
     }
     const t = token();
     if (!t) throw new Error('未登入');
-    const payload = { token: t, nonce: mkNonce(), keys: Array.isArray(keys) ? keys : (keys ? [keys] : undefined) };
+    const payload = { token: t, nonce: mkNonce(), keys: Array.isArray(keys) ? keys.map(normalizeKey) : (keys ? [normalizeKey(keys)] : undefined) };
     const res = await postPlain(BASE + (EP.publish || ''), payload);
     return res;
   }
 
   async function savePublish(key, dataObj, keys) {
+    key = normalizeKey(key);
     if (USE_WIX) {
       // Wix 直接更新即可
       return await update(key, dataObj);
     }
     const t = token();
     if (!t) throw new Error('未登入');
-    const payload = { token: t, nonce: mkNonce(), key, data: dataObj, keys: Array.isArray(keys) ? keys : (keys ? [keys] : undefined) };
+    const payload = { token: t, nonce: mkNonce(), key, data: dataObj, keys: Array.isArray(keys) ? keys.map(normalizeKey) : (keys ? [normalizeKey(keys)] : undefined) };
     const res = await postPlain(BASE + (EP.savePublish || ''), payload);
     if (res && res.ok) {
       try {
-        applyData(key, dataObj);
+        applyData(key, res.data || dataObj);
         const ver = res.update && res.update.version;
         if (ver != null) { const c = getCache(); c[key] = ver; setCache(c); }
         dispatchUpdated([key]);

@@ -17,7 +17,7 @@
  *   1. `renderXxxEditor`: 將資料填入 Input。
  *   2. `collectXxxFromUI`: 將 Input 值存回 JSON。
  */
-// Admin UI for editing datasets via GAS
+// Admin UI for editing local js/data datasets, with GAS used only for auth/publish.
 (function () {
   function qs(s, r = document) { return r.querySelector(s); }
   function text(el, msg) { if (el) el.textContent = msg || ''; }
@@ -29,6 +29,65 @@
     btn.classList.toggle('opacity-50', !!loading);
     btn.classList.toggle('cursor-not-allowed', !!loading);
     if (loading) { btn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block align-[-2px]" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>` + (btn.textContent || '處理中…'); } else { btn.innerHTML = btn.dataset.orig; }
+  }
+
+  function cloneData(obj) {
+    try { return JSON.parse(JSON.stringify(obj || {})); } catch (e) { return obj || {}; }
+  }
+
+  function normalizeRepoImagePath(path) {
+    const s = String(path || '').trim();
+    if (!s) return '';
+    if (/^(https?:|data:|blob:|\.\/|\/)/i.test(s)) return s;
+    if (/^img\//i.test(s)) return './' + s;
+    return s;
+  }
+
+  async function fileToDataUrl(file) {
+    return await new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = () => reject(new Error('讀檔失敗'));
+      r.readAsDataURL(file);
+    });
+  }
+
+  function replaceExt(filename, ext) {
+    const clean = String(filename || 'image').replace(/\.[A-Za-z0-9]+$/, '') || 'image';
+    return clean + '.' + ext;
+  }
+
+  async function prepareImageUpload(file) {
+    const type = String(file && file.type || '').toLowerCase();
+    if (!type.startsWith('image/') || type === 'image/svg+xml' || type === 'image/gif') {
+      return { dataUrl: await fileToDataUrl(file), filename: file.name || 'image.png' };
+    }
+    const src = await fileToDataUrl(file);
+    return await new Promise((resolve) => {
+      const img = new Image();
+      img.onload = function () {
+        const maxSide = 1400;
+        const w = img.naturalWidth || img.width || maxSide;
+        const h = img.naturalHeight || img.height || maxSide;
+        const ratio = Math.min(1, maxSide / Math.max(w, h));
+        if (ratio >= 1 && file.size <= 900 * 1024) {
+          resolve({ dataUrl: src, filename: file.name || 'image.jpg' });
+          return;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(w * ratio));
+        canvas.height = Math.max(1, Math.round(h * ratio));
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.84), filename: replaceExt(file.name || 'image', 'jpg') });
+      };
+      img.onerror = async function () {
+        resolve({ dataUrl: await fileToDataUrl(file), filename: file.name || 'image.png' });
+      };
+      img.src = src;
+    });
   }
 
   // ===== Reorder animation helpers (FLIP) =====
@@ -54,17 +113,11 @@
     return window.AppConfig && window.AppConfig.isWixMode && window.AppConfig.isWixMode();
   }
   
-  // 全域：上傳圖片並回傳 URL（Wix 直接回傳 CDN URL，GAS 回傳 gas:// 佔位符）
+  // 全域：上傳圖片並回傳實際前端可用路徑（通常為 ./img/...）
   async function uploadFileAndGetPlaceholder(file) {
     const t = (window.DataAPI && window.DataAPI.token && window.DataAPI.token()) || '';
     if (!t) throw new Error('未登入');
-    
-    const fr = await new Promise((resolve, reject) => { 
-      const r = new FileReader(); 
-      r.onload = () => resolve(r.result); 
-      r.onerror = () => reject(new Error('讀檔失敗')); 
-      r.readAsDataURL(file); 
-    });
+    const prepared = await prepareImageUpload(file);
     
     if (isWixMode()) {
       // Wix 模式：直接回傳 Wix CDN URL
@@ -72,25 +125,28 @@
       const ep = (window.AppConfig && window.AppConfig.wixEndpoints && window.AppConfig.wixEndpoints.uploadImage) || '';
       if (!base || !ep) throw new Error('未設定 Wix');
       
-      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
+      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: prepared.dataUrl, filename: prepared.filename }) });
       if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
       const data = await resp.json();
       if (!data || !data.ok) throw new Error(data?.message || '上傳失敗');
       
       // Wix 直接回傳 CDN URL
-      return data.url;
+      if (!data.url && !data.path) throw new Error('上傳成功但未回傳圖片路徑');
+      return normalizeRepoImagePath(data.url || data.path);
     } else {
-      // GAS 模式：回傳 gas:// 佔位符
+      // GAS 模式：圖片直接寫入 GitHub img/，資料欄位保存可公開讀取的路徑。
       const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
       const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.uploadImage) || '';
       if (!base || !ep) throw new Error('未登入或未設定 GAS');
       
-      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
+      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: prepared.dataUrl, filename: prepared.filename }) });
       if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
       const data = await resp.json();
-      if (!data || !data.ok || !data.id) throw new Error(data && data.message || '上傳失敗');
+      if (!data || !data.ok) throw new Error(data && data.message || '上傳失敗');
+      if (data.url || data.path) return normalizeRepoImagePath(data.url || data.path);
+      if (!data.id || !data.filename) throw new Error('上傳成功但未回傳圖片路徑');
       const ph = `gas://image/${data.id}/${data.filename}`;
-      previewCache[ph] = fr; // 立刻可見縮圖
+      previewCache[ph] = prepared.dataUrl; // 舊版後端 fallback
       return ph;
     }
   }
@@ -297,19 +353,20 @@
   }
   function updateServicePreview(item) {
     try {
-      const pv = item.querySelector('.sc-svc-preview'); const input = item.querySelector('.sc-svc-image');
+      const pv = item.querySelector('.sc-svc-thumb'); const input = item.querySelector('.sc-svc-image');
       if (!pv || !input) return;
       const val = (input.value || '').trim();
-      if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
+      if (!val) { pv.removeAttribute('src'); pv.style.display = 'none'; return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
-      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
-      setPreviewHeightFromImage(pv, url, 0.9);
+      pv.src = url;
+      pv.style.display = 'block';
     } catch (e) { }
   }
 
-  const AppConfig = window.AppConfig || { datasets: { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent' }, versionCacheKey: 'app_data_version' };
-  const DS = AppConfig.datasets || { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent' };
+  const AppConfig = window.AppConfig || { datasets: { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent', services: 'servicesContent' }, versionCacheKey: 'app_data_version' };
+  const DS = AppConfig.datasets || { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent', services: 'servicesContent' };
   const VERSION_KEY = AppConfig.versionCacheKey || 'app_data_version';
+  const LOCAL_DRAFT_PREFIX = 'admin_local_draft_';
 
   function keyFromSelect() {
     const v = (qs('#ds-select')?.value) || 'about';
@@ -319,6 +376,43 @@
     if (v === 'blog') return DS.blog;
     if (v === 'services') return DS.services || 'servicesContent';
     return v; // fallback
+  }
+
+  function getPublishedData(key) {
+    if (key === DS.about || key === 'aboutContent') return cloneData(window.aboutContent || {});
+    if (key === DS.providers || key === 'providers') return cloneData(window.providersData || {});
+    if (key === DS.site || key === 'siteContent') return cloneData(window.siteContent || {});
+    if (key === DS.blog || key === 'blogContent') return cloneData(window.blogContent || { posts: [] });
+    if (key === DS.services || key === 'servicesContent') return cloneData(window.servicesContent || {});
+    return {};
+  }
+
+  function applyLocalData(key, data) {
+    if (key === DS.about || key === 'aboutContent') window.aboutContent = data;
+    else if (key === DS.providers || key === 'providers') window.providersData = data;
+    else if (key === DS.site || key === 'siteContent') window.siteContent = data;
+    else if (key === DS.blog || key === 'blogContent') window.blogContent = data;
+    else if (key === DS.services || key === 'servicesContent') window.servicesContent = data;
+    try { document.dispatchEvent(new CustomEvent((window.DataAPI && window.DataAPI.EVENT) || 'data:updated', { detail: { keys: [key] } })); } catch (e) { }
+  }
+
+  function draftKey(key) { return LOCAL_DRAFT_PREFIX + key; }
+  function readLocalDraft(key) {
+    try {
+      const raw = localStorage.getItem(draftKey(key));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.data ? parsed : null;
+    } catch (e) { return null; }
+  }
+  function saveLocalDraft(key, data) {
+    const payload = { key, data, savedAt: new Date().toISOString() };
+    localStorage.setItem(draftKey(key), JSON.stringify(payload));
+    applyLocalData(key, data);
+    return payload;
+  }
+  function clearLocalDraft(key) {
+    try { localStorage.removeItem(draftKey(key)); } catch (e) { }
   }
 
   // ---- GAS secure read（回傳完整 JSON：含 hasData/updatedAt/version/data） ----
@@ -345,6 +439,42 @@
     } catch (e) { return {}; }
   }
   function fmtTime(d) { try { const dt = (d instanceof Date) ? d : new Date(d); if (isNaN(+dt)) return '-'; const pad = n => String(n).padStart(2, '0'); return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`; } catch (e) { return '-'; } }
+  function mergeByIndex(existing, rows, keyField) {
+    const base = Array.isArray(existing) ? existing : [];
+    return (rows || []).map((row, i) => ({ ...(base[i] || {}), ...(row || {}) })).filter(item => {
+      if (!keyField) return true;
+      return item && String(item[keyField] || '').trim();
+    });
+  }
+  function normalizeSiteContentData(data) {
+    const src = (data && typeof data === 'object') ? data : {};
+    const hero = src.hero || {};
+    const philosophy = src.philosophy || {};
+    const normalizedServices = Array.isArray(src.services) ? src.services : [];
+    return {
+      ...src,
+      hero: {
+        ...hero,
+        label: hero.label || src.heroLabel || 'SOUND CORE STUDIO',
+        title: hero.title || src.heroTitle || '',
+        subtitle: hero.subtitle || src.heroSubtitle || '',
+        info: hero.info || src.heroInfo || '',
+        slides: Array.isArray(hero.slides) ? hero.slides : []
+      },
+      philosophy: {
+        ...philosophy,
+        label: philosophy.label || src.philosophyLabel || '',
+        title: philosophy.title || src.philosophyTitle || '',
+        content: philosophy.content || src.philosophyContent || '',
+        img: philosophy.img || src.philosophyImage || ''
+      },
+      services: normalizedServices.map(item => ({
+        ...item,
+        image: item.image || item.img || '',
+        img: item.img || item.image || ''
+      }))
+    };
+  }
   async function updateVersionLabel() {
     const key = keyFromSelect();
     const el = qs('#ds-version'); if (!el) return;
@@ -417,7 +547,7 @@
     const logged = !!token;
     show(qs('#admin-login'), !logged);
     show(qs('#admin-panel'), logged);
-    if (logged) { try { const tip = qs('#admin-header-tip'); if (tip) tip.textContent = '已登入：請從上方資料集下拉選單選擇 About / Providers / Site Content 並開始編輯。'; } catch (e) { } }
+    if (logged) { try { const tip = qs('#admin-header-tip'); if (tip) tip.textContent = '已登入：資料從 js/data 載入；暫存只保存在本機，發布後才更新網站。'; } catch (e) { } }
 
     // Inject Font Awesome for icon buttons
     ensureFontAwesome();
@@ -433,7 +563,16 @@
     } catch (e) { }
 
     updateVersionLabel();
-    // 若已登入且是直接刷新頁面，主動載入並渲染目前所選資料集
+
+    // 先註冊 ds-select change handler，確保在 async loadDatasetAndRender 執行期間使用者切換資料集也能被處理
+    qs('#ds-select')?.addEventListener('change', async () => {
+      try { const v = qs('#ds-select')?.value || ''; localStorage.setItem('admin_ds_selected', v); } catch (e) { }
+      updateVersionLabel();
+      toggleSections();
+      try { await loadDatasetAndRender(); } catch (e) { }
+    });
+
+    // 若已登入，初次載入並渲染目前資料集（此時 change handler 已註冊，使用者切換無 race condition）
     if (logged) {
       try { toggleSections(); } catch (e) { }
       try { await loadDatasetAndRender(); } catch (e) { }
@@ -452,13 +591,10 @@
         const res = await window.DataAPI.login(u, p);
         if (!res || !res.ok) { text(status, res && res.message || '登入失敗'); if (window.Toast) Toast.show(res && res.message || '登入失敗', 'error', 3000); setBtnLoading(admBtn, false); return; }
         text(status, '登入成功'); if (window.Toast) Toast.show('登入成功', 'success', 1500);
-        // 登入成功後更新標頭提示文字
-        try { const tip = qs('#admin-header-tip'); if (tip) tip.textContent = '已登入：請從上方資料集下拉選單選擇 About / Providers / Site Content 並開始編輯。'; } catch (e) { }
+        try { const tip = qs('#admin-header-tip'); if (tip) tip.textContent = '已登入：資料從 js/data 載入；暫存只保存在本機，發布後才更新網站。'; } catch (e) { }
         show(qs('#admin-login'), false);
         show(qs('#admin-panel'), true);
-        // 以安全端點讀取目前選擇的資料集並渲染可視化表單
         try { await loadDatasetAndRender(); } catch (e) { }
-        // 登入後刷新「最後更新」時間
         try { await updateVersionLabel(); } catch (e) { }
       } catch (e) { text(status, '錯誤：' + e.message); if (window.Toast) Toast.show('登入錯誤：' + e.message, 'error', 3000); }
       finally { setBtnLoading(admBtn, false); }
@@ -467,14 +603,6 @@
     [admUsr, admPwd].forEach(el => el?.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); admBtn?.click(); } }));
 
     qs('#btn-logout')?.addEventListener('click', () => { window.DataAPI.logout(); window.location.reload(); });
-
-    // 切換資料集：自動載入並顯示對應可視化介面
-    qs('#ds-select')?.addEventListener('change', async () => {
-      try { const v = qs('#ds-select')?.value || ''; localStorage.setItem('admin_ds_selected', v); } catch (e) { }
-      updateVersionLabel();
-      toggleSections();
-      try { await loadDatasetAndRender(); } catch (e) { }
-    });
 
     // 儲存並同步
     qs('#btn-save-publish')?.addEventListener('click', onSavePublish);
@@ -553,6 +681,7 @@
   function isServicesSelected() { return (qs('#ds-select')?.value) === 'services'; }
   // 平滑展開/收合區塊
   let __curSectionId = null;
+  let _loadGen = 0;
   function currentSectionId() { if (isProvidersSelected()) return 'providers-visual'; if (isAboutSelected()) return 'about-visual'; if (isSiteSelected()) return 'site-visual'; if (isServicesSelected()) return 'services-visual'; if (isBlogSelected()) return 'blog-visual'; return null; }
   function asEl(id) { return id ? qs('#' + id) : null; }
   function ensureCollapsible(el) { if (!el) return; el.classList.add('admin-collapsible'); }
@@ -582,7 +711,7 @@
   function getEditorJSON() { try { return JSON.parse(qs('#ds-editor')?.value || '{}'); } catch (e) { alert('內部狀態解析失敗'); return {}; } }
   function setEditor(obj) { const ed = qs('#ds-editor'); if (ed) ed.value = JSON.stringify(obj || {}, null, 2); }
 
-  // 載入資料：優先使用 Google Sheet 暫存（若存在），同時顯示 skeleton 動畫
+  // 載入資料：以 js/data 的公開資料為基底，再覆蓋 localStorage 草稿。
   function buildSkeleton() {
     const sk = [];
     for (let i = 0; i < 3; i++) {
@@ -608,42 +737,49 @@
     box.classList.remove('hidden');
     try { document.querySelectorAll('.admin-collapsible').forEach(sec => sec.classList.add('hidden')); } catch (e) { }
   }
-  function hideLoading() {
+  function hideLoading(sectionId) {
     const box = qs('#admin-loading'); if (!box) return;
     box.classList.add('hidden');
     box.innerHTML = '';
-    // 恢復目前應顯示的視覺化區塊
-    try { toggleSections(); } catch (e) { }
+    // 恢復應顯示的視覺化區塊（若有指定 sectionId 則直接顯示該區塊，避免 toggleSections 使用當前的 select value）
+    if (sectionId) {
+      const ids = ['providers-visual', 'about-visual', 'site-visual', 'services-visual', 'blog-visual'];
+      ids.forEach(id => ensureCollapsible(asEl(id)));
+      // 隱藏其他 section
+      ids.forEach(id => { const el = asEl(id); if (el && id !== sectionId) el.classList.add('hidden'); });
+      // 顯示目標 section
+      const target = asEl(sectionId);
+      if (target) {
+        target.classList.remove('hidden');
+        void target.offsetHeight;
+        target.classList.add('open');
+      }
+      __curSectionId = sectionId;
+    } else {
+      try { toggleSections(); } catch (e) { }
+    }
   }
 
   async function loadDatasetAndRender() {
+    const gen = ++_loadGen;
     const key = keyFromSelect();
     showLoading();
-    // 先載入「目前網站的本地資料」
-    let payload = (function () {
-      if (key === DS.about) return window.aboutContent || {};
-      if (key === DS.providers) return window.providersData || {};
-      if (key === DS.site) return window.siteContent || {};
-      if (key === DS.blog) return window.blogContent || { posts: [] };
-      if (key === (DS.services || 'servicesContent')) return window.servicesContent || {};
-      return {};
-    })();
-    // 若已登入，向 GAS 讀取；若 hasData=true 則優先使用暫存資料
-    try {
-      if (window.DataAPI && window.DataAPI.token()) {
-        const res = await postReadRaw(key);
-        if (res && res.ok) {
-          const useTemp = !!res.hasData && res.data && typeof res.data === 'object' && Object.keys(res.data).length > 0;
-          if (useTemp) payload = res.data;
-        }
-      }
-    } catch (e) { /* ignore */ }
+    let payload = getPublishedData(key);
+    const draft = readLocalDraft(key);
+    if (draft && draft.data && typeof draft.data === 'object') payload = cloneData(draft.data);
+    if (key === DS.site || key === 'siteContent') payload = normalizeSiteContentData(payload);
+    if (key === DS.services || key === 'servicesContent') {
+      payload = { ...(payload || {}), items: Array.isArray(payload?.items) ? payload.items.map(item => ({ ...item, image: item.image || item.img || '' })) : [] };
+    }
+
+    // 若在此次 await 期間已有更新的載入請求，則捨棄這次的結果（避免 out-of-order 覆寫）
+    if (gen !== _loadGen) return;
 
     // 寫入內部編輯器狀態
-    if (isProvidersSelected()) { try { ensureProviderIds(payload); } catch (e) { } }
+    if (key === DS.providers || key === 'providers') { try { ensureProviderIds(payload); } catch (e) { } }
     setEditor(payload);
-    // 渲染對應視覺化介面
-    if (isProvidersSelected()) {
+    // 渲染對應視覺化介面（使用載入時捕捉的 key，避免 await 後 select 值已變）
+    if (key === DS.providers || key === 'providers') {
       fillProviderSelect(payload);
       const firstKey = Object.keys(payload || {})[0];
       if (firstKey) {
@@ -654,16 +790,23 @@
       } else {
         qs('#pv-cases-list').innerHTML = '';
       }
-    } else if (isAboutSelected()) {
+    } else if (key === DS.about || key === 'aboutContent') {
       renderAboutEditor(payload || {});
-    } else if (isSiteSelected()) {
+    } else if (key === DS.site || key === 'siteContent') {
       renderSiteEditor(payload || {});
-    } else if (isServicesSelected()) {
+    } else if (key === DS.services || key === 'servicesContent') {
       renderServicesEditor(payload || {});
-    } else if (isBlogSelected()) {
+    } else if (key === DS.blog || key === 'blogContent') {
       renderBlogEditor(payload || {});
     }
-    hideLoading();
+    // 確保顯示正確的 section（與載入的 key 同步）
+    const expectedSectionId = key === DS.providers || key === 'providers' ? 'providers-visual'
+      : key === DS.about || key === 'aboutContent' ? 'about-visual'
+      : key === DS.site || key === 'siteContent' ? 'site-visual'
+      : key === DS.services || key === 'servicesContent' ? 'services-visual'
+      : key === DS.blog || key === 'blogContent' ? 'blog-visual'
+      : null;
+    hideLoading(expectedSectionId);
     try { renderLivePreview(); } catch (e) { }
   }
 
@@ -1121,19 +1264,21 @@
       list?.querySelectorAll('.pv-img-cell.dragging,.pv-img-cell.drag-over')?.forEach(el => el.classList.remove('dragging', 'drag-over'));
       list?.querySelector('.pv-img-list')?.classList.remove('dropzone-hover');
     });
-    // Upload via GAS (stores to Sheet, returns placeholder gas://image/<id>/<filename>)
+    // Upload via GAS/GitHub and store the final ./img/... path in the data.
     async function uploadFileAndGetPlaceholder(file) {
       const base = (window.AppConfig && window.AppConfig.GAS_BASE_URL) || '';
       const ep = (window.AppConfig && window.AppConfig.endpoints && window.AppConfig.endpoints.uploadImage) || '';
       const t = (window.DataAPI && window.DataAPI.token && window.DataAPI.token()) || '';
       if (!base || !ep || !t) throw new Error('未登入或未設定 GAS');
-      const fr = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => reject(new Error('讀檔失敗')); r.readAsDataURL(file); });
-      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: fr, filename: file.name }) });
+      const prepared = await prepareImageUpload(file);
+      const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: prepared.dataUrl, filename: prepared.filename }) });
       if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
       const data = await resp.json();
-      if (!data || !data.ok || !data.id) throw new Error(data && data.message || '上傳失敗');
+      if (!data || !data.ok) throw new Error(data && data.message || '上傳失敗');
+      if (data.url || data.path) return normalizeRepoImagePath(data.url || data.path);
+      if (!data.id || !data.filename) throw new Error('上傳成功但未回傳圖片路徑');
       const ph = `gas://image/${data.id}/${data.filename}`;
-      previewCache[ph] = fr; // 立刻可見縮圖
+      previewCache[ph] = prepared.dataUrl;
       return ph;
     }
     root.addEventListener('change', async (e) => {
@@ -1248,43 +1393,62 @@
     setEditor(root);
   }
 
+  function normalizePayloadForSelectedDataset(payload) {
+    if (isSiteSelected()) return normalizeSiteContentData(payload);
+    if (isServicesSelected()) {
+      return {
+        ...(payload || {}),
+        items: Array.isArray(payload?.items) ? payload.items.map(item => ({
+          ...item,
+          image: item.image || item.img || ''
+        })) : []
+      };
+    }
+    return payload || {};
+  }
+
+  function collectCurrentPayload() {
+    let payload;
+    if (isProvidersSelected()) {
+      syncCurrentProviderToEditor();
+      const before = getEditorJSON();
+      const oldSel = qs('#pv-prov-select')?.value;
+      const norm = normalizeProviderIdsFromNames(before);
+      payload = norm.root;
+      setEditor(payload);
+      try {
+        fillProviderSelect(payload);
+        const nextSel = (oldSel && norm.idMap[oldSel]) || Object.keys(payload || {})[0];
+        if (nextSel) {
+          qs('#pv-prov-select').value = nextSel;
+          try { updatePvProvButtonLabelFromSelect(); } catch (e) { }
+          const p = payload[nextSel] || {};
+          renderCasesEditor(p); fillBasicFields(p); renderTimelineEditor(p);
+        }
+      } catch (e) { }
+    }
+    else if (isAboutSelected()) { payload = collectAboutFromUI(); }
+    else if (isSiteSelected()) { payload = collectSiteFromUI(); }
+    else if (isServicesSelected()) { payload = collectServicesFromUI(); }
+    else if (isBlogSelected()) { payload = collectBlogFromUI(); }
+    else { payload = getEditorJSON(); }
+    return normalizePayloadForSelectedDataset(payload);
+  }
+
   // 儲存＋同步 GitHub
   async function onSavePublish() {
     const key = keyFromSelect();
     const st = qs('#publish-status'); if (st) st.textContent = '儲存並同步中…';
     try {
       setBtnLoading(qs('#btn-save-publish'), true);
-      let payload;
-      if (isProvidersSelected()) {
-        // 將目前 UI 回寫到編輯器，接著依 name 正規化 id 並重建鍵
-        syncCurrentProviderToEditor();
-        const before = getEditorJSON();
-        const oldSel = qs('#pv-prov-select')?.value;
-        const norm = normalizeProviderIdsFromNames(before);
-        payload = norm.root;
-        // 立即同步回編輯器與 UI（避免後續操作仍使用舊鍵）
-        setEditor(payload);
-        try {
-          fillProviderSelect(payload);
-          const nextSel = (oldSel && norm.idMap[oldSel]) || Object.keys(payload || {})[0];
-          if (nextSel) {
-            qs('#pv-prov-select').value = nextSel;
-            try { updatePvProvButtonLabelFromSelect(); } catch (e) { }
-            const p = payload[nextSel] || {};
-            renderCasesEditor(p); fillBasicFields(p); renderTimelineEditor(p);
-          }
-        } catch (e) { }
+      let payload = collectCurrentPayload();
+      const okToPublish = confirm('確定要儲存並發布嗎？\n\n這會同步到 GitHub，且每日最多 10 次。');
+      if (!okToPublish) {
+        if (st) st.textContent = '已取消發布';
+        return;
       }
-      else if (isAboutSelected()) { payload = collectAboutFromUI(); }
-      else if (isSiteSelected()) { payload = collectSiteFromUI(); }
-      else if (isServicesSelected()) { payload = collectServicesFromUI(); }
-      else if (isBlogSelected()) { payload = collectBlogFromUI(); }
-      else { payload = getEditorJSON(); }
       let res = await window.DataAPI.savePublish(key, payload, [key]);
-      if (!res || !res.ok) {
-        // 退回為僅儲存（無 GitHub）
-        try { res = await window.DataAPI.update(key, payload); } catch (err) { }
-      }
+      if (res && res.ok && res.data && typeof res.data === 'object') payload = res.data;
       // 判斷發佈是否失敗（即便存檔成功）
       const hasPublishErrors = !!(res && Array.isArray(res.results) && res.results.some(r => !r || r.ok === false));
       const firstErr = hasPublishErrors ? (res.results.find(r => !r || r.ok === false) || {}) : null;
@@ -1311,6 +1475,11 @@
           Toast.show('儲存/發佈失敗：' + ((res && res.message) || '未知錯誤'), 'error', 3500);
         }
       }
+      if (res && res.ok && !hasPublishErrors) {
+        applyLocalData(key, payload);
+        clearLocalDraft(key);
+        setEditor(payload);
+      }
       updateVersionLabel();
 
     } catch (e) { if (st) st.textContent = '錯誤：' + e.message; if (window.Toast) Toast.show('儲存錯誤：' + e.message, 'error', 3000); }
@@ -1323,33 +1492,11 @@
     const st = qs('#publish-status'); if (st) st.textContent = '儲存中…';
     try {
       setBtnLoading(qs('#btn-save-only'), true);
-      let payload;
-      if (isProvidersSelected()) {
-        syncCurrentProviderToEditor();
-        const before = getEditorJSON();
-        const oldSel = qs('#pv-prov-select')?.value;
-        const norm = normalizeProviderIdsFromNames(before);
-        payload = norm.root;
-        setEditor(payload);
-        try {
-          fillProviderSelect(payload);
-          const nextSel = (oldSel && norm.idMap[oldSel]) || Object.keys(payload || {})[0];
-          if (nextSel) {
-            qs('#pv-prov-select').value = nextSel;
-            try { updatePvProvButtonLabelFromSelect(); } catch (e) { }
-            const p = payload[nextSel] || {};
-            renderCasesEditor(p); fillBasicFields(p); renderTimelineEditor(p);
-          }
-        } catch (e) { }
-      }
-      else if (isAboutSelected()) { payload = collectAboutFromUI(); }
-      else if (isSiteSelected()) { payload = collectSiteFromUI(); }
-      else if (isServicesSelected()) { payload = collectServicesFromUI(); }
-      else if (isBlogSelected()) { payload = collectBlogFromUI(); }
-      else { payload = getEditorJSON(); }
-      const res = await window.DataAPI.update(key, payload);
-      if (st) st.textContent = (res && res.ok) ? '已儲存' : ('儲存失敗：' + (res && res.message || '未知錯誤'));
-      if (window.Toast) Toast.show((res && res.ok) ? '已儲存' : '儲存失敗：' + (res && res.message || '未知錯誤'), (res && res.ok) ? 'success' : 'error', 3000);
+      const payload = collectCurrentPayload();
+      saveLocalDraft(key, payload);
+      setEditor(payload);
+      if (st) st.textContent = '已暫存於本機';
+      if (window.Toast) Toast.show('已暫存於本機，發布後才會更新 js/data', 'success', 3000);
       updateVersionLabel();
     } catch (e) { if (st) st.textContent = '錯誤：' + e.message; if (window.Toast) Toast.show('儲存錯誤：' + e.message, 'error', 3000); }
     finally { setBtnLoading(qs('#btn-save-only'), false); }
@@ -1713,14 +1860,14 @@
             <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.image || row.img || ''}" placeholder="./img/... 或上傳">
             <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
             <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden shrink-0">
-              <img src="${row.image || row.img || ''}" class="w-full h-full object-contain sc-svc-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
+              <img src="${row.image || row.img || ''}" class="w-full h-full object-contain sc-svc-thumb" onerror="this.style.display='none'" onload="this.style.display='block'">
             </div>
           </div>
         </div>
       </div>`;
     // Live preview for image
     wrap.querySelector('.sc-svc-image').addEventListener('input', e => {
-      const preview = wrap.querySelector('.sc-svc-preview');
+      const preview = wrap.querySelector('.sc-svc-thumb');
       if (preview) {
         preview.src = e.target.value;
         preview.style.display = 'block';
@@ -1728,9 +1875,10 @@
     });
     // Upload handler
     wrap.querySelector('.sc-svc-upload').addEventListener('change', async e => {
+      e.__scSvcUploadHandled = true;
       const file = e.target.files?.[0]; if (!file) return;
       const input = wrap.querySelector('.sc-svc-image');
-      const preview = wrap.querySelector('.sc-svc-preview');
+      const preview = wrap.querySelector('.sc-svc-thumb');
       try {
         const ph = await uploadFileAndGetPlaceholder(file);
         if (input) input.value = ph;
@@ -1750,10 +1898,11 @@
 
   function renderSiteEditor(data) {
     // data is window.siteContent (hero, philosophy, services keys at root)
+    data = normalizeSiteContentData(data);
     const hero = data.hero || {};
-    const hTitle = qs('#sc-hero-title'); if (hTitle) hTitle.value = toPlainText(hero.title) || '';
-    const hSub = qs('#sc-hero-subtitle'); if (hSub) hSub.value = toPlainText(hero.subtitle) || '';
-    const hInfo = qs('#sc-hero-info'); if (hInfo) hInfo.value = toPlainText(hero.info) || '';
+    const hTitle = qs('#sc-hero-title'); if (hTitle) hTitle.value = hero.title || '';
+    const hSub = qs('#sc-hero-subtitle'); if (hSub) hSub.value = hero.subtitle || '';
+    const hInfo = qs('#sc-hero-info'); if (hInfo) hInfo.value = hero.info || '';
 
     const sList = qs('#sc-hero-slides');
     if (sList) {
@@ -1763,8 +1912,8 @@
 
     const phil = data.philosophy || {};
     if (qs('#sc-phil-label')) qs('#sc-phil-label').value = phil.label || '';
-    if (qs('#sc-phil-title')) qs('#sc-phil-title').value = toPlainText(phil.title) || '';
-    if (qs('#sc-phil-content')) qs('#sc-phil-content').value = toPlainText(phil.content) || '';
+    if (qs('#sc-phil-title')) qs('#sc-phil-title').value = phil.title || '';
+    if (qs('#sc-phil-content')) qs('#sc-phil-content').value = phil.content || '';
     if (qs('#sc-phil-img')) qs('#sc-phil-img').value = phil.img || '';
     // Update philosophy preview
     const philPreview = qs('#sc-phil-preview-img');
@@ -1773,8 +1922,17 @@
     const svcList = qs('#sc-service-list');
     if (svcList) {
       svcList.innerHTML = '';
-      (data.services || []).forEach((s, i) => svcList.appendChild(buildServiceItem(s, i)));
+      (data.services || []).forEach((s, i) => {
+        const node = buildServiceItem(s, i);
+        svcList.appendChild(node);
+        try { updateServicePreview(node); } catch (e) { }
+      });
     }
+
+    // 其餘區塊若頁面上有對應欄位，也一併回填，避免切到主畫面時只看到半套資料
+    if (qs('#sc-sdgs-title')) qs('#sc-sdgs-title').value = data.sdgsTitle || '';
+    if (qs('#sc-resources-title')) qs('#sc-resources-title').value = data.resources?.title || '';
+    if (qs('#sc-map-title')) qs('#sc-map-title').value = data.map?.title || '';
   }
 
   function addBlankSlide() {
@@ -1787,42 +1945,54 @@
   }
 
   function collectSiteFromUI() {
-    // Preserve existing data for fields not edited via UI
-    const existing = window.siteContent || {};
+    // Preserve existing loaded/draft data for fields not edited via UI.
+    const existing = normalizeSiteContentData(getEditorJSON() || {});
+    const existingHero = existing.hero || {};
+    const existingPhil = existing.philosophy || {};
+    const slideRows = Array.from(qs('#sc-hero-slides')?.children || []).map(el => ({
+      img: el.querySelector('.sc-slide-img')?.value?.trim() || '',
+      alt: el.querySelector('.sc-slide-alt')?.value?.trim() || ''
+    })).filter(x => x.img);
+    const serviceRows = Array.from(qs('#sc-service-list')?.children || []).map(el => ({
+      title: el.querySelector('.sc-svc-title')?.value?.trim() || '',
+      desc: el.querySelector('.sc-svc-desc')?.value?.trim() || '',
+      icon: el.querySelector('.sc-svc-icon')?.value?.trim() || '',
+      link: el.querySelector('.sc-svc-link')?.value?.trim() || '',
+      img: el.querySelector('.sc-svc-image')?.value?.trim() || ''
+    })).filter(x => x.title || x.desc || x.img);
 
     const out = {
+      ...existing,
       hero: {
-        label: existing.hero?.label || 'SOUND CORE STUDIO',
+        ...existingHero,
+        label: existingHero.label || 'SOUND CORE STUDIO',
         title: linkifyHtml(qs('#sc-hero-title')?.value || ''),
         subtitle: linkifyHtml(qs('#sc-hero-subtitle')?.value || ''),
         info: linkifyHtml(qs('#sc-hero-info')?.value || ''),
-        slides: Array.from(qs('#sc-hero-slides')?.children || []).map(el => ({
-          img: el.querySelector('.sc-slide-img')?.value?.trim() || '',
-          alt: el.querySelector('.sc-slide-alt')?.value?.trim() || ''
-        })).filter(x => x.img),
-        buttons: existing.hero?.buttons || [
+        slides: mergeByIndex(existingHero.slides, slideRows, 'img'),
+        buttons: existingHero.buttons || [
           { text: '開始探索', link: './explore.html', style: 'primary' },
           { text: '了解更多', link: '#about', style: 'outline' }
         ]
       },
       philosophy: {
+        ...existingPhil,
         label: qs('#sc-phil-label')?.value?.trim() || '',
         title: linkifyHtml(qs('#sc-phil-title')?.value || ''),
         content: linkifyHtml(qs('#sc-phil-content')?.value || ''),
         img: qs('#sc-phil-img')?.value?.trim() || ''
       },
-      services: Array.from(qs('#sc-service-list')?.children || []).map(el => ({
-        title: el.querySelector('.sc-svc-title')?.value?.trim() || '',
-        desc: el.querySelector('.sc-svc-desc')?.value?.trim() || '',
-        icon: el.querySelector('.sc-svc-icon')?.value?.trim() || '',
-        link: el.querySelector('.sc-svc-link')?.value?.trim() || '',
-        img: el.querySelector('.sc-svc-image')?.value?.trim() || ''
-      })).filter(x => x.title),
-      // Preserve existing sections not edited in admin
+      services: mergeByIndex(existing.services, serviceRows),
       sdgs: existing.sdgs || [],
-      resources: existing.resources || {},
+      resources: {
+        ...(existing.resources || {}),
+        title: qs('#sc-resources-title')?.value?.trim() || existing.resources?.title || ''
+      },
       blogPosts: existing.blogPosts || [],
-      map: existing.map || {}
+      map: {
+        ...(existing.map || {}),
+        title: qs('#sc-map-title')?.value?.trim() || existing.map?.title || ''
+      }
     };
     return out; // Return flat siteContent, not wrapped
   }
@@ -1857,7 +2027,7 @@
   }
 
   function collectServicesFromUI() {
-    const existing = window.servicesContent || {};
+    const existing = getEditorJSON() || {};
     return {
       ...existing,
       title: qs('#svc-title')?.value?.trim() || '服務項目',
@@ -1973,18 +2143,19 @@
     const item = inp.closest('div[data-index]'); if (item) updateServicePreview(item);
   });
   qs('#sc-service-list')?.addEventListener('change', async (e) => {
+    if (e.__scSvcUploadHandled) return;
     const up = e.target.closest('.sc-svc-upload'); if (!up) return;
     const item = up.closest('div[data-index]'); if (!item) return;
     const file = up.files?.[0]; if (!file) return;
     up.disabled = true;
     try {
-      const pv = item.querySelector('.sc-svc-preview'); if (pv) pv.classList.add('is-uploading');
+      const pv = item.querySelector('.sc-svc-thumb'); if (pv) pv.classList.add('is-uploading');
       const ph = await uploadFileAndGetPlaceholder(file);
       const input = item.querySelector('.sc-svc-image'); if (input) input.value = ph;
       updateServicePreview(item);
       if (window.Toast) Toast.show('圖片已加入（待發佈）', 'success', 2000);
     } catch (err) { if (window.Toast) Toast.show('上傳失敗：' + err.message, 'error', 3000); }
-    finally { up.value = ''; up.disabled = false; const pv = item.querySelector('.sc-svc-preview'); if (pv) pv.classList.remove('is-uploading'); }
+    finally { up.value = ''; up.disabled = false; const pv = item.querySelector('.sc-svc-thumb'); if (pv) pv.classList.remove('is-uploading'); }
   });
 
   // Site｜Philosophy 圖片預覽/上傳
@@ -2847,7 +3018,8 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
   function collectBlogFromUI() {
     const list = qs('#bl-post-list');
     if (!list) return { posts: [] };
-    const existingPosts = (window.blogContent && Array.isArray(window.blogContent.posts)) ? window.blogContent.posts : [];
+    const current = getEditorJSON();
+    const existingPosts = (current && Array.isArray(current.posts)) ? current.posts : [];
     const posts = Array.from(list.children).map(el => {
       const get = sel => el.querySelector(sel);
       const id = get('.bl-id')?.value || '';

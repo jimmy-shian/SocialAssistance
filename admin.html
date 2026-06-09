@@ -39,8 +39,8 @@
 
     <main class="container mx-auto px-6 py-12">
       <header class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-gradient inline-block">資料管理（GAS）</h1>
-        <p id="admin-header-tip" class="text-gray-600 dark:text-gray-300">登入後可編輯以下三個資料集：About、Providers、Site Content。
+        <h1 class="text-3xl font-bold text-gradient inline-block">資料管理</h1>
+        <p id="admin-header-tip" class="text-gray-600 dark:text-gray-300">登入後可編輯 js/data 的資料集；暫存只保存在本機，發布後才更新網站資料。
         </p>
         <div id="gas-url-warning" class="mt-3 hidden text-sm text-red-600 dark:text-red-400">請先在
           <code>js/config.js</code>
@@ -121,8 +121,8 @@
                 </button>
                 <!-- Dropdown Menu -->
                 <div id="ds-menu"
-                  class="absolute left-1/2 -translate-x-1/2 mt-4 w-56 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden origin-top scale-95 opacity-0 invisible group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
-                  <div class="py-1">
+                  class="absolute left-1/2 top-full -translate-x-1/2 pt-2 w-56 bg-transparent origin-top scale-95 opacity-0 invisible group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
+                  <div class="overflow-hidden bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl">
                     <button type="button" data-value="site"
                       class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400 border-b border-gray-100 dark:border-gray-800">主畫面
                       <span class="block text-xs text-gray-400 font-normal">siteContent</span></button>
