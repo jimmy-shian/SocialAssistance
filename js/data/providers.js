@@ -3,7 +3,7 @@ window.providersData = {
   "dongshi-fisher": {
     "id": "dongshi-fisher",
     "name": "東石漁囡仔",
-    "category": "養殖/食農加工",
+    "category": "養殖漁業",
     "schedule": "每週六 09:00–12:00",
     "location": "嘉義縣 東石鄉",
     "address": "嘉義縣東石鄉東石村XX路XX號",
@@ -51,6 +51,13 @@ window.providersData = {
         "detail": "簡易海鮮料理與分享"
       }
     ],
+    "contact": {
+      "phone": "05-3731234",
+      "email": "dongshi@example.com",
+      "contactPerson": "陳班長",
+      "line": "@dongshifish",
+      "hours": "週六 09:00–12:00"
+    },
     "cases": [
       {
         "id": "case-1",
@@ -78,7 +85,7 @@ window.providersData = {
   "woodwork-day": {
     "id": "woodwork-day",
     "name": "一日小木匠",
-    "category": "工匠/技藝",
+    "category": "樂器零售業",
     "schedule": "每週日 13:30–17:30",
     "location": "嘉義市 東區",
     "address": "嘉義市東區XX街XX號",
@@ -126,6 +133,13 @@ window.providersData = {
         "detail": "表面處理與完成作品展示"
       }
     ],
+    "contact": {
+      "phone": "05-2756789",
+      "email": "woodwork@example.com",
+      "contactPerson": "林師傅",
+      "line": "@woodday",
+      "hours": "週日 13:30–17:30"
+    },
     "cases": [
       {
         "id": "case-1",
@@ -149,7 +163,7 @@ window.providersData = {
   "coffee-starter": {
     "id": "coffee-starter",
     "name": "小小咖啡師",
-    "category": "餐飲服務",
+    "category": "餐飲業",
     "schedule": "每週三 15:00–18:00",
     "location": "嘉義市 西區",
     "address": "嘉義市西區XX路XX號",
@@ -197,6 +211,13 @@ window.providersData = {
         "detail": "基本圖案練習與服務流程"
       }
     ],
+    "contact": {
+      "phone": "05-2834567",
+      "email": "coffee@example.com",
+      "contactPerson": "王店長",
+      "line": "@coffeestarter",
+      "hours": "週三 15:00–18:00"
+    },
     "cases": [
       {
         "id": "case-1",
@@ -213,7 +234,7 @@ window.providersData = {
   },
   "佇嘉木DI-JA-BU": {
     "name": "佇嘉木",
-    "category": "體驗教育、戶外教育、探索教育",
+    "category": "農業",
     "location": "嘉義縣市",
     "address": "嘉義縣朴子市竹圍里大同路２４６號",
     "description": "走進木文化，透過攀樹體驗，投身自然場域裡，遠離社會塵囂，擁抱大自然，享受大自然，從中認識自我，發覺學習的樂趣，遼闊視野，找到心靈的平靜。",
@@ -261,6 +282,13 @@ window.providersData = {
         "detail": "參觀史蹟資料館"
       }
     ],
+    "contact": {
+      "phone": "05-3798888",
+      "email": "dijabu@example.com",
+      "contactPerson": "黃教練",
+      "line": "@dijabu",
+      "hours": "週一至週日 9:00–12:00、13:30–16:30"
+    },
     "featuredOnIndex": true,
     "schedule": "星期一至星期日9:00-12:00；13:30-16:30",
     "id": "佇嘉木DI-JA-BU"

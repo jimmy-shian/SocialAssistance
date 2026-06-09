@@ -133,6 +133,9 @@
                     <button type="button" data-value="providers"
                       class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400 border-b border-gray-100 dark:border-gray-800">探索資源
                       <span class="block text-xs text-gray-400 font-normal">providers</span></button>
+                    <button type="button" data-value="services"
+                      class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400 border-b border-gray-100 dark:border-gray-800">服務項目
+                      <span class="block text-xs text-gray-400 font-normal">servicesContent</span></button>
                     <button type="button" data-value="blog"
                       class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400">部落格
                       <span class="block text-xs text-gray-400 font-normal">blogContent</span></button>
@@ -142,6 +145,7 @@
                   <option value="site">siteContent</option>
                   <option value="about">aboutContent</option>
                   <option value="providers">providers</option>
+                  <option value="services">servicesContent</option>
                   <option value="blog">blogContent</option>
                 </select>
               </div>
@@ -312,6 +316,46 @@
               <button id="sc-add-service" class="btn-soft btn-purple">新增服務</button>
             </div>
             <div id="sc-service-list" class="space-y-3"></div>
+          </div>
+        </section>
+
+        <!-- Services 視覺化編輯器 -->
+        <section id="services-visual" class="mt-8 hidden">
+          <header class="mb-3">
+            <h3 class="text-lg font-semibold">Services（服務項目頁）</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300">管理獨立服務頁的 7 個項目、成就經歷與底部輪播照片。</p>
+          </header>
+
+          <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="text-sm">頁面標題
+              <input id="svc-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+            </label>
+            <label class="text-sm">導語
+              <textarea id="svc-lead" rows="3" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+            </label>
+          </div>
+
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="font-semibold">7 大服務項目</h4>
+              <button id="svc-add-item" class="btn-soft btn-purple">新增服務</button>
+            </div>
+            <div id="svc-item-list" class="space-y-3"></div>
+          </div>
+
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
+            <label class="text-sm">成就區塊標題
+              <input id="svc-ach-title" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+            </label>
+            <label class="text-sm block mt-3">成就清單（每行一筆）
+              <textarea id="svc-achievements" rows="5" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+            </label>
+          </div>
+
+          <div class="mt-4 ui-card card-dynamic-bg p-4">
+            <label class="text-sm block">底部輪播照片（每行一張圖片路徑）
+              <textarea id="svc-gallery" rows="5" class="w-full rounded border px-2 py-1 bg-white dark:bg-gray-800"></textarea>
+            </label>
           </div>
         </section>
 
@@ -524,6 +568,7 @@
     <script src="./js/config.js"></script>
     <script src="./js/data/aboutContent.js"></script>
     <script src="./js/data/siteContent.js"></script>
+    <script src="./js/data/servicesContent.js"></script>
     <script src="./js/data/providers.js"></script>
     <script src="./js/data/blogContent.js"></script>
     <script src="./js/data-loader.js"></script>

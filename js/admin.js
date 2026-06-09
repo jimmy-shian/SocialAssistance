@@ -317,6 +317,7 @@
     if (v === 'providers') return DS.providers;
     if (v === 'site') return DS.site;
     if (v === 'blog') return DS.blog;
+    if (v === 'services') return DS.services || 'servicesContent';
     return v; // fallback
   }
 
@@ -549,13 +550,14 @@
   function isAboutSelected() { return (qs('#ds-select')?.value) === 'about'; }
   function isSiteSelected() { return (qs('#ds-select')?.value) === 'site'; }
   function isBlogSelected() { return (qs('#ds-select')?.value) === 'blog'; }
+  function isServicesSelected() { return (qs('#ds-select')?.value) === 'services'; }
   // 平滑展開/收合區塊
   let __curSectionId = null;
-  function currentSectionId() { if (isProvidersSelected()) return 'providers-visual'; if (isAboutSelected()) return 'about-visual'; if (isSiteSelected()) return 'site-visual'; if (isBlogSelected()) return 'blog-visual'; return null; }
+  function currentSectionId() { if (isProvidersSelected()) return 'providers-visual'; if (isAboutSelected()) return 'about-visual'; if (isSiteSelected()) return 'site-visual'; if (isServicesSelected()) return 'services-visual'; if (isBlogSelected()) return 'blog-visual'; return null; }
   function asEl(id) { return id ? qs('#' + id) : null; }
   function ensureCollapsible(el) { if (!el) return; el.classList.add('admin-collapsible'); }
   function toggleSections() {
-    const ids = ['providers-visual', 'about-visual', 'site-visual', 'blog-visual'];
+    const ids = ['providers-visual', 'about-visual', 'site-visual', 'services-visual', 'blog-visual'];
     ids.forEach(id => ensureCollapsible(asEl(id)));
     const nextId = currentSectionId();
     if (__curSectionId === nextId) {
@@ -623,6 +625,7 @@
       if (key === DS.providers) return window.providersData || {};
       if (key === DS.site) return window.siteContent || {};
       if (key === DS.blog) return window.blogContent || { posts: [] };
+      if (key === (DS.services || 'servicesContent')) return window.servicesContent || {};
       return {};
     })();
     // 若已登入，向 GAS 讀取；若 hasData=true 則優先使用暫存資料
@@ -655,6 +658,8 @@
       renderAboutEditor(payload || {});
     } else if (isSiteSelected()) {
       renderSiteEditor(payload || {});
+    } else if (isServicesSelected()) {
+      renderServicesEditor(payload || {});
     } else if (isBlogSelected()) {
       renderBlogEditor(payload || {});
     }
@@ -1272,6 +1277,7 @@
       }
       else if (isAboutSelected()) { payload = collectAboutFromUI(); }
       else if (isSiteSelected()) { payload = collectSiteFromUI(); }
+      else if (isServicesSelected()) { payload = collectServicesFromUI(); }
       else if (isBlogSelected()) { payload = collectBlogFromUI(); }
       else { payload = getEditorJSON(); }
       let res = await window.DataAPI.savePublish(key, payload, [key]);
@@ -1338,6 +1344,7 @@
       }
       else if (isAboutSelected()) { payload = collectAboutFromUI(); }
       else if (isSiteSelected()) { payload = collectSiteFromUI(); }
+      else if (isServicesSelected()) { payload = collectServicesFromUI(); }
       else if (isBlogSelected()) { payload = collectBlogFromUI(); }
       else { payload = getEditorJSON(); }
       const res = await window.DataAPI.update(key, payload);
@@ -1703,10 +1710,10 @@
         <div class="text-sm">
           <span>圖片</span>
           <div class="flex gap-2 items-end mt-1">
-            <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.img || ''}" placeholder="./img/... 或上傳">
+            <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.image || row.img || ''}" placeholder="./img/... 或上傳">
             <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
             <div class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden shrink-0">
-              <img src="${row.img || ''}" class="w-full h-full object-cover sc-svc-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
+              <img src="${row.image || row.img || ''}" class="w-full h-full object-cover sc-svc-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
             </div>
           </div>
         </div>
@@ -1820,11 +1827,81 @@
     return out; // Return flat siteContent, not wrapped
   }
 
+  function renderServicesEditor(data) {
+    data = data || {};
+    const title = qs('#svc-title'); if (title) title.value = data.title || '服務項目';
+    const lead = qs('#svc-lead'); if (lead) lead.value = data.lead || '';
+    const achTitle = qs('#svc-ach-title'); if (achTitle) achTitle.value = data.achievementsTitle || '成就經歷';
+    const ach = qs('#svc-achievements');
+    if (ach) {
+      ach.value = (Array.isArray(data.achievements) ? data.achievements : []).map(item => {
+        if (typeof item === 'string') return item;
+        return item && (item.text || item.title) || '';
+      }).filter(Boolean).join('\n');
+    }
+    const gallery = qs('#svc-gallery');
+    if (gallery) gallery.value = (Array.isArray(data.gallery) ? data.gallery : []).join('\n');
+    const list = qs('#svc-item-list');
+    if (list) {
+      list.innerHTML = '';
+      const items = Array.isArray(data.items) ? data.items : [];
+      items.forEach((item, i) => list.appendChild(buildServiceItem({
+        title: item.title || '',
+        desc: item.desc || item.description || '',
+        image: item.image || item.img || '',
+        link: item.link || '',
+        icon: item.icon || ''
+      }, i)));
+    }
+    renderAdaptiveNotice('services', data);
+  }
+
+  function collectServicesFromUI() {
+    const existing = window.servicesContent || {};
+    return {
+      ...existing,
+      title: qs('#svc-title')?.value?.trim() || '服務項目',
+      lead: qs('#svc-lead')?.value?.trim() || '',
+      items: Array.from(qs('#svc-item-list')?.children || []).map(el => ({
+        title: el.querySelector('.sc-svc-title')?.value?.trim() || '',
+        desc: el.querySelector('.sc-svc-desc')?.value?.trim() || '',
+        image: el.querySelector('.sc-svc-image')?.value?.trim() || ''
+      })).filter(item => item.title || item.desc || item.image),
+      achievementsTitle: qs('#svc-ach-title')?.value?.trim() || '成就經歷',
+      achievements: (qs('#svc-achievements')?.value || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean),
+      gallery: (qs('#svc-gallery')?.value || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean)
+    };
+  }
+
+  function renderAdaptiveNotice(type, data) {
+    const known = {
+      services: ['title', 'lead', 'items', 'achievementsTitle', 'achievements', 'gallery']
+    }[type] || [];
+    const extra = Object.keys(data || {}).filter(k => !known.includes(k));
+    let box = qs(`#${type}-adaptive-extra`);
+    const host = type === 'services' ? qs('#services-visual') : null;
+    if (!host) return;
+    if (!box) {
+      box = document.createElement('div');
+      box.id = `${type}-adaptive-extra`;
+      box.className = 'mt-4 ui-card card-dynamic-bg p-4';
+      host.appendChild(box);
+    }
+    box.innerHTML = extra.length
+      ? `<h4 class="font-semibold mb-2">其他資料欄位</h4><p class="text-sm text-gray-600 dark:text-gray-300">偵測到此資料還有 ${extra.length} 個非主要欄位，儲存時會保留：${extra.map(escHtml).join('、')}</p>`
+      : `<h4 class="font-semibold mb-2">資料結構</h4><p class="text-sm text-gray-600 dark:text-gray-300">目前資料符合服務項目頁表單，可直接新增、修改、排序與儲存。</p>`;
+  }
+
   // Global Binding for Site Editor Buttons
   document.addEventListener('click', e => {
     if (!e.target) return;
     if (e.target.id === 'sc-add-slide') { e.preventDefault(); addBlankSlide(); }
     if (e.target.id === 'sc-add-service') { e.preventDefault(); addBlankService(); }
+    if (e.target.id === 'svc-add-item') {
+      e.preventDefault();
+      const list = qs('#svc-item-list');
+      if (list) list.appendChild(buildServiceItem({}, list.children.length));
+    }
 
     // Delegation for dynamic items
     if (e.target.closest('.sc-slide-del')) e.target.closest('[data-index]').remove();
@@ -2056,7 +2133,7 @@
       const sel = qs('#ds-select'); const label = qs('#ds-button-label');
       if (!sel || !label) return;
       const v = sel.value;
-      const map = { site: '主畫面（siteContent）', about: '關於我們（aboutContent）', providers: '探索資源平台（providers）' };
+      const map = { site: '主畫面（siteContent）', about: '關於我們（aboutContent）', providers: '探索資源平台（providers）', services: '服務項目（servicesContent）', blog: '部落格（blogContent）' };
       label.textContent = map[v] || v;
     } catch (e) { }
   }
@@ -2535,6 +2612,10 @@
       pagePath = './blog.html';
       dataKey = 'blogContent';
       collectFn = collectBlogFromUI;
+    } else if (sel === 'services') {
+      pagePath = './services.html';
+      dataKey = 'servicesContent';
+      collectFn = collectServicesFromUI;
     } else if (sel === 'providers') {
       pagePath = './explore.html';
       dataKey = 'providersData';
@@ -2673,6 +2754,12 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
          <label class="text-sm">摘要 (excerpt)
           <textarea class="bl-excerpt w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${escHtml(p.excerpt)}</textarea>
         </label>
+        <label class="text-sm">內文 (content，可留空)
+          <textarea class="bl-content w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="3">${escHtml(p.content || '')}</textarea>
+        </label>
+        <label class="text-sm">時間軸 (timeline，每行：時間｜標題｜說明；榮耀時刻會自動套用)
+          <textarea class="bl-timeline w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${escHtml(formatBlogTimeline(p.timeline))}</textarea>
+        </label>
          <label class="text-sm">圖片 (image)
            <div class="flex gap-2 items-end">
               <input class="bl-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.image || '')}" placeholder="./img/... 或上傳">
@@ -2743,19 +2830,40 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
     };
   }
 
+  function formatBlogTimeline(timeline) {
+    if (!Array.isArray(timeline)) return '';
+    return timeline.map(row => [row.time || '', row.title || '', row.detail || ''].join('｜')).join('\n');
+  }
+
+  function parseBlogTimeline(text) {
+    return String(text || '').split(/\r?\n/).map(line => {
+      const raw = line.trim();
+      if (!raw) return null;
+      const parts = raw.split(/[｜|]/).map(s => s.trim());
+      return { time: parts[0] || '', title: parts[1] || '', detail: parts.slice(2).join('｜') || '' };
+    }).filter(row => row && (row.time || row.title || row.detail));
+  }
+
   function collectBlogFromUI() {
     const list = qs('#bl-post-list');
     if (!list) return { posts: [] };
+    const existingPosts = (window.blogContent && Array.isArray(window.blogContent.posts)) ? window.blogContent.posts : [];
     const posts = Array.from(list.children).map(el => {
       const get = sel => el.querySelector(sel);
+      const id = get('.bl-id')?.value || '';
+      const previous = existingPosts.find(p => String(p.id) === String(id)) || {};
+      const timeline = parseBlogTimeline(get('.bl-timeline')?.value || '');
       return {
-        id: get('.bl-id')?.value || '',
+        ...previous,
+        id,
         title: get('.bl-title')?.value || '',
         date: get('.bl-date')?.value || '',
         category: get('.bl-category')?.value || '',
         excerpt: get('.bl-excerpt')?.value || '',
+        content: get('.bl-content')?.value || '',
         image: get('.bl-image')?.value || '',
-        link: get('.bl-link')?.value || './blog.html'
+        link: get('.bl-link')?.value || './blog.html',
+        timeline: timeline
       };
     });
     return { posts };

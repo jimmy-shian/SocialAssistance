@@ -189,14 +189,106 @@
     });
   }
 
+  function ensureContactFlip(provider) {
+    let overlay = document.getElementById('contact-flip-overlay');
+    if (overlay) return overlay.__open;
+    overlay = document.createElement('div');
+    overlay.id = 'contact-flip-overlay';
+    overlay.className = 'contact-flip-overlay';
+    overlay.innerHTML = `
+      <div class="contact-flip-backdrop"></div>
+      <div class="contact-flip-stage">
+        <div class="contact-flip-card">
+          <div class="contact-flip-face contact-flip-front">
+            <div class="contact-flip-loading">載入中⋯</div>
+          </div>
+          <div class="contact-flip-face contact-flip-back">
+            <button class="contact-flip-close" aria-label="關閉">×</button>
+            <div class="contact-flip-header">
+              <div class="contact-flip-kicker">聯絡資訊</div>
+              <h2>${provider.name}</h2>
+            </div>
+            <div class="contact-flip-body">
+              ${provider.contact ? `
+                <div class="contact-flip-grid">
+                  ${provider.contact.phone ? `<div class="contact-flip-item">
+                    <strong>📞 電話</strong>
+                    <span>${provider.contact.phone}</span>
+                  </div>` : ''}
+                  ${provider.contact.email ? `<div class="contact-flip-item">
+                    <strong>✉️ 電子郵件</strong>
+                    <span>${provider.contact.email}</span>
+                  </div>` : ''}
+                  ${provider.contact.contactPerson ? `<div class="contact-flip-item">
+                    <strong>👤 聯絡人</strong>
+                    <span>${provider.contact.contactPerson}</span>
+                  </div>` : ''}
+                  ${provider.contact.line ? `<div class="contact-flip-item">
+                    <strong>💬 LINE</strong>
+                    <span>${provider.contact.line}</span>
+                  </div>` : ''}
+                  ${provider.contact.hours ? `<div class="contact-flip-item">
+                    <strong>🕐 營業時間</strong>
+                    <span>${provider.contact.hours}</span>
+                  </div>` : ''}
+                  ${provider.schedule ? `<div class="contact-flip-item">
+                    <strong>📅 活動時段</strong>
+                    <span>${provider.schedule}</span>
+                  </div>` : ''}
+                  ${provider.location || provider.address ? `<div class="contact-flip-item">
+                    <strong>📍 地址</strong>
+                    <span>${[provider.location || '', provider.address || ''].filter(Boolean).join(' ')}</span>
+                  </div>` : ''}
+                </div>
+              ` : '<p class="text-gray-500">暫無聯絡資訊</p>'}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const backdrop = overlay.querySelector('.contact-flip-backdrop');
+    const card = overlay.querySelector('.contact-flip-card');
+    const closeBtn = overlay.querySelector('.contact-flip-close');
+
+    function open() {
+      document.getElementById('provider-root')?.classList.add('contact-content-dim');
+      overlay.classList.add('open');
+      requestAnimationFrame(() => {
+        card.classList.add('flipped');
+      });
+    }
+
+    function close() {
+      card.classList.remove('flipped');
+      overlay.classList.remove('open');
+      document.getElementById('provider-root')?.classList.remove('contact-content-dim');
+    }
+
+    backdrop.addEventListener('click', close);
+    closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (overlay.classList.contains('open') && e.key === 'Escape') close();
+    });
+
+    overlay.__open = open;
+    overlay.__close = close;
+    return open;
+  }
+
   function render(provider) {
     const root = qs('#provider-root');
     if (!root) return;
 
-    const imgs = Array.isArray(provider.images) ? provider.images : [];
-    const seqHtml = imgs.map((src, i) => `
-      <img src="${src}" loading="lazy" alt="${provider.name} 活動照片 ${i + 1}" />
-    `).join('');
+    const imgs = (Array.isArray(provider.images) ? provider.images : []).slice(0, 4);
+    const fallbackImages = [
+      './img/DSC01739__8a8686e4b1.jpg',
+      './img/DSC09555___ba0754ae5a.jpg',
+      './img/1000012756_61e30f039f.jpg',
+      './img/1000012016_6e6b5da647.jpg'
+    ];
+    const heroImages = (imgs.length ? imgs : fallbackImages).slice(0, 4);
 
     const timelineHtml = (provider.timeline || []).map(item => `
       <div class="flex gap-4 items-start">
@@ -325,48 +417,24 @@
         <span class="text-gray-500 dark:text-gray-300">${provider.name}</span>
       </nav>
 
-      <header class="mb-8 card-dynamic-bg p-8 rounded-2xl shadow-lg relative overflow-hidden group">
-        <div class="absolute inset-0 bg-gradient-to-r from-[var(--primary)]/5 to-transparent opacity-50 pointer-events-none"></div>
-        <div class="relative z-10">
-          <div class="flex flex-wrap items-center gap-4 mb-4">
-             <h1 class="text-3xl md:text-5xl font-black text-gradient">${provider.name}</h1>
-             <div class="px-3 py-1 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-sm font-bold border border-[var(--primary)]/20">${provider.category}</div>
-          </div>
-          <p class="text-lg text-gray-700 dark:text-gray-200 leading-relaxed max-w-3xl">${provider.description}</p>
+      <header class="provider-simple-hero mb-10">
+        <div>
+          <div class="provider-simple-kicker">${provider.category || '探索體驗'}</div>
+          <h1>${provider.name}</h1>
+          <p>${provider.description || '透過現場觀察與簡單實作，認識產業日常與工作樣貌。'}</p>
+        </div>
+        <div class="provider-simple-gallery">
+          ${heroImages.map((src, i) => `<button type="button" class="provider-simple-photo" data-photo-index="${i}"><img src="${src}" loading="lazy" alt="${provider.name} 照片 ${i + 1}"></button>`).join('')}
         </div>
       </header>
 
-      ${(() => {
-        const blocks = [
-          { key: 'know', title: '你將認識', color: 'bg-blue-500/10 text-blue-600', border: 'border-blue-100' },
-          { key: 'learn', title: '你將學到', color: 'bg-green-500/10 text-green-600', border: 'border-green-100' },
-          { key: 'gain', title: '你將獲得', color: 'bg-purple-500/10 text-purple-600', border: 'border-purple-100' }
-        ];
-        const hasAny = blocks.some(b => Array.isArray(provider[b.key]) && provider[b.key].length);
-        if (!hasAny) return '';
-        const cols = blocks.map(b => {
-          const items = (provider[b.key] || []).map(v => `<li class=\"flex items-start gap-3 text-gray-700 dark:text-gray-300 group/li\"><span class=\"mt-1.5 w-1.5 h-1.5 rounded-full bg-[var(--primary)] group-hover/li:scale-150 transition-transform\"></span><span class="group-hover/li:text-[var(--primary)] transition-colors">${v}</span></li>`).join('');
-          if (!items) return '';
-          return `
-            <div class="card-dynamic-bg p-6 rounded-xl hover:-translate-y-1 transition-transform duration-300">
-              <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-                <span class="w-2 h-6 rounded-full ${b.color.split(' ')[0]}"></span>
-                ${b.title}
-              </h3>
-              <ul class="space-y-3">${items}</ul>
-            </div>
-          `;
-        }).join('');
-        return `<section class="grid md:grid-cols-3 gap-6 mb-12">${cols}</section>`;
-      })()}
-
-      <section aria-labelledby="sec-info" class="grid md:grid-cols-3 gap-6 mb-12">
-        <div class="p-6 rounded-xl card-dynamic-bg flex flex-col justify-center">
-          <div class="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">課程時間</div>
-          <div class="font-bold text-xl text-[var(--primary)]">${provider.schedule || '-'}</div>
-        </div>
-        <div class="p-6 rounded-xl card-dynamic-bg md:col-span-2 flex flex-col justify-center">
-          <div class="text-gray-500 text-xs uppercase tracking-wider font-bold mb-1">地點</div>
+      <section aria-labelledby="sec-info" class="provider-simple-info mb-12">
+        <article>
+          <span>時間</span>
+          <strong>${provider.schedule || '-'}</strong>
+        </article>
+        <article>
+          <span>地點</span>
           ${(() => {
         const lat = provider.coords?.lat;
         const lng = provider.coords?.lng;
@@ -380,20 +448,14 @@
                   <i class="fas fa-external-link-alt text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>
                 </a>`;
       })()}
-        </div>
-      </section>
-
-      <section aria-labelledby="sec-photos" class="mb-12">
-        <div class="flex items-center justify-between mb-4">
-          <h2 id="sec-photos" class="text-2xl font-bold">活動照片</h2>
-          <a href="#sec-cases" class="link-soft text-[var(--primary)]">精選案例</a>
-        </div>
-        <div class="carousel-marquee" id="photos-carousel">
-          <div class="carousel-track">
-            <div class="marquee-seq">${seqHtml}</div>
-            <div class="marquee-seq">${seqHtml}</div>
-          </div>
-        </div>
+        </article>
+        <article>
+          <span>聯絡方式</span>
+          <button class="contact-flip-trigger font-bold text-lg" aria-label="查看聯絡詳情">
+            <span>📞 查看聯絡詳情</span>
+            <i class="fas fa-chevron-right text-xs ml-1"></i>
+          </button>
+        </article>
       </section>
 
       <section aria-labelledby="sec-map" class="mb-12">
@@ -437,8 +499,8 @@
     `;
 
     // Lightbox binding for photos & marquee sizing
-    const carousel = document.getElementById('photos-carousel');
-    if (carousel) { enableLightboxOn(carousel, imgs); setupMarquee(carousel); }
+    const gallery = root.querySelector('.provider-simple-gallery');
+    if (gallery) enableLightboxOn(gallery, heroImages);
     // Cases: bind lightbox on media and video modal
     try {
       const casesRoot = document.getElementById('sec-cases')?.parentElement;
@@ -485,6 +547,17 @@
       }
     } catch (e) { }
     attachInteractiveChecklist(root);
+    // Contact flip trigger
+    try {
+      const trigger = root.querySelector('.contact-flip-trigger');
+      if (trigger && provider.contact) {
+        const openContact = ensureContactFlip(provider);
+        trigger.addEventListener('click', (e) => {
+          e.preventDefault();
+          openContact();
+        });
+      }
+    } catch (e) { }
   }
 
   function start() {

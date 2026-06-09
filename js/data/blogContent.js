@@ -34,6 +34,23 @@ window.blogContent = {
             category: 'glory',
             excerpt: '感謝各界肯定，我們將持續為青少年自立努力...',
             image: './img/1000012016_6e6b5da647.jpg',
+            timeline: [
+                {
+                    time: '2025/07',
+                    title: '方案整理',
+                    detail: '彙整體驗教育、自立培養與在地產業合作成果。'
+                },
+                {
+                    time: '2025/08',
+                    title: '現場評選',
+                    detail: '以孩子參與歷程、團隊回饋與課程設計完整度進行分享。'
+                },
+                {
+                    time: '2025/09',
+                    title: '獲獎公布',
+                    detail: '榮獲社會創新實踐獎，持續把資源帶回青少年身邊。'
+                }
+            ],
             link: './blog.html'
         },
         {

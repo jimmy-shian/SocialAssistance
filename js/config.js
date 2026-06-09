@@ -147,7 +147,8 @@ window.AppConfig = {
     about: 'aboutContent',
     providers: 'providers',
     site: 'siteContent',
-    blog: 'blogContent'
+    blog: 'blogContent',
+    services: 'servicesContent'
   },
   versionCacheKey: '1.0.0',
   // 預設不在公開頁自動向後端取資料 

@@ -89,6 +89,8 @@ function _handleSavePublish(e){
     results = keys.map(function(k){ return { ok:false, key:String(k), message: 'GitHub 未設定：' + (conf.message || '缺少設定') }; });
     return _jsonOutput({ ok: true, update: updated, results: results, publishOk: false });
   }
+  var quota = _dailyPublishQuota(ver.user);
+  if (!quota.ok) return _badRequest(quota.message);
   // 有 GitHub 設定：對 providers 的圖片占位（gas://image/<id>/<filename>）進行處理後再發佈
   for (var i=0;i<keys.length;i++){
     try {
@@ -118,7 +120,8 @@ function _handleSavePublish(e){
     } catch(err){ results.push({ ok:false, key:k, message:String(err) }); }
   }
   var publishOk = results.every(function(r){ return r && r.ok; });
-  return _jsonOutput({ ok: true, update: updated, results: results, publishOk: publishOk });
+  var used = publishOk ? _markPublishUsed(ver.user) : quota.used;
+  return _jsonOutput({ ok: true, update: updated, results: results, publishOk: publishOk, publishQuota: { limit: DAILY_PUBLISH_LIMIT, used: used, remaining: Math.max(0, DAILY_PUBLISH_LIMIT - used) } });
 }
 // GET  ?action=data&key=<dataset-key>   -> { ok:true, key, version, data }
 // POST ?action=login    body: { username, password }       -> { ok:true, token, exp }
@@ -151,7 +154,8 @@ var ALLOWED_KEYS = Object.freeze({
   'aboutContent': true,
   'providers': true,
   'siteContent': true,
-  'blogContent': true
+  'blogContent': true,
+  'servicesContent': true
 });
 
 // Simple rate limits per minute (approx)
@@ -161,6 +165,8 @@ var RL = Object.freeze({
   UPDATE_PER_MIN: 60,
   PUBLISH_PER_MIN: 20
 });
+
+var DAILY_PUBLISH_LIMIT = 10;
 
 function _props(){ return PropertiesService.getScriptProperties(); }
 
@@ -288,6 +294,35 @@ function _rateLimit(key, limit, windowSec){
   } catch(e){ return true; }
 }
 
+function _publishQuotaKey(user){
+  var day = Utilities.formatDate(new Date(), 'Asia/Taipei', 'yyyyMMdd');
+  return 'publish-day:' + String(user || 'admin') + ':' + day;
+}
+
+function _dailyPublishQuota(user){
+  try {
+    var p = _props();
+    var key = _publishQuotaKey(user);
+    var used = Number(p.getProperty(key) || '0');
+    if (used >= DAILY_PUBLISH_LIMIT) {
+      return { ok:false, used: used, remaining: 0, limit: DAILY_PUBLISH_LIMIT, message:'今日發布已達 10 次上限，請明日再發布' };
+    }
+    return { ok:true, used: used, remaining: DAILY_PUBLISH_LIMIT - used, limit: DAILY_PUBLISH_LIMIT };
+  } catch(e){
+    return { ok:true, used: 0, remaining: DAILY_PUBLISH_LIMIT, limit: DAILY_PUBLISH_LIMIT };
+  }
+}
+
+function _markPublishUsed(user){
+  try {
+    var p = _props();
+    var key = _publishQuotaKey(user);
+    var used = Number(p.getProperty(key) || '0') + 1;
+    p.setProperty(key, String(used));
+    return used;
+  } catch(e){ return 0; }
+}
+
 function _nonceKey(n){ return 'nonce:' + n; }
 function _useNonce(n){
   if (!n) return { ok:false, message:'缺少 nonce' };
@@ -354,6 +389,7 @@ function _datasetFilename(key){
   if (key === 'providers') return 'providers.js';
   if (key === 'siteContent') return 'siteContent.js';
   if (key === 'blogContent') return 'blogContent.js';
+  if (key === 'servicesContent') return 'servicesContent.js';
   return key + '.js';
 }
 function _datasetGlobalVar(key){
@@ -361,6 +397,7 @@ function _datasetGlobalVar(key){
   if (key === 'providers') return 'window.providersData';
   if (key === 'siteContent') return 'window.siteContent';
   if (key === 'blogContent') return 'window.blogContent';
+  if (key === 'servicesContent') return 'window.servicesContent';
   return 'window.' + key;
 }
 function _formatDatasetContent(key, obj){
@@ -468,6 +505,8 @@ function _handlePublish(e){
   var ver = _verifyToken(token);
   if (!ver.ok) return _badRequest(ver.message || '未授權');
   if (!_rateLimit('publish:' + ver.user, RL.PUBLISH_PER_MIN, 60)) return _badRequest('請求過於頻繁，稍後再試');
+  var quota = _dailyPublishQuota(ver.user);
+  if (!quota.ok) return _badRequest(quota.message);
   var n = _useNonce(nonce); if (!n.ok) return _badRequest(n.message);
   var conf = _ghConf(); if (!conf.ok) return _badRequest(conf.message);
   var keys = body && body.keys; if (!Array.isArray(keys) || !keys.length) keys = Object.keys(ALLOWED_KEYS);
@@ -491,7 +530,8 @@ function _handlePublish(e){
     } catch(err){ results.push({ ok:false, key: String(keys[i]), message: String(err) }); }
   }
   var ok = results.every(function(r){ return r && r.ok; });
-  return _jsonOutput({ ok: ok, results: results });
+  var used = ok ? _markPublishUsed(ver.user) : quota.used;
+  return _jsonOutput({ ok: ok, results: results, publishQuota: { limit: DAILY_PUBLISH_LIMIT, used: used, remaining: Math.max(0, DAILY_PUBLISH_LIMIT - used) } });
 }
 
 function doGet(e){
@@ -881,8 +921,26 @@ function _handleUploadImage(e){
   try { var sz = parsed.base64.length * 0.75; if (sz > 2*1024*1024) return _badRequest('檔案過大（>2MB）'); } catch(err){}
   var id = Utilities.getUuid();
   var filename = _safeFilename(body.filename || ('img_'+id+'.png'));
-  _putImageRow({ id: id, filename: filename, mimetype: parsed.mimetype, base64: parsed.base64 });
-  return _jsonOutput({ ok:true, id: id, filename: filename, mimetype: parsed.mimetype });
+  var conf = _ghConf();
+  if (!conf.ok) return _badRequest('圖片上傳需要 GitHub 設定：' + conf.message);
+  var bytes = Utilities.base64Decode(parsed.base64);
+  var ext = (function(fn, mt){
+    var parts = String(fn||'').split('.');
+    if (parts.length > 1) return (parts.pop() || '').toLowerCase();
+    mt = String(mt||'').toLowerCase();
+    if (mt === 'image/png') return 'png';
+    if (mt === 'image/webp') return 'webp';
+    if (mt === 'image/gif') return 'gif';
+    if (mt === 'image/svg+xml') return 'svg';
+    return 'jpg';
+  })(filename, parsed.mimetype);
+  var hashedName = _nameWithHash(filename, ext, bytes);
+  var path = _uniqueImagePath(conf, hashedName);
+  var put = _ghPutBinary(conf, path, bytes, 'feat(image): upload ' + hashedName);
+  if (!put || !put.ok) return _badRequest((put && put.message) || '圖片寫入 GitHub 失敗');
+  _putImageRow({ id: id, filename: filename, mimetype: parsed.mimetype, base64: '' });
+  try { _markImageCommitted(_getImageById(id).row, path, (put.data && put.data.content && put.data.content.sha) || ''); } catch(err){}
+  return _jsonOutput({ ok:true, id: id, filename: filename, mimetype: parsed.mimetype, path: path, url: path });
 }
 function _processImagesForPublish(conf, obj){
   // 深拷貝

@@ -3708,3 +3708,466 @@ html.dark .sdgs-section {
     background: linear-gradient(135deg, rgba(107, 142, 35, 0.1) 0%, rgba(85, 107, 47, 0.08) 100%);
   }
 }
+
+.provider-simple-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1.08fr);
+  gap: clamp(1rem, 4vw, 2rem);
+  align-items: center;
+  padding: clamp(1rem, 4vw, 2rem);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, .35));
+  border-radius: 8px;
+  background: var(--glass-bg, rgba(255, 255, 255, .72));
+  box-shadow: var(--surface-shadow, 0 20px 60px rgba(15, 23, 42, .12));
+  backdrop-filter: blur(24px) saturate(145%);
+}
+
+.provider-simple-kicker {
+  color: var(--primary);
+  font-size: .82rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.provider-simple-hero h1 {
+  margin: .45rem 0 .85rem;
+  color: var(--text-primary);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.provider-simple-hero p {
+  max-width: 48rem;
+  color: var(--text-secondary);
+  font-size: clamp(1rem, 1.7vw, 1.18rem);
+  line-height: 1.85;
+}
+
+.provider-simple-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .65rem;
+}
+
+.provider-simple-photo {
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-inset);
+}
+
+.provider-simple-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .55s var(--motion-emphasized, cubic-bezier(.16,1,.3,1));
+}
+
+.provider-simple-photo:hover img,
+.provider-simple-photo:focus-visible img {
+  transform: scale(1.045);
+}
+
+.provider-simple-info {
+  display: grid;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
+  gap: 1rem;
+}
+
+.provider-simple-info article {
+  padding: 1.25rem;
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, .35));
+  border-radius: 8px;
+  background: var(--glass-bg, rgba(255, 255, 255, .72));
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+.provider-simple-info span {
+  display: block;
+  margin-bottom: .35rem;
+  color: var(--text-muted);
+  font-size: .76rem;
+  font-weight: 850;
+}
+
+.provider-simple-info strong,
+.provider-simple-info a {
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 850;
+}
+
+.footer-info-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: grid;
+  align-items: end;
+  pointer-events: none;
+}
+
+.footer-info-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 24, 19, .58);
+  opacity: 0;
+  backdrop-filter: blur(0);
+  transition: opacity .28s ease, backdrop-filter .28s ease;
+}
+
+.footer-info-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 920px);
+  max-height: min(82vh, 680px);
+  margin: 0 auto;
+  overflow: auto;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid rgba(255, 255, 255, .32);
+  border-radius: 8px 8px 0 0;
+  background: rgba(250, 252, 249, .86);
+  box-shadow: 0 -24px 80px rgba(10, 20, 16, .24);
+  opacity: 0;
+  transform: translateY(100%);
+  transition: opacity .25s ease, transform .42s cubic-bezier(.16, 1, .3, 1);
+  backdrop-filter: blur(28px) saturate(150%);
+}
+
+.footer-info-drawer.open {
+  pointer-events: auto;
+}
+
+.footer-info-drawer.open .footer-info-backdrop {
+  opacity: 1;
+  backdrop-filter: blur(16px);
+}
+
+.footer-info-drawer.open .footer-info-panel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.footer-info-close {
+  position: absolute;
+  top: .85rem;
+  right: .85rem;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(22, 42, 32, .14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .72);
+  color: #17211d;
+  font-size: 1.4rem;
+}
+
+.footer-info-kicker {
+  color: var(--primary, #1e7d5f);
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.footer-info-content h2 {
+  margin: .35rem 0 .8rem;
+  color: #17211d;
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1.08;
+}
+
+.footer-info-content p {
+  max-width: 62ch;
+  color: #53625a;
+  line-height: 1.85;
+}
+
+.footer-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .85rem;
+  margin-top: 1.2rem;
+}
+
+.footer-info-grid a,
+.footer-info-list div {
+  display: grid;
+  gap: .25rem;
+  padding: 1rem;
+  border: 1px solid rgba(22, 42, 32, .12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .62);
+}
+
+.footer-info-grid strong,
+.footer-info-list dt {
+  color: #1e7d5f;
+  font-size: .8rem;
+  font-weight: 900;
+}
+
+.footer-info-grid span,
+.footer-info-list dd {
+  margin: 0;
+  color: #17211d;
+  overflow-wrap: anywhere;
+}
+
+.footer-info-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .85rem;
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 760px) {
+  .provider-simple-hero,
+  .provider-simple-info,
+  .footer-info-grid,
+  .footer-info-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==============================
+   聯絡詳情 3D 翻轉燈箱
+   Contact Flip Lightbox
+============================== */
+.contact-flip-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--primary);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.95rem;
+}
+.contact-flip-trigger:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(107, 142, 35, 0.25);
+}
+
+/* Overlay */
+.contact-flip-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.contact-flip-overlay.open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* Backdrop with blur */
+.contact-flip-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(14, 24, 19, 0.55);
+  backdrop-filter: blur(0px);
+  transition: backdrop-filter 0.35s ease;
+}
+.contact-flip-overlay.open .contact-flip-backdrop {
+  backdrop-filter: blur(8px);
+}
+
+/* 3D Stage */
+.contact-flip-stage {
+  position: relative;
+  z-index: 1;
+  perspective: 1200px;
+  width: min(92vw, 640px);
+  max-height: min(88vh, 700px);
+}
+
+/* Card with 3D flip */
+.contact-flip-card {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: rotateY(15deg) scale(0.88);
+  opacity: 0;
+}
+.contact-flip-overlay.open .contact-flip-card {
+  opacity: 1;
+  transform: rotateY(0deg) scale(1);
+}
+.contact-flip-card.flipped {
+  transform: rotateY(180deg) scale(1);
+}
+
+/* Face base */
+.contact-flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Front face (shown during animation start) */
+.contact-flip-front {
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+}
+.contact-flip-loading {
+  color: var(--text-tertiary);
+  font-size: 1rem;
+}
+
+/* Back face (the actual content) */
+.contact-flip-back {
+  transform: rotateY(180deg);
+  background: var(--bg-surface, #fff);
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 80px rgba(10, 20, 16, 0.25);
+  padding: 1.75rem;
+  overflow-y: auto;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Close button */
+.contact-flip-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background 0.2s ease;
+  z-index: 2;
+}
+.contact-flip-close:hover {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* Header */
+.contact-flip-header {
+  margin-bottom: 1.25rem;
+  padding-right: 2.5rem;
+}
+.contact-flip-kicker {
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.contact-flip-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+/* Body - contact grid */
+.contact-flip-body {
+  flex: 1;
+}
+.contact-flip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+.contact-flip-item {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-base);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.contact-flip-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+.contact-flip-item strong {
+  font-size: 0.78rem;
+  color: var(--primary);
+  font-weight: 800;
+}
+.contact-flip-item span {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* Dim effect on background content */
+.contact-content-dim {
+  transform: scale(0.94);
+  filter: blur(3px);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .contact-flip-stage {
+    width: 96vw;
+    max-height: 94vh;
+  }
+  .contact-flip-card {
+    min-height: 340px;
+  }
+  .contact-flip-back {
+    min-height: 340px;
+    padding: 1.25rem;
+  }
+  .contact-flip-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-flip-card {
+    transition: none;
+    transform: none;
+    opacity: 1;
+  }
+  .contact-content-dim {
+    transition: none;
+    transform: none;
+    filter: none;
+  }
+  .contact-flip-overlay {
+    transition: none;
+  }
+  .contact-flip-backdrop {
+    transition: none;
+  }
+}
+

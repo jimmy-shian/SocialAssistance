@@ -17,7 +17,7 @@ function renderNavFooter() {
 
         <div class="hidden md:flex items-center space-x-6">
           <a href="./about.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-300 font-medium">關於我們</a>
-          <a href="./explore.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-300 font-medium">服務項目</a>
+          <a href="./services.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-300 font-medium">服務項目</a>
           <a href="./explore.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-300 font-medium">尋找探索資源</a>
           <a href="./blog.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-300 font-medium">部落格</a>
           <a href="./member.html" class="nav-link text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-300 font-medium">會員登入</a>
@@ -44,7 +44,7 @@ function renderNavFooter() {
       <div id="mobile-menu" class="md:hidden hidden px-6 pb-4 mobile-menu-collapsible" aria-hidden="true">
         <div class="flex flex-col space-y-3 pt-2 border-t border-[var(--border)]">
           <a href="./about.html" class="nav-link py-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200 font-medium">關於我們</a>
-          <a href="./explore.html" class="nav-link py-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200 font-medium">服務項目</a>
+          <a href="./services.html" class="nav-link py-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200 font-medium">服務項目</a>
           <a href="./explore.html" class="nav-link py-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200 font-medium">尋找探索資源</a>
           <a href="./blog.html" class="nav-link py-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200 font-medium">部落格</a>
           <a href="./member.html" class="nav-link py-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-200 font-medium">會員登入</a>
@@ -135,7 +135,7 @@ function renderNavFooter() {
             <h3 class="text-lg font-semibold mb-4 text-[#9ACD32]">網站地圖</h3>
             <ul class="space-y-2 text-sm">
               <li><a href="./about.html" class="text-gray-300 hover:text-[#9ACD32] transition-colors duration-200">關於我們</a></li>
-              <li><a href="./explore.html" class="text-gray-300 hover:text-[#9ACD32] transition-colors duration-200">服務項目</a></li>
+              <li><a href="./services.html" class="text-gray-300 hover:text-[#9ACD32] transition-colors duration-200">服務項目</a></li>
               <li><a href="./explore.html" class="text-gray-300 hover:text-[#9ACD32] transition-colors duration-200">尋找探索資源</a></li>
               <li><a href="./blog.html" class="text-gray-300 hover:text-[#9ACD32] transition-colors duration-200">部落格</a></li>
               <li><a href="./member.html" class="text-gray-300 hover:text-[#9ACD32] transition-colors duration-200">會員登入</a></li>
@@ -176,6 +176,10 @@ function renderNavFooter() {
 
         <!-- 底部版權 -->
         <div class="mt-10 pt-6 border-t border-gray-600 text-center text-sm text-gray-400">
+          <div class="mb-4 flex flex-wrap justify-center gap-3">
+            <button type="button" class="footer-drawer-trigger px-4 py-2 rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15 transition" data-footer-drawer="details">詳細資訊</button>
+            <button type="button" class="footer-drawer-trigger px-4 py-2 rounded-full border border-white/15 bg-white/10 text-white hover:bg-white/15 transition" data-footer-drawer="inquiry">最終詢問</button>
+          </div>
           Copyright &copy; 2025 Sound Core 聽見核心工作室. All Rights Reserved.
         </div>
       </div>
@@ -187,6 +191,72 @@ function renderNavFooter() {
   const footerPlaceholder = document.getElementById('footer-placeholder');
   if (navPlaceholder) navPlaceholder.innerHTML = navHTML;
   if (footerPlaceholder) footerPlaceholder.innerHTML = footerHTML;
+
+  function ensureFooterDrawer() {
+    let drawer = document.getElementById('footer-info-drawer');
+    if (drawer) return drawer;
+    drawer = document.createElement('div');
+    drawer.id = 'footer-info-drawer';
+    drawer.className = 'footer-info-drawer';
+    drawer.setAttribute('aria-hidden', 'true');
+    drawer.innerHTML = `
+      <div class="footer-info-backdrop" data-close-footer-drawer></div>
+      <section class="footer-info-panel" role="dialog" aria-modal="true" aria-labelledby="footer-info-title">
+        <button type="button" class="footer-info-close" data-close-footer-drawer aria-label="關閉">×</button>
+        <div class="footer-info-content"></div>
+      </section>
+    `;
+    document.body.appendChild(drawer);
+    drawer.addEventListener('click', (e) => {
+      if (e.target.closest('[data-close-footer-drawer]')) closeFooterDrawer();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeFooterDrawer();
+    });
+    return drawer;
+  }
+
+  function closeFooterDrawer() {
+    const drawer = document.getElementById('footer-info-drawer');
+    if (!drawer) return;
+    drawer.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  function openFooterDrawer(type) {
+    const drawer = ensureFooterDrawer();
+    const content = drawer.querySelector('.footer-info-content');
+    const isInquiry = type === 'inquiry';
+    content.innerHTML = isInquiry ? `
+      <p class="footer-info-kicker">Final Check</p>
+      <h2 id="footer-info-title">最終詢問</h2>
+      <p>想安排課程、合作場域或確認孩子適合的探索形式，可以直接留下需求，我們會協助整理下一步。</p>
+      <div class="footer-info-grid">
+        <a href="tel:0988368450"><strong>電話</strong><span>0988-368-450</span></a>
+        <a href="mailto:soundcore.3co@gmail.com"><strong>Email</strong><span>soundcore.3co@gmail.com</span></a>
+        <a href="https://lin.ee/1C3roAfA" target="_blank" rel="noopener"><strong>LINE</strong><span>加入官方帳號</span></a>
+      </div>
+    ` : `
+      <p class="footer-info-kicker">Contact Detail</p>
+      <h2 id="footer-info-title">詳細資訊</h2>
+      <p>聽見核心工作室以青少年生涯探索、自立培養與體驗教育為核心，串連在地產業、家庭與社福系統。</p>
+      <dl class="footer-info-list">
+        <div><dt>地址</dt><dd>嘉義市西區車店里蘭州五街66號</dd></div>
+        <div><dt>電話</dt><dd>0988-368-450</dd></div>
+        <div><dt>Email</dt><dd>soundcore.3co@gmail.com</dd></div>
+        <div><dt>統編</dt><dd>94369582</dd></div>
+      </dl>
+    `;
+    drawer.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    requestAnimationFrame(() => drawer.querySelector('.footer-info-close')?.focus({ preventScroll: true }));
+  }
+
+  document.querySelectorAll('.footer-drawer-trigger').forEach(btn => {
+    btn.addEventListener('click', () => openFooterDrawer(btn.dataset.footerDrawer));
+  });
 
   // 複製電話功能
   try {

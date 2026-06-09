@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>服務項目 | 聽見核心工作室</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K), v = null;
+        try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + encodeURIComponent(v);
+        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.head).insertBefore(s, cur);
+      } catch (e) { var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + Date.now(); document.head.appendChild(s); }
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="./css/style.css" rel="stylesheet">
+  <script>
+    (function () {
+      try {
+        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
+        var raw = localStorage.getItem(K), v = null; try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
+        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
+        var l = document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
+        if (l) { var href = l.getAttribute('href') || ''; try { var url = new URL(href, document.baseURI); url.searchParams.set('v', v); l.href = url.href; } catch (e) { var h = href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); l.href = h + (h.indexOf('?') > -1 ? '&' : '?') + 'v=' + encodeURIComponent(v); } }
+      } catch (e) { }
+    })();
+  </script>
+  <link href="./css/services-section.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="section-bg-1">
+  <div id="nav-placeholder"></div>
+
+  <main id="services-root" class="container mx-auto px-6 py-12">
+    <div class="text-center text-gray-500">載入中…</div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="./js/config.js"></script>
+  <script src="./js/toast.js"></script>
+  <script src="./js/data-loader.js"></script>
+  <script src="./js/navFooter.js"></script>
+  <script src="./js/data/aboutContent.js"></script>
+  <script src="./js/data/servicesContent.js"></script>
+  <script src="./js/services.js"></script>
+</body>
+
+</html>

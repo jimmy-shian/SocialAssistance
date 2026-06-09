@@ -68,11 +68,11 @@
   }
 
   function attachCardInteractions(container) {
-    container.querySelectorAll('.about-card').forEach(card => {
+    container.querySelectorAll('.about-card, .team-card').forEach(card => {
       // Simplified interaction: just slight lift is enough (handled by CSS hover)
       card.addEventListener('click', (e) => {
         if (e.target && e.target.closest('a')) return;
-        // Optional: interactions logic if needed
+        if (card.classList.contains('team-card')) card.classList.toggle('flipped');
       });
     });
   }
@@ -163,7 +163,7 @@
         return `<a href="${s.href}" target="_blank" rel="noopener" class="text-gray-500 ${hoverColor} transition-colors duration-300" onclick="event.stopPropagation()">${icon}</a>`;
       }).join(' ');
       return `
-            <article class=\"team-card\" onclick=\"this.classList.toggle('flipped')\">
+            <article class=\"team-card\" tabindex=\"0\" role=\"button\" aria-label=\"${t.name || ''} 學經歷\">
               <div class=\"card-inner\">
                 <div class=\"card-face front\">
                   ${t.photo ? `<img class=\"team-photo-img\" src=\"${t.photo}\" alt=\"${t.name || ''}\">` : '<div class=\"team-photo-placeholder\"></div>'}
@@ -187,25 +187,6 @@
         </div>
       </section>
       ` : ''}
-
-      <section class="mt-16">
-        <h2 class="heading-section mb-6">${data.achievementsTitle || '成就經歷'}</h2>
-        <ul class="space-y-2 text-lg text-[var(--text-primary)]">
-          ${(data.achievements || []).map(a => {
-      if (typeof a === 'string') {
-        const { html } = numberSpan(a);
-        return `<li>${html}</li>`;
-      } else if (a && a.href) {
-        const { html } = numberSpan(a.text || '');
-        return `<li><a class=\"link-cta outcard\" href=\"${a.href}\" target=\"_blank\" rel=\"noopener\">${html} <span class=\"arrow\">→</span></a></li>`;
-      } else {
-        const t = a && (a.text || a.title) || '';
-        const { html } = numberSpan(t);
-        return `<li>${html}</li>`;
-      }
-    }).join('')}
-        </ul>
-      </section>
     `;
 
     // typing effects with click-to-shatter
@@ -225,7 +206,7 @@
 
     // interactions and animations
     attachCardInteractions(root);
-    const toAnimate = Array.from(root.querySelectorAll('.about-card, section:nth-of-type(3) li'));
+    const toAnimate = Array.from(root.querySelectorAll('.about-card, .team-card, .model-step'));
     animateOnView(toAnimate);
 
     // 進場時重新計算階梯位移（考慮到每張卡片原始高度）
@@ -247,25 +228,17 @@
     setTimeout(adjustModelStairs, 0);
     window.addEventListener('resize', adjustModelStairs);
 
-    // Team：點擊卡片翻面顯示詳細資訊（忽略卡片內連結與互動元素）
+    // Team：點擊/鍵盤卡片翻面顯示學經歷（忽略卡片內連結與互動元素）
     try {
       const cards = Array.from(root.querySelectorAll('.team-card'));
       cards.forEach(card => {
-        card.addEventListener('click', (e) => {
-          if (e.target.closest('a,button,input,textarea,select,label')) return; // 讓互動元素照常運作
+        card.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
           card.classList.toggle('flipped');
         });
       });
     } catch (e) { }
-
-    // Start count when section is visible
-    const achSec = root.querySelector('section:nth-of-type(3)');
-    if (achSec) {
-      const io = new IntersectionObserver(es => {
-        es.forEach(e => { if (e.isIntersecting) { countUpOnce(achSec); io.disconnect(); } });
-      }, { threshold: 0.2 });
-      io.observe(achSec);
-    }
   }
 
   if (document.readyState === 'loading') {
