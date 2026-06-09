@@ -19,7 +19,7 @@
   
   const BASE = AppConfig.GAS_BASE_URL || '';
   const EP = AppConfig.endpoints || {};
-  const DS = AppConfig.datasets || { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent' };
+  const DS = AppConfig.datasets || { about: 'aboutContent', providers: 'providers', site: 'siteContent', blog: 'blogContent', services: 'servicesContent' };
   const VERSION_KEY = AppConfig.versionCacheKey || 'app_data_version';
   const EVT = 'data:updated';
 
@@ -52,6 +52,8 @@
       window.siteContent = data;
     } else if (key === DS.blog || key === 'blogContent') {
       window.blogContent = data;
+    } else if (key === DS.services || key === 'servicesContent') {
+      window.servicesContent = data;
     }
   }
 
@@ -88,7 +90,7 @@
   async function fetchAll() {
     // Wix 模式下從本地快取讀取
     if (USE_WIX) {
-      const keys = [DS.about, DS.providers, DS.site, DS.blog];
+      const keys = [DS.about, DS.providers, DS.site, DS.blog, DS.services].filter(Boolean);
       for (const key of keys) {
         try {
           const cached = localStorage.getItem(`wix_data_${key}`);
@@ -99,7 +101,7 @@
     }
     
     if (!BASE || !EP.data) return;
-    const keys = [DS.about, DS.providers, DS.site, DS.blog];
+    const keys = [DS.about, DS.providers, DS.site, DS.blog, DS.services].filter(Boolean);
     for (const key of keys) {
       try { await fetchData(key); } catch (e) { }
     }
@@ -122,7 +124,7 @@
     const url = BASE + EP.data + '&key=' + encodeURIComponent(key) + '&v=' + encodeURIComponent(v);
     const data = await getJSON(url);
     if (data && data.notModified) {
-      return (key === DS.providers ? (window.providersData || {}) : key === DS.site ? (window.siteContent || {}) : key === DS.blog ? (window.blogContent || {}) : (window.aboutContent || {}));
+      return (key === DS.providers ? (window.providersData || {}) : key === DS.site ? (window.siteContent || {}) : key === DS.blog ? (window.blogContent || {}) : key === DS.services ? (window.servicesContent || {}) : (window.aboutContent || {}));
     }
     const payload = data && (data.data ?? data[key] ?? data);
     const version = data && (data.version ?? data.v ?? null);
@@ -198,7 +200,7 @@
   }
 
   async function fetchAllSecure() {
-    const keys = [DS.about, DS.providers, DS.site, DS.blog];
+    const keys = [DS.about, DS.providers, DS.site, DS.blog, DS.services].filter(Boolean);
     for (const key of keys) { try { await secureRead(key); } catch (e) { } }
   }
 

@@ -83,6 +83,9 @@ function _handleSavePublish(e){
 
   // publish（若 GitHub 未設定，也回 ok:true 並附帶錯誤訊息）
   var keys = body && body.keys; if (!Array.isArray(keys) || !keys.length) keys = key ? [key] : Object.keys(ALLOWED_KEYS);
+  for (var ki=0; ki<keys.length; ki++) {
+    if (!ALLOWED_KEYS[String(keys[ki])]) return _badRequest('不允許的 key: ' + String(keys[ki]));
+  }
   var conf = _ghConf();
   var results = [];
   if (!conf.ok) {
@@ -510,6 +513,9 @@ function _handlePublish(e){
   var n = _useNonce(nonce); if (!n.ok) return _badRequest(n.message);
   var conf = _ghConf(); if (!conf.ok) return _badRequest(conf.message);
   var keys = body && body.keys; if (!Array.isArray(keys) || !keys.length) keys = Object.keys(ALLOWED_KEYS);
+  for (var ki=0; ki<keys.length; ki++) {
+    if (!ALLOWED_KEYS[String(keys[ki])]) return _badRequest('不允許的 key: ' + String(keys[ki]));
+  }
   var results = [];
   for (var i=0;i<keys.length;i++){
     try {
