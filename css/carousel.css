@@ -52,18 +52,14 @@
 }
 
 .service-bubble h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 900;
     margin-bottom: 0.5rem;
-    color: var(--text-primary);
-}
-
-.dark .service-bubble h3 {
-    color: #f3f4f6;
+    color: #ffffff;
 }
 
 .service-bubble p {
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     color: var(--text-secondary);
     line-height: 1.5;
     margin: 0;

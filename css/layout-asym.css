@@ -78,11 +78,35 @@
     /* Sketchy border */
     border: 2px solid var(--text-primary);
     box-shadow: 15px 15px 0 rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+}
+
+.hero-content-asym h1 {
+    font-size: calc(2.25rem + 0.5rem);
+}
+
+@media (min-width: 768px) {
+    .hero-content-asym h1 {
+        font-size: calc(3rem + 0.5rem);
+    }
+}
+
+.hero-content-asym p {
+    font-size: calc(1.125rem + 0.5rem);
+}
+
+.hero-content-asym span {
+    font-size: calc(0.875rem + 0.5rem);
+}
+
+.hero-content-asym div:not(.flex) {
+    font-size: calc(1rem + 0.5rem);
 }
 
 /* Dark mode for hero-content-asym */
 html.dark .hero-content-asym {
     background: rgba(45, 42, 36, 0.95);
+    color: var(--text-primary);
 }
 
 /* Responsive adjustment */
@@ -110,13 +134,21 @@ html.dark .hero-content-asym {
     }
 
     .hero-content-asym h1 {
-        font-size: 1.5rem;
+        font-size: calc(1.5rem + 0.5rem);
         margin-bottom: 0.75rem;
     }
 
     .hero-content-asym p {
-        font-size: 0.95rem;
+        font-size: calc(0.95rem + 0.5rem);
         margin-bottom: 1rem;
+    }
+
+    .hero-content-asym span {
+        font-size: calc(0.875rem + 0.5rem);
+    }
+
+    .hero-content-asym div:not(.flex) {
+        font-size: calc(1rem + 0.5rem);
     }
 
     /* Dots position adjustment */
