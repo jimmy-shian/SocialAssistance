@@ -67,30 +67,7 @@
     }
   }
 
-  // Services (Overlapping Gallery on Desktop, Scroll on Mobile)
-  if (data.services) {
-    const box = document.querySelector('.services-carousel');
-    if (box) {
-      // Generate Items HTML
-      const items = data.services.map((s, i) => `
-        <a href="${s.link || '#'}" class="service-card-carousel card-dynamic-bg">
-          <img decoding="async" src="${s.img}" alt="${s.title}" class="service-card-img" loading="lazy">
-          <div class="service-bubble">
-            <div class="service-icon-float"><i class="${s.icon || 'fas fa-star'}"></i></div>
-            <h3>${s.title}</h3>
-            <p>${s.desc}</p>
-          </div>
-        </a>
-       `).join('');
-
-      box.innerHTML = items;
-
-      // Desktop: Enable horizontal masonry mode (grid)
-      if (window.innerWidth >= 768) {
-        box.classList.add('masonry-mode');
-      }
-    }
-  }
+  // Services section now rendered inline in index.html from servicesContent.js
 
   // Resources Section
   if (data.resources) {

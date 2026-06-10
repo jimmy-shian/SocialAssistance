@@ -3086,7 +3086,7 @@ html.dark .hero-content {
   background: linear-gradient(135deg, #F0F5E8 0%, #E8F0E0 100%);
   border-radius: var(--radius-lg);
   padding: 3rem;
-  margin: 0.5rem 0;
+  margin: 2.5rem 0;
 }
 
 html.dark .sdgs-section {

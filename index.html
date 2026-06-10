@@ -25,6 +25,7 @@
   <link href="./css/style.css" rel="stylesheet">
   <link href="./css/layout-asym.css" rel="stylesheet">
   <link href="./css/carousel.css" rel="stylesheet">
+  <link href="./css/services-tape.css" rel="stylesheet">
   <script>
     (function () {
       try {
@@ -70,7 +71,7 @@
 
     <div class="container mx-auto px-6 relative z-10">
       <!-- Philosophy / About Section - Dynamically rendered from siteContent.js -->
-      <section class="philosophy-section asym-layout mt-24 mb-16" id="about">
+      <section class="philosophy-section asym-layout mt-16 mb-16" id="about">
         <div class="philosophy-image-box">
           <!-- Image rendered by render-index.js -->
         </div>
@@ -79,24 +80,78 @@
         </div>
       </section>
 
-      <!-- Services Section - Dynamically rendered from siteContent.js -->
-      <section class="mt-6 section-bg-1 py-4 overflow-visible" id="services">
-        <div class="text-center">
+      <!-- Services Section - Sticky Stacked Cards (Desktop) -->
+      <section class="services-tape-section" id="services">
+        <div class="services-tape-sticky">
+          <div class="text-center">
+            <h2 class="section-title inline-block relative z-10">服務項目</h2>
+          </div>
+
+          <div class="services-tape-stage">
+            <div class="services-tape-stack" id="services-tape-stack">
+              <!-- Cards will be rendered by JS from servicesContent.js -->
+            </div>
+
+            <div class="services-tape-info">
+              <span class="services-tape-label">服務項目</span>
+              <h3 id="serviceTapeTitle">體驗教育</h3>
+              <p id="serviceTapeText">
+                用任務、討論與回饋串起學習歷程，讓孩子從行動中理解自己與團隊。
+              </p>
+
+              <div class="services-tape-progress">
+                <div class="services-tape-progress-bar" id="serviceTapeProgress"></div>
+              </div>
+
+              <div class="services-tape-counter">
+                <span id="serviceTapeCurrent">01</span>
+                <span>/</span>
+                <span id="serviceTapeTotal">07</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Services Section - Mobile Carousel (Mobile only) -->
+      <section class="services-mobile-section md:hidden mt-6 section-bg-1 py-4" id="services-mobile">
+        <div class="text-center mb-4">
           <h2 class="section-title inline-block relative z-10">服務項目</h2>
         </div>
-
-        <div class="services-carousel-wrapper">
-          <!-- Dynamically populated by render-index.js from siteContent.js -->
-          <div class="services-carousel"></div>
-          <!-- Scroll Indicators (Mobile) -->
-          <div
-            class="scroll-hint md:hidden text-center text-gray-400 text-sm mt-6 flex items-center justify-center gap-3">
+        <div class="services-carousel-wrapper" id="services-carousel-container">
+          <div class="services-carousel" id="services-carousel"></div>
+          <div class="scroll-hint text-center text-gray-400 text-sm mt-6 flex items-center justify-center gap-3">
             <i class="fas fa-chevron-left animate-bounce-horizontal-left"></i>
             <span class="text-xs tracking-wider">滑動查看更多</span>
             <i class="fas fa-chevron-right animate-bounce-horizontal-right"></i>
           </div>
         </div>
       </section>
+
+      <script src="./js/data/servicesContent.js"></script>
+      <script src="./js/services-tape.js"></script>
+      <script>
+        // Mobile carousel rendering
+        (function () {
+          function esc(s) {
+            return String(s || '').replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"');
+          }
+          const container = document.querySelector('#services-carousel');
+          const data = window.servicesContent;
+          if (!container || !data || !Array.isArray(data.items)) return;
+
+          container.innerHTML = data.items.map(item => `
+            <article class="service-card-carousel card-dynamic-bg">
+              ${item.image ? `<img decoding="async" src="${esc(item.image)}" alt="${esc(item.title)}" class="service-card-img" loading="lazy">` : ''}
+              <div class="service-bubble">
+                <div class="service-icon-float"><i class="fas fa-star"></i></div>
+                <h3>${esc(item.title)}</h3>
+                <p>${esc(item.desc)}</p>
+              </div>
+            </article>
+          `).join('');
+        })();
+      </script>
 
       <!-- SDGs Section - Dynamically rendered from siteContent.js -->
       <section class="sdgs-section mt-24 mb-16" id="sdgs">
