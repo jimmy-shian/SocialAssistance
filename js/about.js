@@ -209,24 +209,24 @@
     const toAnimate = Array.from(root.querySelectorAll('.about-card, .team-card, .model-step'));
     animateOnView(toAnimate);
 
-    // 進場時重新計算階梯位移（考慮到每張卡片原始高度）
-    function adjustModelStairs() {
-      const container = root.querySelector('.model-steps'); if (!container) return;
-      const steps = Array.from(container.querySelectorAll('.model-step'));
-      if (!steps.length) return;
-      const heights = steps.map(s => s.getBoundingClientRect().height);
-      const Hmax = Math.max(...heights);
-      const n = steps.length; const step = 14; // 每階小幅度
-      steps.forEach((el, i) => {
-        const desiredTop = (n - 1 - i) * step;
-        const currentTop = Hmax - heights[i];
-        const delta = desiredTop - currentTop; // 允許負值（往上移）
-        el.style.setProperty('--offset', `${delta}px`);
-      });
-    }
-    // 初次與視窗尺寸變更時重算
-    setTimeout(adjustModelStairs, 0);
-    window.addEventListener('resize', adjustModelStairs);
+    // // 進場時重新計算階梯位移（考慮到每張卡片原始高度）
+    // function adjustModelStairs() {
+    //   const container = root.querySelector('.model-steps'); if (!container) return;
+    //   const steps = Array.from(container.querySelectorAll('.model-step'));
+    //   if (!steps.length) return;
+    //   const heights = steps.map(s => s.getBoundingClientRect().height);
+    //   const Hmax = Math.max(...heights);
+    //   const n = steps.length; const step = 14; // 每階小幅度
+    //   steps.forEach((el, i) => {
+    //     const desiredTop = (n - 1 - i) * step;
+    //     const currentTop = Hmax - heights[i];
+    //     const delta = desiredTop - currentTop; // 允許負值（往上移）
+    //     el.style.setProperty('--offset', `${delta}px`);
+    //   });
+    // }
+    // // 初次與視窗尺寸變更時重算
+    // setTimeout(adjustModelStairs, 0);
+    // window.addEventListener('resize', adjustModelStairs);
 
     // Team：點擊/鍵盤卡片翻面顯示學經歷（忽略卡片內連結與互動元素）
     try {

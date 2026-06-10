@@ -1721,15 +1721,15 @@ textarea:focus {
   position: relative;
   flex: 1;
   min-width: 0;
-  transform: translateY(var(--offset, 0px));
+  transform: translateY(var(--offset, 0px)) !important;
   transition: transform 0.3s ease;
 }
 
-/* 階梯遞減效果：步1最上、步4最下 */
-.model-step-1 { --offset: 0px; }
-.model-step-2 { --offset: 40px; }
-.model-step-3 { --offset: 80px; }
-.model-step-4 { --offset: 120px; }
+/* 1最低 → 4最高 */
+.model-step-1 { --offset: 120px; }
+.model-step-2 { --offset: 80px; }
+.model-step-3 { --offset: 40px; }
+.model-step-4 { --offset: 0px; }
 
 /* 響應式階梯偏移量 */
 @media (max-width: 767px) {
