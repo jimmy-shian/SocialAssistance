@@ -206,7 +206,13 @@
         const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: prepared.dataUrl, filename: prepared.filename }) });
         if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
         const data = await resp.json();
-        if (!data || !data.ok) throw new Error(data?.message || '上傳失敗');
+        if (!data || !data.ok) {
+          const msg = (data && data.message) || '上傳失敗';
+          if (msg === "token 已過期" || msg === "token 驗證失敗" || msg === "未授權") {
+            handleTokenExpired();
+          }
+          throw new Error(msg);
+        }
 
         if (!data.url && !data.path) throw new Error('上傳成功但未回傳圖片路徑');
         return normalizeRepoImagePath(data.url || data.path);
@@ -219,7 +225,13 @@
         const resp = await fetch(base + ep, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ token: t, dataUrl: prepared.dataUrl, filename: prepared.filename }) });
         if (!resp.ok) throw new Error('上傳失敗(' + resp.status + ')');
         const data = await resp.json();
-        if (!data || !data.ok) throw new Error(data && data.message || '上傳失敗');
+        if (!data || !data.ok) {
+          const msg = (data && data.message) || '上傳失敗';
+          if (msg === "token 已過期" || msg === "token 驗證失敗" || msg === "未授權") {
+            handleTokenExpired();
+          }
+          throw new Error(msg);
+        }
         if (data.url || data.path) {
           const path = normalizeRepoImagePath(data.url || data.path);
           if (window.Toast) Toast.show('圖片已寫入 GitHub img：' + path, 'success', 2500);
@@ -728,8 +740,9 @@
       const time = meta.updatedAt ? fmtTime(meta.updatedAt) : '-';
       el.innerHTML = `最後更新：${time}${meta.hasData ? ' <span class="text-rose-600">(暫存檔案)</span>' : ''}`;
     }
-    else if (meta.message == "token 已過期") {
+    else if (meta && (meta.message === "token 已過期" || meta.message === "token 驗證失敗" || meta.message === "未授權")) {
       el.textContent = '最後更新：-（請重登入）';
+      handleTokenExpired();
     }
     else {
       el.textContent = '最後更新：-';
@@ -740,6 +753,71 @@
     try { return JSON.stringify(JSON.parse(jsonStr), null, 2); } catch (e) { return jsonStr; }
   }
   function setEditor(obj) { qs('#ds-editor').value = JSON.stringify(obj || {}, null, 2); }
+
+  // Helper to check token expiration
+  function isTokenExpired(token) {
+    if (!token) return true;
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    const ts = parseInt(parts[1], 10);
+    if (!ts || isNaN(ts)) return true;
+    const ttl = 2 * 60 * 60 * 1000; // 2 hours
+    return Date.now() - ts > ttl;
+  }
+
+  // Helper to handle expired token
+  function handleTokenExpired() {
+    if (window.Toast) {
+      Toast.show('登入憑證已過期，請重新登入。', 'warning', 3000);
+    } else {
+      alert('登入憑證已過期，請重新登入。');
+    }
+    if (window.DataAPI && window.DataAPI.logout) {
+      window.DataAPI.logout();
+    }
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  }
+
+  // Quota helper functions
+  function getPublishRemaining() {
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local time
+    try {
+      const raw = localStorage.getItem('admin_publish_quota');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.date === today) {
+          return typeof parsed.remaining === 'number' ? parsed.remaining : 10;
+        }
+      }
+    } catch (e) {}
+    return 10;
+  }
+
+  function savePublishRemaining(remaining) {
+    const today = new Date().toLocaleDateString('en-CA');
+    try {
+      localStorage.setItem('admin_publish_quota', JSON.stringify({ date: today, remaining: remaining }));
+    } catch (e) {}
+    updatePublishButtonState();
+  }
+
+  function updatePublishButtonState() {
+    const remaining = getPublishRemaining();
+    const btn = qs('#btn-save-publish');
+    if (btn) {
+      if (remaining <= 0) {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.title = '今日已達發布上限 10 次';
+      } else {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.title = `儲存並發布到 GitHub (今日剩餘 ${remaining} 次)`;
+      }
+    }
+  }
 
   async function init() {
     const hasBase = !!(AppConfig && AppConfig.GAS_BASE_URL);
@@ -783,6 +861,14 @@
       overlay.setAttribute('aria-hidden', 'true');
     }
     if (overlayBtn) overlayBtn.addEventListener('click', (e) => { e.stopPropagation(); dismissOverlay(); });
+
+    const rawToken = (window.DataAPI && window.DataAPI.token && window.DataAPI.token()) || '';
+    if (rawToken && isTokenExpired(rawToken)) {
+      console.warn('Admin token expired locally.');
+      if (window.DataAPI && window.DataAPI.logout) {
+        window.DataAPI.logout();
+      }
+    }
 
     const token = (window.DataAPI && window.DataAPI.token && window.DataAPI.token()) || '';
     const logged = !!token;
@@ -835,6 +921,7 @@
         try { const tip = qs('#admin-header-tip'); if (tip) tip.textContent = '已登入：資料從 js/data 載入；暫存只保存在本機，發布後才更新網站。'; } catch (e) { }
         show(qs('#admin-login'), false);
         show(qs('#admin-panel'), true);
+        updatePublishButtonState();
         try { await loadDatasetAndRender(); } catch (e) { }
         try { await updateVersionLabel(); } catch (e) { }
       } catch (e) { text(status, '錯誤：' + e.message); if (window.Toast) Toast.show('登入錯誤：' + e.message, 'error', 3000); }
@@ -906,6 +993,7 @@
       window.addEventListener('scroll', updateShadow, { passive: true });
       updateShadow(); // init check
     }
+    updatePublishButtonState();
   }
 
   if (document.readyState === 'loading') {
@@ -1675,14 +1763,29 @@
     const key = keyFromSelect();
     const st = qs('#publish-status'); if (st) st.textContent = '儲存並同步中…';
     try {
+      const remaining = getPublishRemaining();
+      if (remaining <= 0) {
+        if (st) st.textContent = '今日已達發布上限 10 次';
+        if (window.Toast) Toast.show('今日已達發布上限 10 次，已鎖定發布。', 'error', 3500);
+        return;
+      }
+
       setBtnLoading(qs('#btn-save-publish'), true);
       let payload = collectCurrentPayload();
-      const okToPublish = await confirmDialog('儲存並發布', '確定要儲存並發布嗎？\n\n這會同步到 GitHub，且每日最多 10 次。', '發布');
+      const okToPublish = await confirmDialog('儲存並發布', `確定要儲存並發布嗎？\n\n這會同步到 GitHub，今日剩餘可發布次數：${remaining} 次。`, '發布');
       if (!okToPublish) {
         if (st) st.textContent = '已取消發布';
         return;
       }
       let res = await withBusy('發布中', '正在儲存資料並同步 GitHub，請稍候。', () => window.DataAPI.savePublish(key, payload, [key]));
+      
+      // 更新發布次數配額
+      if (res && res.publishQuota) {
+        savePublishRemaining(res.publishQuota.remaining);
+      } else if (res && res.ok) {
+        savePublishRemaining(Math.max(0, remaining - 1));
+      }
+
       if (res && res.ok && res.data && typeof res.data === 'object') payload = res.data;
       // 判斷發佈是否失敗（即便存檔成功）
       const hasPublishErrors = !!(res && Array.isArray(res.results) && res.results.some(r => !r || r.ok === false));
@@ -1717,8 +1820,16 @@
       }
       updateVersionLabel();
 
-    } catch (e) { if (st) st.textContent = '錯誤：' + e.message; if (window.Toast) Toast.show('儲存錯誤：' + e.message, 'error', 3000); }
-    finally { setBtnLoading(qs('#btn-save-publish'), false); }
+    } catch (e) {
+      if (st) st.textContent = '錯誤：' + e.message;
+      if (window.Toast) Toast.show('儲存錯誤：' + e.message, 'error', 3000);
+      if (e.message && e.message.includes('已達 10 次上限')) {
+        savePublishRemaining(0);
+      }
+      if (e.message === "token 已過期" || e.message === "token 驗證失敗" || e.message === "未授權") {
+        handleTokenExpired();
+      }
+    } finally { setBtnLoading(qs('#btn-save-publish'), false); }
   }
 
   // 僅儲存（不發佈）
@@ -3069,6 +3180,58 @@ window.__ADMIN_PREVIEW__ = true;
 window.${dataKey} = ${JSON.stringify(editedData, null, 2)};
 // Also set aboutContent for index.html Team section if editing site
 ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent || {}, null, 2)};` : ''}
+
+// Prevents WebSocket connection in about:srcdoc (from injected live reload scripts)
+if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about:srcdoc') > -1) {
+  window.WebSocket = function(url, protocols) {
+    console.warn('WebSocket connection to ' + url + ' blocked in preview iframe.');
+    this.url = url;
+    this.protocol = '';
+    this.readyState = 3; // CLOSED
+    this.bufferedAmount = 0;
+    this.extensions = '';
+    this.binaryType = 'blob';
+    this.send = function() {};
+    this.close = function() {};
+    this.addEventListener = function() {};
+    this.removeEventListener = function() {};
+  };
+}
+
+// Global image CDN fallback handler inside preview iframe
+(function () {
+  function handleFallback(img) {
+    const src = img.src;
+    if (src && src.includes('cdn.jsdelivr.net') && src.includes('/img/')) {
+      const parts = src.split('/img/');
+      if (parts.length > 1) {
+        const localPath = './img/' + parts[1];
+        if (img.getAttribute('data-fallback-tried') !== 'true') {
+          img.setAttribute('data-fallback-tried', 'true');
+          console.warn('Preview CDN image load failed, falling back to local path:', localPath);
+          img.src = localPath;
+        }
+      }
+    }
+  }
+  window.addEventListener('error', function (e) {
+    if (e && e.target && e.target.tagName === 'IMG') {
+      handleFallback(e.target);
+    }
+  }, true);
+  function checkExistingImages() {
+    document.querySelectorAll('img').forEach(img => {
+      if (img.complete && img.naturalWidth === 0) {
+        handleFallback(img);
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkExistingImages);
+  } else {
+    checkExistingImages();
+  }
+})();
 </script>
 `;
         // Insert after <head> opening or before first <script>

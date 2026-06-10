@@ -1,3 +1,44 @@
+// 全域圖片 CDN 載入失敗 fallback 機制
+(function () {
+  function handleFallback(img) {
+    const src = img.src;
+    if (src && src.includes('cdn.jsdelivr.net') && src.includes('/img/')) {
+      const parts = src.split('/img/');
+      if (parts.length > 1) {
+        const localPath = './img/' + parts[1];
+        if (img.getAttribute('data-fallback-tried') !== 'true') {
+          img.setAttribute('data-fallback-tried', 'true');
+          console.warn('CDN image load failed, falling back to local path:', localPath);
+          img.src = localPath;
+        }
+      }
+    }
+  }
+
+  // 1. 監聽後續的載入錯誤（使用 capture phase）
+  window.addEventListener('error', function (e) {
+    if (e && e.target && e.target.tagName === 'IMG') {
+      handleFallback(e.target);
+    }
+  }, true);
+
+  // 2. 處理在腳本載入前就已經載入失敗的圖片
+  function checkExistingImages() {
+    const imgs = document.querySelectorAll('img');
+    imgs.forEach(img => {
+      if (img.complete && img.naturalWidth === 0) {
+        handleFallback(img);
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkExistingImages);
+  } else {
+    checkExistingImages();
+  }
+})();
+
 // 全站統一聯絡資料 — 放在最頂端，navFooter 執行時立即寫入 window
 const CONTACT = {
   name: '聽見核心工作室',
