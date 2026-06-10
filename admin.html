@@ -121,7 +121,7 @@
                 </button>
                 <!-- Dropdown Menu -->
                 <div id="ds-menu"
-                  class="absolute left-1/2 top-full -translate-x-1/2 pt-2 w-56 bg-transparent origin-top scale-95 opacity-0 invisible group-hover:visible group-hover:opacity-100 group-hover:scale-100 transition-all duration-200">
+                  class="absolute left-1/2 top-full -translate-x-1/2 pt-2 w-56 bg-transparent origin-top scale-95 opacity-0 invisible pointer-events-none transition-all duration-200">
                   <div class="overflow-hidden bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-xl shadow-2xl">
                     <button type="button" data-value="site"
                       class="block w-full text-left px-4 py-3 text-sm hover:bg-emerald-50 dark:hover:bg-emerald-900/20 text-gray-700 dark:text-gray-200 hover:text-emerald-700 dark:hover:text-emerald-400 border-b border-gray-100 dark:border-gray-800">主畫面
@@ -547,6 +547,51 @@
           <div class="mt-6 flex items-center justify-end gap-2">
             <button id="link-cancel" type="button" class="btn-soft btn-yellow">取消</button>
             <button id="link-insert" type="button" class="btn-soft btn-purple">插入</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="admin-confirm-modal" class="admin-modal fixed inset-0 hidden">
+        <div class="overlay-bg fixed inset-0 bg-slate-900/50 dark:bg-slate-900/60"></div>
+        <section
+          class="modal-card relative z-10 w-full max-w-md mx-auto p-6 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+          <h3 id="admin-confirm-title" class="text-lg font-bold mb-2">確認操作</h3>
+          <p id="admin-confirm-message" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line"></p>
+          <div class="mt-5 flex justify-end gap-2">
+            <button id="admin-confirm-cancel" type="button" class="btn-soft btn-yellow">取消</button>
+            <button id="admin-confirm-ok" type="button" class="btn-soft btn-purple">確認</button>
+          </div>
+        </section>
+      </div>
+
+      <div id="image-picker-modal" class="admin-modal fixed inset-0 hidden">
+        <div class="overlay-bg fixed inset-0 bg-slate-900/50 dark:bg-slate-900/60"></div>
+        <section
+          class="modal-card relative z-10 w-full max-w-4xl mx-auto p-5 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h3 class="text-lg font-bold">選擇圖片來源</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-300">可直接選用網站 img 資料夾內既有圖片，或上傳新的圖片。</p>
+            </div>
+            <button id="image-picker-close" type="button" class="btn-soft btn-yellow" aria-label="關閉">×</button>
+          </div>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <input id="image-picker-search" type="text" placeholder="搜尋檔名"
+              class="flex-1 min-w-[220px] rounded border px-3 py-2 bg-white dark:bg-gray-800">
+            <button id="image-picker-upload" type="button" class="btn-soft btn-blue">上傳本機圖片</button>
+          </div>
+          <div id="image-picker-grid" class="image-picker-grid mt-4"></div>
+        </section>
+      </div>
+
+      <div id="admin-busy-overlay" class="admin-busy fixed inset-0 hidden">
+        <div class="overlay-bg fixed inset-0 bg-slate-950/45 dark:bg-slate-950/60"></div>
+        <section
+          class="busy-card relative z-10 mx-auto rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl">
+          <div class="busy-spinner"></div>
+          <div>
+            <div id="admin-busy-title" class="font-bold">處理中</div>
+            <div id="admin-busy-message" class="text-sm text-gray-600 dark:text-gray-300 mt-1">請稍候，不要關閉頁面。</div>
           </div>
         </section>
       </div>

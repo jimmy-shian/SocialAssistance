@@ -11,7 +11,7 @@ body {
 /* Local fonts */
 @font-face {
   font-family: 'SourceHanSerifTC';
-  src: url('../assets/font/竹風體W4.ttc') format('opentype');
+  src: url('../assets/font/LXGWWenKaiTC-Regular.woff2') format('woff2');
   font-weight: 1 999;
   font-style: normal;
   font-display: swap;
@@ -205,12 +205,12 @@ body {
 
 /* Style 3: Card "Glass" dynamic background */
 .card-dynamic-bg {
-  position: relative;
-  background: rgba(255, 255, 255, 0.85);
-  /* Fallback */
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  overflow: hidden;
+    position: relative;
+    background: rgb(249 244 255 / 85%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    overflow: hidden;
+    border-radius: 16px;
 }
 
 .dark .card-dynamic-bg {
@@ -892,7 +892,10 @@ textarea:focus {
 #admin-panel textarea,
 #link-modal input[type="text"],
 #link-modal input[type="url"],
-#link-modal select {
+#link-modal select,
+.admin-modal input[type="text"],
+.admin-modal input[type="url"],
+.admin-modal select {
   appearance: none;
   -webkit-appearance: none;
   color: #1f2937;
@@ -907,25 +910,32 @@ textarea:focus {
 .dark #admin-panel textarea,
 .dark #link-modal input[type="text"],
 .dark #link-modal input[type="url"],
-.dark #link-modal select {
+.dark #link-modal select,
+.dark .admin-modal input[type="text"],
+.dark .admin-modal input[type="url"],
+.dark .admin-modal select {
   color: #f3f4f6;
 }
 #admin-panel input:focus,
 #admin-panel select:focus,
 #admin-panel textarea:focus,
 #link-modal input:focus,
-#link-modal select:focus {
+#link-modal select:focus,
+.admin-modal input:focus,
+.admin-modal select:focus {
   box-shadow: 0 0 0 2px var(--primary), 0 8px 16px rgba(0, 0, 0, 0.08);
   border-color: transparent;
 }
 #admin-panel input::placeholder,
 #admin-panel textarea::placeholder,
-#link-modal input::placeholder {
+#link-modal input::placeholder,
+.admin-modal input::placeholder {
   color: #9ca3af;
 }
 .dark #admin-panel input::placeholder,
 .dark #admin-panel textarea::placeholder,
-.dark #link-modal input::placeholder {
+.dark #link-modal input::placeholder,
+.dark .admin-modal input::placeholder {
   color: #9ca3af;
 }
 
@@ -1441,6 +1451,126 @@ textarea:focus {
   opacity: 1;
 }
 
+.admin-modal,
+.admin-busy {
+  z-index: 1300;
+  display: none;
+}
+
+.admin-modal:not(.hidden),
+.admin-busy:not(.hidden) {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.admin-modal .modal-card,
+.admin-busy .busy-card {
+  opacity: 0;
+  transform: translateY(10px) scale(.98);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.admin-modal .overlay-bg,
+.admin-busy .overlay-bg {
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+
+.admin-modal.open .modal-card,
+.admin-busy.open .busy-card {
+  opacity: 1;
+  transform: none;
+}
+
+.admin-modal.open .overlay-bg,
+.admin-busy.open .overlay-bg {
+  opacity: 1;
+}
+
+.image-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+  gap: .75rem;
+  max-height: min(60vh, 520px);
+  overflow: auto;
+  padding-right: .25rem;
+}
+
+.image-picker-item {
+  display: grid;
+  gap: .4rem;
+  padding: .45rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--ui-radius-sm, .375rem);
+  background: var(--bg-surface, #fff);
+  text-align: left;
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.image-picker-item:hover,
+.image-picker-item:focus-visible {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .1);
+}
+
+.image-picker-item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: calc(var(--ui-radius-sm, .375rem) - 1px);
+  background: #e5e7eb;
+}
+
+.image-picker-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: .75rem;
+  color: var(--text-secondary);
+}
+
+.busy-card {
+  width: min(92vw, 420px);
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.busy-spinner {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  border: 3px solid rgba(16, 185, 129, .18);
+  border-top-color: var(--primary);
+  animation: admin-busy-spin .8s linear infinite;
+  flex: 0 0 auto;
+}
+
+@keyframes admin-busy-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (hover: none) {
+  #ds-menu,
+  #pv-prov-menu {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    transform: translateX(-50%) scale(.95) !important;
+    pointer-events: none !important;
+  }
+
+  #ds-menu.admin-dropdown-open,
+  #pv-prov-menu.admin-dropdown-open {
+    visibility: visible !important;
+    opacity: 1 !important;
+    transform: translateX(-50%) scale(1) !important;
+    pointer-events: auto !important;
+  }
+}
+
 /* Member｜忘記密碼 Modal 動畫 */
 #forgot-modal {
   z-index: 1200;
@@ -1923,7 +2053,8 @@ textarea:focus {
 
 /* Index｜Hero 特別字體 */
 #hero-title,
-#hero-subtitle {
+#hero-subtitle,
+.hero-content-asym {
   font-family: 'ChenYuluoyan', 'SourceHanSerifTC', 'Noto Serif TC', 'Noto Sans TC', 'Microsoft JhengHei', PingFangTC, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, serif;
 }
 
@@ -2984,7 +3115,6 @@ html.dark .sdgs-section {
   border: 1px solid var(--border);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
-  color: inherit;
   display: block;
 }
 
@@ -3427,7 +3557,7 @@ html.dark .sdgs-section {
   }
 
   .hero-content-asym h1 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     line-height: 1.3;
     margin-bottom: 0.5rem;
   }
@@ -4009,7 +4139,10 @@ html.dark .team-card .team-back-content li {
 #admin-panel textarea,
 #link-modal input[type="text"],
 #link-modal input[type="url"],
-#link-modal select {
+#link-modal select,
+.admin-modal input[type="text"],
+.admin-modal input[type="url"],
+.admin-modal select {
   appearance: none;
   width: 100%;
   padding: 0.5rem 0.75rem;
@@ -4030,7 +4163,10 @@ html.dark .team-card .team-back-content li {
 #admin-panel textarea:focus,
 #link-modal input[type="text"]:focus,
 #link-modal input[type="url"]:focus,
-#link-modal select:focus {
+#link-modal select:focus,
+.admin-modal input[type="text"]:focus,
+.admin-modal input[type="url"]:focus,
+.admin-modal select:focus {
   border-color: transparent;
   box-shadow: 0 0 0 2px var(--primary);
 }
@@ -4042,7 +4178,10 @@ html.dark #admin-panel select,
 html.dark #admin-panel textarea,
 html.dark #link-modal input[type="text"],
 html.dark #link-modal input[type="url"],
-html.dark #link-modal select {
+html.dark #link-modal select,
+html.dark .admin-modal input[type="text"],
+html.dark .admin-modal input[type="url"],
+html.dark .admin-modal select {
   background: #374151;
   color: #f3f4f6;
 }
