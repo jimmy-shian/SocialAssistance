@@ -120,7 +120,7 @@ window.AppConfig = {
 
   // ==================== GAS 設定（保留作為備用）==================== 
   // TODO: 填入你部署完成的 Google Apps Script Web App URL（結尾不要有斜線） 
-  GAS_BASE_URL: 'https://script.google.com/macros/s/AKfycbyWosylWYVCJd2vE2jVwX617fLQePy3-SPPxa1sy1DlMMr6nutIySrXY07iNUIU2yGPbQ/exec',
+  GAS_BASE_URL: 'https://script.google.com/macros/s/AKfycbx49khHowsFpqqf3aSD4MRn9ByuLXjGipM2q8a6vLAt7ZzLq7Em0K59zXHsiLm3mlTfag/exec',
 
   // 以單一 Web App 端點 + action 路由 
   endpoints: {
