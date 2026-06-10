@@ -296,7 +296,7 @@ html.dark .services-tape-counter {
   position: relative;
   background:
     linear-gradient(135deg, rgba(250, 246, 240, 0.85) 0%, rgba(255, 253, 248, 0.75) 50%, rgba(240, 245, 232, 0.85) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -305,7 +305,7 @@ html.dark .services-tape-counter {
 html.dark .services-mobile-section {
   background:
     linear-gradient(135deg, rgba(45, 42, 36, 0.92) 0%, rgba(26, 24, 22, 0.85) 50%, rgba(35, 40, 30, 0.92) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

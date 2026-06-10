@@ -42,7 +42,8 @@
   function renderStandardPost(post, index) {
     return `
       <article class="blog-post-card" role="button" tabindex="0" data-post-id="${esc(post.id)}" data-category="${esc(post.category)}">
-        <div class="blog-post-image">
+        <!-- 原代碼: <div class="blog-post-image"> -->
+        <div class="blog-post-image image-frame image-frame--card">
           <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" loading="lazy">
           <span class="blog-post-tag" data-category="${esc(post.category)}">${esc(categoryLabels[post.category] || post.category)}</span>
         </div>
@@ -58,7 +59,8 @@
   function renderGloryPost(post, index) {
     return `
       <article class="blog-glory-feature" style="--stack:${index}" data-post-id="${esc(post.id)}" data-category="glory">
-        <div class="blog-glory-media">
+        <!-- 原代碼: <div class="blog-glory-media"> -->
+        <div class="blog-glory-media image-frame image-frame--banner">
           <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" loading="lazy">
           <span class="blog-post-tag" data-category="glory">${esc(categoryLabels.glory)}</span>
         </div>
@@ -152,7 +154,8 @@
     const body = modal.querySelector('.blog-lightbox-body');
     const label = categoryLabels[post.category] || post.category;
     body.innerHTML = `
-      <div class="blog-modal-hero">
+      <!-- 原代碼: <div class="blog-modal-hero"> -->
+      <div class="blog-modal-hero image-frame image-frame--hero">
         <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}">
       </div>
       <div class="blog-modal-meta">${esc(label)}</div>

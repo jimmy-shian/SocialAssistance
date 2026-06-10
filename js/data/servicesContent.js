@@ -5,44 +5,44 @@ window.servicesContent = {
     {
       title: "體驗教育",
       desc: "用任務、討論與回饋串起學習歷程，讓孩子從行動中理解自己與團隊。",
-      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg"
+      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.webp"
     },
     {
       title: "自立培養",
       desc: "聚焦生活技能、情緒整理與資源使用，建立可以帶著走的日常能力。",
-      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.jpg"
+      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.webp"
     },
     {
       title: "職業探索",
       desc: "走進在地產業場域，透過觀察與實作認識工作樣貌與職涯可能。",
-      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg"
+      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp"
     },
     {
       title: "生活規劃",
       desc: "陪伴孩子整理目標、時間與資源，將想法轉成可執行的小步驟。",
-      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.jpg"
+      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.webp"
     },
     {
       title: "親子互動",
       desc: "透過共同任務與引導對話，創造更容易被聽見與理解的相處時刻。",
-      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.jpg"
+      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.webp"
     },
     {
       title: "冒險挑戰",
       desc: "在安全規劃下進行戶外與高低空挑戰，練習面對未知與自我突破。",
-      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1_20250917_153644.jpg"
+      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1_20250917_153644.webp"
     },
     {
       title: "寒假營隊",
       desc: "整合探索、自立與冒險活動，打造密集且有節奏的假期成長經驗。",
-      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.jpg"
+      image: "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.webp"
     }
   ],
   achievementsTitle: "成就經歷",
   gallery: [
-    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg",
-    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.jpg",
-    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.jpg",
-    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.jpg"
+    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.webp",
+    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.webp",
+    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.webp",
+    "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.webp"
   ]
 };

@@ -92,11 +92,7 @@
 }
 
 .hero-content-asym p {
-    font-size: calc(1.125rem + 0.5rem);
-}
-
-.hero-content-asym span {
-    font-size: calc(0.875rem + 0.5rem);
+    font-size: calc(1.5rem + 0.5rem);
 }
 
 .hero-content-asym div:not(.flex) {
@@ -107,6 +103,10 @@
 html.dark .hero-content-asym {
     background: rgba(45, 42, 36, 0.95);
     color: var(--text-primary);
+}
+
+html.dark .hero-content-asym .italic {
+    color: var(--text-p-300);
 }
 
 /* Responsive adjustment */

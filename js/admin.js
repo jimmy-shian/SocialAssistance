@@ -59,32 +59,31 @@
 
   async function prepareImageUpload(file) {
     const type = String(file && file.type || '').toLowerCase();
-    if (!type.startsWith('image/') || type === 'image/svg+xml' || type === 'image/gif') {
+    if (type === 'image/svg+xml' || type === 'image/gif') {
       return { dataUrl: await fileToDataUrl(file), filename: file.name || 'image.png' };
     }
     const src = await fileToDataUrl(file);
     return await new Promise((resolve) => {
       const img = new Image();
       img.onload = function () {
-        const maxSide = 1400;
+        const maxSide = 1600;
         const w = img.naturalWidth || img.width || maxSide;
         const h = img.naturalHeight || img.height || maxSide;
         const ratio = Math.min(1, maxSide / Math.max(w, h));
-        if (ratio >= 1 && file.size <= 900 * 1024) {
-          resolve({ dataUrl: src, filename: file.name || 'image.jpg' });
+        if (type === 'image/webp' && ratio >= 1 && file.size <= 900 * 1024) {
+          resolve({ dataUrl: src, filename: file.name || 'image.webp' });
           return;
         }
         const canvas = document.createElement('canvas');
         canvas.width = Math.max(1, Math.round(w * ratio));
         canvas.height = Math.max(1, Math.round(h * ratio));
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.84), filename: replaceExt(file.name || 'image', 'jpg') });
+        resolve({ dataUrl: canvas.toDataURL('image/webp', 0.82), filename: replaceExt(file.name || 'image', 'webp') });
       };
       img.onerror = async function () {
-        resolve({ dataUrl: await fileToDataUrl(file), filename: file.name || 'image.png' });
+        resolve({ dataUrl: await fileToDataUrl(file), filename: replaceExt(file.name || 'image', 'webp') });
       };
       img.src = src;
     });
@@ -108,20 +107,20 @@
   // Preview cache for gas://image placeholders
   const previewCache = (window.__imgPreviewCache = window.__imgPreviewCache || {});
   const SITE_IMAGE_LIBRARY = [
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_2026-06-10_015100_fec24d89d2.png',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_-_.jpg',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-title.png',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-min.png',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/puzzle-404.png',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/index-bg.png',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.jpg',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1_20250917_153644.jpg',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/doctor_icon_142653_ce6d756a37.png',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.jpg',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.jpg',
-    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.jpg'
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_2026-06-10_015100_fec24d89d2.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_-_.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-title.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-min.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/puzzle-404.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/index-bg.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1_20250917_153644.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/doctor_icon_142653_ce6d756a37.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.webp',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.webp'
   ];
   let imagePickerTarget = null;
 
@@ -456,9 +455,13 @@
         const ar = (img.naturalHeight && img.naturalWidth) ? (img.naturalHeight / img.naturalWidth) : 0.5625;
         pv.dataset.ar = String(ar);
         const w = pv.clientWidth || pv.offsetWidth || 300;
-        pv.style.height = Math.round(w * ar * factor) + 'px';
+        // 已停用：禁止在 JS 中寫死圖片尺寸
+        // pv.style.height = Math.round(w * ar * factor) + 'px';
       };
-      img.onerror = function () { pv.style.height = ''; pv.style.minHeight = '12rem'; };
+      img.onerror = function () {
+        // 已停用：禁止在 JS 中寫死圖片尺寸
+        // pv.style.height = ''; pv.style.minHeight = '12rem';
+      };
       img.src = url;
     } catch (e) { }
   }
@@ -469,23 +472,33 @@
         const ar = parseFloat(pv.dataset.ar || '');
         if (!isFinite(ar) || !ar) return;
         const w = pv.clientWidth || pv.offsetWidth || 300;
-        pv.style.height = Math.round(w * ar * 0.9) + 'px';
+        // 已停用：禁止在 JS 中寫死圖片尺寸
+        // pv.style.height = Math.round(w * ar * 0.9) + 'px';
       });
     } catch (e) { }
   }
-  window.addEventListener('resize', () => { try { recalcPreviewHeights(); } catch (e) { } });
+  // 已停用：禁止在 JS 中寫死圖片尺寸
+  // window.addEventListener('resize', () => { try { recalcPreviewHeights(); } catch (e) { } });
 
   // 已移除：欄位說明改以 <label> 包裹，不再需要自動插入 caption。
 
   // 預覽：首頁英雄圖（site.index.heroImage）
   function updateHeroPreview() {
     const pv = qs('#sc-hero-preview'); const input = qs('#sc-hero-image'); if (!pv || !input) return;
+    const img = pv.querySelector('img');
     const val = (input.value || '').trim();
-    if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
+    if (!val) {
+      if (img) { img.removeAttribute('src'); img.classList.add('hidden'); }
+      pv.textContent = '尚未選擇';
+      return;
+    }
     let url = val;
     if (/^gas:\/\/image\//.test(val)) { const p = previewCache[val]; if (p) url = p; }
-    pv.style.backgroundImage = `url('${url}')`;
-    pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+    if (img) {
+      img.src = url;
+      img.classList.remove('hidden');
+    }
+    pv.textContent = '';
     setPreviewHeightFromImage(pv, url, 0.9);
   }
 
@@ -503,13 +516,17 @@
       cell.draggable = true;
       cell.dataset.index = String(i);
       cell.innerHTML = preview
-        ? `<img decoding="async" src="${preview}" alt="story${i + 1}" class="w-full h-full object-contain opacity-90">
-            <div class="absolute inset-0 grid place-items-center bg-black/10 text-[10px] text-white">待發佈</div>`
+        ? `<div class="image-frame image-frame--card w-full h-full">
+             <img decoding="async" src="${preview}" alt="story${i + 1}" class="opacity-90">
+             <div class="absolute inset-0 grid place-items-center bg-black/10 text-[10px] text-white">待發佈</div>
+           </div>`
         : url
-          ? `<img decoding="async" src="${url}" alt="story${i + 1}" class="w-full h-full object-contain">`
+          ? `<div class="image-frame image-frame--card w-full h-full">
+               <img decoding="async" src="${url}" alt="story${i + 1}">
+             </div>`
           : `<div class="w-full h-full grid place-items-center bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300">無圖片</div>`;
       const ctrls = document.createElement('div');
-      ctrls.className = 'absolute top-1 right-1 flex gap-1';
+      ctrls.className = 'absolute top-1 right-1 flex gap-1 z-10';
       ctrls.innerHTML = `
         <button type="button" class="sc-story-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
         <button type="button" class="sc-story-down bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↓</button>
@@ -527,10 +544,19 @@
     try {
       const pv = item.querySelector('.tm-photo-preview'); const input = item.querySelector('.ab-team-photo');
       if (!pv || !input) return;
+      const img = pv.querySelector('img');
       const val = (input.value || '').trim();
-      if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
+      if (!val) {
+        if (img) { img.removeAttribute('src'); img.classList.add('hidden'); }
+        pv.textContent = '尚未選擇';
+        return;
+      }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
-      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      if (img) {
+        img.src = url;
+        img.classList.remove('hidden');
+      }
+      pv.textContent = '';
       setPreviewHeightFromImage(pv, url, 0.9);
     } catch (e) { }
   }
@@ -540,10 +566,19 @@
     try {
       const pv = item.querySelector('.sc-intro-preview'); const input = item.querySelector('.sc-intro-image');
       if (!pv || !input) return;
+      const img = pv.querySelector('img');
       const val = (input.value || '').trim();
-      if (!val) { pv.style.backgroundImage = 'none'; pv.textContent = '尚未選擇'; return; }
+      if (!val) {
+        if (img) { img.removeAttribute('src'); img.classList.add('hidden'); }
+        pv.textContent = '尚未選擇';
+        return;
+      }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
-      pv.style.backgroundImage = `url('${url}')`; pv.style.backgroundSize = 'contain'; pv.style.backgroundRepeat = 'no-repeat'; pv.style.backgroundPosition = 'center'; pv.textContent = '';
+      if (img) {
+        img.src = url;
+        img.classList.remove('hidden');
+      }
+      pv.textContent = '';
       setPreviewHeightFromImage(pv, url, 0.9);
     } catch (e) { }
   }
@@ -552,10 +587,10 @@
       const pv = item.querySelector('.sc-svc-thumb'); const input = item.querySelector('.sc-svc-image');
       if (!pv || !input) return;
       const val = (input.value || '').trim();
-      if (!val) { pv.removeAttribute('src'); pv.style.display = 'none'; return; }
+      if (!val) { pv.removeAttribute('src'); pv.classList.add('hidden'); return; }
       let url = val; if (/^gas:\/\/image\//.test(val) && previewCache[val]) url = previewCache[val];
       pv.src = url;
-      pv.style.display = 'block';
+      pv.classList.remove('hidden');
     } catch (e) { }
   }
 
@@ -1242,7 +1277,10 @@
         </label>
         <label class="text-sm">video（YouTube/Vimeo/MP4）
           <input class="pv-video w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${c.video || ''}">
-          <div class="pv-video-preview mt-2 aspect-video rounded overflow-hidden bg-gray-200 dark:bg-gray-700 grid place-items-center text-xs text-gray-600 dark:text-gray-300">${c.video ? '預覽載入中…' : '輸入影片網址後顯示縮圖'}</div>
+          <div class="pv-video-preview image-frame image-frame--card image-frame--rounded mt-2 bg-gray-200 dark:bg-gray-700 grid place-items-center text-xs text-gray-600 dark:text-gray-300">
+            <img decoding="async" class="hidden" src="" alt="影片縮圖">
+            <span class="pv-video-preview-text">${c.video ? '預覽載入中…' : '輸入影片網址後顯示縮圖'}</span>
+          </div>
         </label>
       </div>
     `;
@@ -1349,16 +1387,21 @@
   function updatePreviewFor(item) {
     const url = item.querySelector('.pv-video')?.value || '';
     const box = item.querySelector('.pv-video-preview'); if (!box) return;
+    const img = box.querySelector('img');
+    const textEl = box.querySelector('.pv-video-preview-text');
     const poster = posterFrom(url);
     if (poster) {
-      box.style.backgroundImage = `url('${poster}')`;
-      box.style.backgroundSize = 'cover';
-      box.style.backgroundPosition = 'center';
-      box.textContent = '';
+      if (img) {
+        img.src = poster;
+        img.classList.remove('hidden');
+      }
+      if (textEl) textEl.textContent = '';
     } else if (/\.mp4($|\?)/i.test(url)) {
-      box.style.backgroundImage = 'none'; box.textContent = 'MP4 影片';
+      if (img) { img.removeAttribute('src'); img.classList.add('hidden'); }
+      if (textEl) textEl.textContent = 'MP4 影片';
     } else {
-      box.style.backgroundImage = 'none'; box.textContent = '輸入影片網址後顯示縮圖';
+      if (img) { img.removeAttribute('src'); img.classList.add('hidden'); }
+      if (textEl) textEl.textContent = '輸入影片網址後顯示縮圖';
     }
   }
   function refreshCasePreviews() { qs('#pv-cases-list')?.querySelectorAll('div[data-index]')?.forEach(updatePreviewFor); }
@@ -1833,7 +1876,9 @@
             </label>
             <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden tm-photo-upload" accept="image/*"></label>
           </div>
-          <div class="tm-photo-preview mt-2 min-h-16 rounded border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 grid place-items-center text-[11px] text-gray-500 dark:text-gray-400">預覽</div>
+          <div class="tm-photo-preview image-frame image-frame--card image-frame--rounded mt-2">
+            <img decoding="async" src="${row.photo ? resolveImage(row.photo) : ''}" alt="預覽" class="${row.photo ? '' : 'hidden'}">
+          </div>
         </div>
         <label class="text-sm">角色
           <input class="ab-team-roles w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${Array.isArray(row.roles) ? row.roles.join('、') : ''}">

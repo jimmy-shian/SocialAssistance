@@ -165,8 +165,11 @@
       return `
             <article class=\"team-card\" tabindex=\"0\" role=\"button\" aria-label=\"${t.name || ''} 學經歷\">
               <div class=\"card-inner\">
-                <div class=\"card-face front\">
-                  ${t.photo ? `<img decoding="async" class=\"team-photo-img\" src=\"${t.photo}\" alt=\"${t.name || ''}\">` : '<div class=\"team-photo-placeholder\"></div>'}
+                <div class="card-face front">
+                  ${t.photo ? `<!-- 原代碼: <img decoding="async" class="team-photo-img" src="${t.photo}" alt="${t.name || ''}"> -->
+                  <figure class="image-frame image-frame--portrait w-full h-[400px] sm:h-[300px] md:h-[300px] lg:h-[400px]">
+                    <img decoding="async" class="team-photo-img" src="${t.photo}" alt="${t.name || ''}">
+                  </figure>` : '<div class=\"team-photo-placeholder\"></div>'}
                   <div class=\"team-info\">
                     <div class=\"team-roles\">${roles}</div>
                     <h4 class=\"team-name\">${t.name || ''}</h4>

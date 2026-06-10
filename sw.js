@@ -1,28 +1,36 @@
 // Service Worker for image and data caching (7 days)
 const CACHE_NAME = 'social-assistance-cache-v2';
+const IMAGE_CACHE_NAME = 'images-v2';
 const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 
 self.addEventListener('install', (event) => {
-  // Activate immediately
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
-    // Cleanup old caches if version changed
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => k !== CACHE_NAME && k !== IMAGE_CACHE_NAME).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });
 
-function isCacheTarget(req) {
+function isImageRequest(req) {
   try {
     const url = new URL(req.url);
-    if (url.origin !== self.location.origin) return false; // same-origin only
-    // Cache images and generated data files
     if (req.destination === 'image') return true;
-    if (url.pathname.startsWith('/img/')) return true;
+    const path = url.pathname.toLowerCase();
+    if (path.endsWith('.webp') || path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.svg') || path.endsWith('.gif')) {
+      return true;
+    }
+    return false;
+  } catch (e) { return false; }
+}
+
+function isDataRequest(req) {
+  try {
+    const url = new URL(req.url);
+    if (url.origin !== self.location.origin) return false;
     if (url.pathname.startsWith('/js/data/')) return true;
     return false;
   } catch (e) { return false; }
@@ -30,6 +38,10 @@ function isCacheTarget(req) {
 
 async function putWithTimestamp(cache, request, response) {
   try {
+    if (response.type === 'opaque') {
+      await cache.put(request, response.clone());
+      return response;
+    }
     const cloned = response.clone();
     const body = await cloned.blob();
     const headers = new Headers(cloned.headers);
@@ -38,7 +50,6 @@ async function putWithTimestamp(cache, request, response) {
     await cache.put(request, wrapped.clone());
     return wrapped;
   } catch (e) {
-    // Fallback: store original response if wrapping fails
     await cache.put(request, response.clone());
     return response;
   }
@@ -46,28 +57,33 @@ async function putWithTimestamp(cache, request, response) {
 
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (!isCacheTarget(req)) return; // pass-through
+  const isImg = isImageRequest(req);
+  const isData = isDataRequest(req);
+  if (!isImg && !isData) return;
+
+  const cacheName = isImg ? IMAGE_CACHE_NAME : CACHE_NAME;
 
   event.respondWith((async () => {
-    const cache = await caches.open(CACHE_NAME);
+    const cache = await caches.open(cacheName);
     const cached = await cache.match(req, { ignoreSearch: false });
-    // If cached and fresh within TTL -> serve
     if (cached) {
       const ts = Number(cached.headers.get('x-sw-fetch-time') || '0');
       if (ts && (Date.now() - ts) < TTL_MS) {
-        // Revalidate in background
-        event.waitUntil(fetch(req).then(res => { if (res && res.ok) return putWithTimestamp(cache, req, res); }).catch(()=>{}));
+        event.waitUntil(
+          fetch(req)
+            .then(res => { if (res && (res.ok || res.type === 'opaque')) return putWithTimestamp(cache, req, res); })
+            .catch(()=>{})
+        );
         return cached;
       }
     }
-    // Otherwise fetch from network
     try {
-      const res = await fetch(req, { cache: 'no-store' });
-      if (res && res.ok) return await putWithTimestamp(cache, req, res);
-      if (cached) return cached; // fallback to stale cached
+      const res = await fetch(req);
+      if (res && (res.ok || res.type === 'opaque')) return await putWithTimestamp(cache, req, res);
+      if (cached) return cached;
       return res;
     } catch (e) {
-      if (cached) return cached; // offline fallback
+      if (cached) return cached;
       throw e;
     }
   })());

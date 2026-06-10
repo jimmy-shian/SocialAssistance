@@ -961,9 +961,13 @@ function _handleUploadImage(e){
   var du = body.dataUrl || '';
   var parsed = _parseDataUrl(du);
   if (!parsed) return _badRequest('資料格式錯誤');
+  var mt = String(parsed.mimetype || '').toLowerCase();
+  if (mt !== 'image/webp' && mt !== 'image/svg+xml' && mt !== 'image/gif') {
+    return _badRequest('不支援此格式，僅接受 webp、svg、gif 圖片');
+  }
   try { var sz = parsed.base64.length * 0.75; if (sz > 2*1024*1024) return _badRequest('檔案過大（>2MB）'); } catch(err){}
   var id = Utilities.getUuid();
-  var filename = _safeFilename(body.filename || ('img_'+id+'.png'));
+  var filename = _safeFilename(body.filename || ('img_'+id+'.webp'));
   var conf = _ghConf();
   if (!conf.ok) return _badRequest('圖片上傳需要 GitHub 設定：' + conf.message);
   var bytes = Utilities.base64Decode(parsed.base64);
@@ -971,11 +975,10 @@ function _handleUploadImage(e){
     var parts = String(fn||'').split('.');
     if (parts.length > 1) return (parts.pop() || '').toLowerCase();
     mt = String(mt||'').toLowerCase();
-    if (mt === 'image/png') return 'png';
     if (mt === 'image/webp') return 'webp';
     if (mt === 'image/gif') return 'gif';
     if (mt === 'image/svg+xml') return 'svg';
-    return 'jpg';
+    return 'webp';
   })(filename, parsed.mimetype);
   var outputName = _safeFilename(filename);
   if (ext) {
@@ -1026,12 +1029,10 @@ function _processImagesForPublish(conf, obj){
                 if (parts.length>1) { return (parts.pop()||'').toLowerCase(); }
               } catch(e){}
               mt = String(mt||'').toLowerCase();
-              if (mt==='image/jpeg' || mt==='image/jpg') return 'jpg';
-              if (mt==='image/png') return 'png';
               if (mt==='image/webp') return 'webp';
               if (mt==='image/gif') return 'gif';
               if (mt==='image/svg+xml') return 'svg';
-              return 'jpg';
+              return 'webp';
             })(rec.filename, rec.mimetype);
             var outBytes = bytes;
             var outputName = _safeFilename(rec.filename || 'image');

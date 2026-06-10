@@ -27,7 +27,10 @@
     stackContainer.innerHTML = data.items.map(function (item, i) {
       return `
         <article class="service-tape-card" data-index="${i}">
-          <img decoding="async" src="${esc(item.image)}" alt="${esc(item.title)}" class="service-card-img" loading="lazy">
+          <!-- 原代碼: <img decoding="async" src="${esc(item.image)}" alt="${esc(item.title)}" class="service-card-img" loading="lazy"> -->
+          <figure class="image-frame image-frame--card w-full h-full">
+            <img decoding="async" src="${esc(item.image)}" alt="${esc(item.title)}" class="service-card-img" loading="lazy">
+          </figure>
           <div class="service-bubble">
             <div class="service-icon-float"><i class="fas fa-star"></i></div>
             <h3>${esc(item.title)}</h3>

@@ -23,7 +23,7 @@ function renderNavFooter() {
         <a href="./index.html" class="nav-brand flex items-center gap-3 text-2xl font-bold text-[var(--text-primary)] transition-colors duration-300 hover:text-[var(--primary)]">
           <div class="dark:bg-[radial-gradient(ellipse_at_center,rgba(235,235,235,0.85)_0%,rgba(235,235,235,0.5)_35%,rgba(235,235,235,0.2)_55%,rgba(235,235,235,0)_75%)]">
             <img decoding="async" 
-              src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-title.png"
+              src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-title.webp"
               alt="SoundCore Title"
               class="brand-title-img relative z-10"
             />
@@ -80,7 +80,7 @@ function renderNavFooter() {
           <div class="md:col-span-1">
             <div class="flex items-center gap-3 mb-4">
               <img decoding="async" 
-                src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-min.png" 
+                src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-min.webp" 
                 alt="Logo Icon"
                 class="w-10 h-10 brightness-0 invert transition duration-300 hover:brightness-100 hover:invert-0"
               />

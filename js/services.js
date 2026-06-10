@@ -29,7 +29,8 @@
     const delay = (i * 0.05).toFixed(2);
     return `
       <article class="service-feature-card glass-surface rounded-xl overflow-hidden ${span} transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:translate-y-6 hover:scale-105 active:scale-97" style="animation-delay:${delay}s">
-        <div class="service-feature-image">
+        <!-- 原代碼: <div class="service-feature-image"> -->
+        <div class="service-feature-image image-frame image-frame--card">
           ${item.image ? `<img decoding="async" src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy">` : ''}
         </div>
         <div class="p-6">

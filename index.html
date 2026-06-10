@@ -41,6 +41,10 @@
       } catch (e) { }
     })();
   </script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/font/LXGWWenKaiTC-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
@@ -142,7 +146,7 @@
 
           container.innerHTML = data.items.map(item => `
             <article class="service-card-carousel card-dynamic-bg">
-              ${item.image ? `<img decoding="async" src="${esc(item.image)}" alt="${esc(item.title)}" class="service-card-img" loading="lazy">` : ''}
+              ${item.image ? `<figure class="image-frame image-frame--card"><img decoding="async" src="${esc(item.image)}" alt="${esc(item.title)}" class="service-card-img" loading="lazy"></figure>` : ''}
               <div class="service-bubble">
                 <div class="service-icon-float"><i class="fas fa-star"></i></div>
                 <h3>${esc(item.title)}</h3>
@@ -208,7 +212,9 @@
               <article class="team-card" onclick="this.classList.toggle('flipped')">
                 <div class="card-inner">
                   <div class="card-face front">
-                    ${t.photo ? `<img decoding="async" class="team-photo-img" src="${t.photo}" alt="${t.name || ''}" loading="lazy">` : '<div class="team-photo-placeholder"></div>'}
+                    <figure class="image-frame image-frame--portrait">
+                      ${t.photo ? `<img decoding="async" class="team-photo-img" src="${t.photo}" alt="${t.name || ''}" loading="lazy">` : '<div class="team-photo-placeholder"></div>'}
+                    </figure>
                     <div class="team-info">
                       <div class="team-roles">${roles}</div>
                       <h4 class="team-name">${t.name || ''}</h4>
@@ -242,7 +248,9 @@
           <!-- Blog posts will be loaded dynamically or can be static -->
           <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
             <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-              <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg" alt="活動紀錄" class="w-full h-48 object-cover" loading="lazy">
+              <figure class="image-frame image-frame--card w-full h-full">
+                <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.webp" alt="活動紀錄" loading="lazy">
+              </figure>
             </div>
             <div class="blog-card-content flex flex-col flex-1">
               <p class="blog-card-date ui-eyebrow">2025/12/15</p>
@@ -251,7 +259,9 @@
           </a>
           <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
             <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-              <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.jpg" alt="活動紀錄" class="w-full h-48 object-cover" loading="lazy">
+              <figure class="image-frame image-frame--card w-full h-full">
+                <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.webp" alt="活動紀錄" loading="lazy">
+              </figure>
             </div>
             <div class="blog-card-content flex flex-col flex-1">
               <p class="blog-card-date ui-eyebrow">2025/11/28</p>
@@ -260,7 +270,9 @@
           </a>
           <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
             <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-              <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg" alt="活動紀錄" class="w-full h-48 object-cover" loading="lazy">
+              <figure class="image-frame image-frame--card w-full h-full">
+                <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp" alt="活動紀錄" loading="lazy">
+              </figure>
             </div>
             <div class="blog-card-content flex flex-col flex-1">
               <p class="blog-card-date ui-eyebrow">2025/10/20</p>
@@ -275,13 +287,13 @@
         <div class="flex flex-col items-center gap-2 mb-4">
           <h2 class="section-title">地區資源地圖</h2>
           <div class="flex items-center gap-2 text-sm">
-            <button id="region-prev"
+            <button id="region-prev" aria-label="上一個地區"
               class="px-3 py-2 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--primary)] hover:text-white transition-all duration-300">◀</button>
             <div id="region-ticker"
               class="min-w-[240px] px-4 py-2 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-primary)]">
               載入地區中…
             </div>
-            <button id="region-next"
+            <button id="region-next" aria-label="下一個地區"
               class="px-3 py-2 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--primary)] hover:text-white transition-all duration-300">▶</button>
           </div>
         </div>

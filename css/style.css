@@ -116,7 +116,8 @@ html.dark {
   --text-primary: #F5F0E8;
   --text-secondary: #D9D0C1;
   --text-tertiary: #A89F8F;
-
+  --text-p-300: #d1eaff;
+  
   /* Dark warm tones */
   --bg-base: #2D2A24;
   --bg-surface: #1A1816;
@@ -184,7 +185,7 @@ body {
 
 /* Style 1: Corner Reveal (Top-Right & Bottom-Left) */
 .dynamic-reveal-corners::before {
-  background-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
+  background-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.webp');
   opacity: 0.6;
   /* Reveal the image */
 }
@@ -196,7 +197,7 @@ body {
 
 /* Style 2: Center Glow (Radial Reveal) */
 .dynamic-reveal-center::before {
-  background-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
+  background-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
   opacity: 0.5;
 }
 
@@ -244,7 +245,7 @@ body {
   position: relative;
   background:
     linear-gradient(135deg, rgba(250, 246, 240, 0.85) 0%, rgba(255, 253, 248, 0.75) 50%, rgba(240, 245, 232, 0.85) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -271,7 +272,7 @@ body {
     radial-gradient(circle at 20% 50%, rgba(154, 205, 50, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(107, 142, 35, 0.06) 0%, transparent 50%),
     linear-gradient(135deg, rgba(255, 253, 248, 0.88) 0%, rgba(250, 246, 240, 0.82) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
   background-size: cover;
   background-position: center;
 }
@@ -293,7 +294,7 @@ body {
 .dark .section-bg-1 {
   background:
     linear-gradient(135deg, rgba(45, 42, 36, 0.92) 0%, rgba(26, 24, 22, 0.85) 50%, rgba(35, 40, 30, 0.92) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.webp');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -304,7 +305,7 @@ body {
     radial-gradient(circle at 20% 50%, rgba(154, 205, 50, 0.05) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(107, 142, 35, 0.04) 0%, transparent 50%),
     linear-gradient(135deg, rgba(26, 24, 22, 0.90) 0%, rgba(45, 42, 36, 0.85) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
   background-size: cover;
   background-position: center;
 }
@@ -1992,7 +1993,7 @@ textarea:focus {
 /* Hero Banner - Vibrant Mesh Gradient */
 .hero-banner {
   position: relative;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)), url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/index-bg.png');
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)), url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/index-bg.webp');
   background-size: cover;
   background-position: center;
   /* background-attachment: fixed; Removed for smoother mobile perf */
@@ -3212,18 +3213,18 @@ html.dark .sdgs-section {
 
 .team-card .team-photo-img {
   width: 100%;
-  height: 400px;
+  height: 100%;
   object-fit: cover;
 }
 
 .team-card .team-photo-placeholder {
   width: 100%;
-  height: 400px;
+  height: 100%;
   background: linear-gradient(135deg, var(--primary-light), var(--primary));
   /* Dynamic Pattern Overlay for Card Back */
   background-image:
     linear-gradient(135deg, rgba(154, 205, 50, 0.9), rgba(107, 142, 35, 0.95)),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
   background-blend-mode: overlay;
   background-size: cover;
 }
@@ -3521,7 +3522,7 @@ html.dark .sdgs-section {
 
   .team-card .team-photo-img,
   .team-card .team-photo-placeholder {
-    height: 280px;
+    height: 100%;
   }
 
   .sdgs-icon-img {
@@ -3616,7 +3617,7 @@ html.dark .sdgs-section {
   }
 
   .service-card-img {
-    height: 150px;
+    height: 100%;
   }
 
   .service-bubble {
@@ -3683,7 +3684,7 @@ html.dark .sdgs-section {
 
   .team-card .team-photo-img,
   .team-card .team-photo-placeholder {
-    height: 300px;
+    height: 100%;
   }
 
   .team-card .team-info {
@@ -3805,7 +3806,7 @@ html.dark .sdgs-section {
 
   .team-card .team-photo-img,
   .team-card .team-photo-placeholder {
-    height: 340px;
+    height: 100%;
   }
 
   .blog-grid {
