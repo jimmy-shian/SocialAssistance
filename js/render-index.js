@@ -15,7 +15,7 @@
       // Re-building is better for dynamic count.
       wrapper.innerHTML = data.hero.slides.map((s, i) => `
         <div class="hero-slide-asym ${i === 0 ? 'active' : ''}">
-          <img src="${s.img}" alt="${s.alt || ''}">
+          <img decoding="async" src="${s.img}" alt="${s.alt || ''}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>
         </div>
       `).join('');
 
@@ -57,7 +57,7 @@
     if (p) {
       const pData = data.philosophy;
       const imgBox = p.querySelector('.philosophy-image-box');
-      if (imgBox) imgBox.innerHTML = `<img src="${pData.img}" alt="philosophy">`;
+      if (imgBox) imgBox.innerHTML = `<img decoding="async" src="${pData.img}" alt="philosophy" loading="lazy">`;
       const txt = p.querySelector('.philosophy-content');
       if (txt) txt.innerHTML = `
         <span class="section-label">${pData.label || 'ABOUT'}</span>
@@ -74,7 +74,7 @@
       // Generate Items HTML
       const items = data.services.map((s, i) => `
         <a href="${s.link || '#'}" class="service-card-carousel card-dynamic-bg">
-          <img src="${s.img}" alt="${s.title}" class="service-card-img">
+          <img decoding="async" src="${s.img}" alt="${s.title}" class="service-card-img" loading="lazy">
           <div class="service-bubble">
             <div class="service-icon-float"><i class="${s.icon || 'fas fa-star'}"></i></div>
             <h3>${s.title}</h3>
@@ -116,7 +116,7 @@
       grid.innerHTML = data.blogPosts.slice(0, 3).map(post => `
         <a href="${post.link || './blog.html'}" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
           <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-            <img src="${post.image}" alt="${post.title}" class="w-full h-48 object-cover">
+            <img decoding="async" src="${post.image}" alt="${post.title}" class="w-full h-48 object-cover" loading="lazy">
           </div>
           <div class="blog-card-content flex flex-col flex-1">
             <p class="blog-card-date ui-eyebrow">${post.date}</p>

@@ -33,7 +33,7 @@
     const tag = href ? 'a' : 'article';
     const attr = href ? `href="${esc(href)}"` : '';
     return `<${tag} ${attr} class="sc-card public-card" style="--i:${index}">
-      ${image ? `<div class="public-card-media"><img src="${esc(image)}" alt="${esc(title)}" loading="lazy"></div>` : ''}
+      ${image ? `<div class="public-card-media"><img decoding="async" src="${esc(image)}" alt="${esc(title)}" loading="lazy"></div>` : ''}
       <div class="public-card-body">
         <h3>${esc(title)}</h3>
         ${text ? `<p class="sc-lead" style="font-size:.98rem">${esc(text)}</p>` : ''}
@@ -60,7 +60,7 @@
     const data = window.siteContent || {};
     if (!root) return;
     const hero = data.hero || {};
-    const slides = Array.isArray(hero.slides) && hero.slides.length ? hero.slides : [{ img: './img/index-bg.png', alt: 'Sound Core' }];
+    const slides = Array.isArray(hero.slides) && hero.slides.length ? hero.slides : [{ img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/index-bg.png', alt: 'Sound Core' }];
     root.innerHTML = `
       <section class="hero-public">
         <div class="sc-card hero-copy" style="--i:0">
@@ -74,13 +74,13 @@
           ${sketchSvg()}
         </div>
         <div class="sc-card hero-media" style="--i:1">
-          ${slides.map((s, i) => `<img class="${i === 0 ? 'active' : ''}" src="${esc(s.img)}" alt="${esc(s.alt || '')}">`).join('')}
+          ${slides.map((s, i) => `<img decoding="async" class="${i === 0 ? 'active' : ''}" src="${esc(s.img)}" alt="${esc(s.alt || '')}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`).join('')}
           <div class="hero-dots">${slides.map((_, i) => `<button class="hero-dot ${i === 0 ? 'active' : ''}" type="button" aria-label="切換主視覺 ${i + 1}"></button>`).join('')}</div>
         </div>
       </section>
 
       <section class="sc-section split-grid">
-        <div class="sc-card split-image" style="--i:0"><img src="${esc(data.philosophy?.img || './img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg')}" alt="理念"></div>
+        <div class="sc-card split-image" style="--i:0"><img decoding="async" src="${esc(data.philosophy?.img || 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg')}" alt="理念" loading="lazy"></div>
         <div class="sc-card split-copy" style="--i:1">
           <span class="sc-eyebrow">${esc(data.philosophy?.label || 'About')}</span>
           <h2 class="sc-section-title">${data.philosophy?.title || '穩定的笑容與溫柔'}</h2>
@@ -156,7 +156,7 @@
           return `<article class="sc-card public-card" style="--i:${i}"><div class="public-card-body"><p class="sc-lead">${esc(row.text || '')}</p></div></article>`;
         }).join('')}</div>
       </section>
-      <section class="sc-section card-grid">${gallery.map((src, i) => `<div class="sc-card split-image" style="--i:${i}"><img src="${esc(src)}" alt="服務照片 ${i + 1}" loading="lazy"></div>`).join('')}</section>`;
+      <section class="sc-section card-grid">${gallery.map((src, i) => `<div class="sc-card split-image" style="--i:${i}"><img decoding="async" src="${esc(src)}" alt="服務照片 ${i + 1}" loading="lazy"></div>`).join('')}</section>`;
   }
 
   function providerList() {
@@ -201,7 +201,7 @@
       root.innerHTML = `<section class="sc-card hero-copy"><h1 class="sc-title">找不到此資源</h1><a class="sc-btn primary" href="./explore.html">回探索資源</a></section>`;
       return;
     }
-    const images = p.images?.length ? p.images : ['./img/DSC01739__8a8686e4b1.jpg'];
+    const images = p.images?.length ? p.images : ['https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg'];
     root.innerHTML = `
       <header class="sc-card hero-copy" style="--i:0">
         <span class="sc-eyebrow">${esc(p.category || 'Provider')}</span>
@@ -212,13 +212,13 @@
       </header>
       <section class="sc-section split-grid">
         <div class="sc-card split-copy"><h2 class="sc-section-title">課程資訊</h2><p class="sc-lead"><strong>時間：</strong>${esc(p.schedule || '-')}</p><p class="sc-lead"><strong>地點：</strong>${esc([p.location, p.address].filter(Boolean).join(' ') || '-')}</p></div>
-        <div class="sc-card split-image"><img src="${esc(images[0])}" alt="${esc(p.name)}"></div>
+        <div class="sc-card split-image"><img decoding="async" src="${esc(images[0])}" alt="${esc(p.name)}" loading="lazy"></div>
       </section>
       <section class="sc-section card-grid">
         ${['know', 'learn', 'gain'].map((key, i) => `<article class="sc-card public-card" style="--i:${i}"><div class="public-card-body"><h3>${key === 'know' ? '你將認識' : key === 'learn' ? '你將學到' : '你將獲得'}</h3><div class="pill-row">${(p[key] || []).map((x) => `<span class="pill">${esc(x)}</span>`).join('')}</div></div></article>`).join('')}
       </section>
       <section class="sc-section"><h2 class="sc-section-title">課程安排</h2><div class="timeline">${(p.timeline || []).map((t, i) => `<article class="sc-card timeline-row" style="--i:${i}"><div class="timeline-time">${esc(t.time)}</div><div><strong>${esc(t.title || '體驗活動')}</strong><p class="sc-lead" style="font-size:.98rem">${esc(t.detail)}</p></div></article>`).join('')}</div></section>
-      <section class="sc-section"><h2 class="sc-section-title">活動照片</h2><div class="card-grid">${images.map((src, i) => `<div class="sc-card split-image" style="--i:${i}"><img src="${esc(src)}" alt="${esc(p.name)} ${i + 1}" loading="lazy"></div>`).join('')}</div></section>
+      <section class="sc-section"><h2 class="sc-section-title">活動照片</h2><div class="card-grid">${images.map((src, i) => `<div class="sc-card split-image" style="--i:${i}"><img decoding="async" src="${esc(src)}" alt="${esc(p.name)} ${i + 1}" loading="lazy"></div>`).join('')}</div></section>
       <section class="sc-section"><h2 class="sc-section-title">精選案例</h2><div class="card-grid">${(p.cases || []).map((c, i) => card(c.title, c.summary, (c.images || [])[0], i, c.video || '')).join('')}</div></section>`;
   }
 
@@ -240,7 +240,7 @@
       <section id="blog-grid" class="card-grid"></section>`;
     const draw = () => {
       const posts = (window.blogContent?.posts || []).filter((p) => active === 'all' || p.category === active);
-      $('#blog-grid').innerHTML = posts.map((p, i) => `<article class="sc-card public-card" style="--i:${i}" data-post="${esc(p.id)}">${p.image ? `<div class="public-card-media"><img src="${esc(p.image)}" alt="${esc(p.title)}"></div>` : ''}<div class="public-card-body"><span class="sc-eyebrow">${esc(labels[p.category] || p.category || 'Post')}</span><h3>${esc(p.title)}</h3><p class="sc-lead" style="font-size:.98rem">${esc(p.excerpt || p.content || '')}</p></div></article>`).join('');
+      $('#blog-grid').innerHTML = posts.map((p, i) => `<article class="sc-card public-card" style="--i:${i}" data-post="${esc(p.id)}">${p.image ? `<div class="public-card-media"><img decoding="async" src="${esc(p.image)}" alt="${esc(p.title)}" loading="lazy"></div>` : ''}<div class="public-card-body"><span class="sc-eyebrow">${esc(labels[p.category] || p.category || 'Post')}</span><h3>${esc(p.title)}</h3><p class="sc-lead" style="font-size:.98rem">${esc(p.excerpt || p.content || '')}</p></div></article>`).join('');
     };
     $('#blog-tabs').addEventListener('click', (event) => {
       const btn = event.target.closest('[data-cat]');

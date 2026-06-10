@@ -43,7 +43,7 @@
     return `
       <article class="blog-post-card" role="button" tabindex="0" data-post-id="${esc(post.id)}" data-category="${esc(post.category)}">
         <div class="blog-post-image">
-          <img src="${esc(post.image)}" alt="${esc(post.title)}" loading="lazy">
+          <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" loading="lazy">
           <span class="blog-post-tag" data-category="${esc(post.category)}">${esc(categoryLabels[post.category] || post.category)}</span>
         </div>
         <div class="blog-post-content">
@@ -59,7 +59,7 @@
     return `
       <article class="blog-glory-feature" style="--stack:${index}" data-post-id="${esc(post.id)}" data-category="glory">
         <div class="blog-glory-media">
-          <img src="${esc(post.image)}" alt="${esc(post.title)}" loading="lazy">
+          <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" loading="lazy">
           <span class="blog-post-tag" data-category="glory">${esc(categoryLabels.glory)}</span>
         </div>
         <div class="blog-glory-copy">
@@ -153,7 +153,7 @@
     const label = categoryLabels[post.category] || post.category;
     body.innerHTML = `
       <div class="blog-modal-hero">
-        <img src="${esc(post.image)}" alt="${esc(post.title)}">
+        <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}">
       </div>
       <div class="blog-modal-meta">${esc(label)}</div>
       <h2 class="blog-modal-title" id="blog-modal-title">${esc(post.title)}</h2>

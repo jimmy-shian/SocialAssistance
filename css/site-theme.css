@@ -1474,15 +1474,15 @@ a {
 }
 
 .intro-imgwrap.zig-left > img {
-  -webkit-mask-image: url('../assets/mask-brush-left.svg');
-  mask-image: url('../assets/mask-brush-left.svg');
+  -webkit-mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-left.svg');
+  mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-left.svg');
   -webkit-mask-position: left center;
   mask-position: left center;
 }
 
 .intro-imgwrap.zig-right > img {
-  -webkit-mask-image: url('../assets/mask-brush-right.svg');
-  mask-image: url('../assets/mask-brush-right.svg');
+  -webkit-mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-right.svg');
+  mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-right.svg');
   -webkit-mask-position: right center;
   mask-position: right center;
 }

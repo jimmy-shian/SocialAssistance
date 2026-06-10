@@ -1,9 +1,9 @@
 window.siteContent = {
   hero: {
     slides: [
-      { img: './img/DSC09555___ba0754ae5a.jpg', alt: '攀樹活動' },
-      { img: './img/DSC01739__8a8686e4b1.jpg', alt: '戶外學習' },
-      { img: './img/1000010964_bdb0404a99.jpg', alt: '團隊活動' }
+      { img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.jpg', alt: '攀樹活動' },
+      { img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg', alt: '戶外學習' },
+      { img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.jpg', alt: '團隊活動' }
     ],
     label: 'SOUND CORE STUDIO',
     title: '孩子成長路上的<br><span class="text-[var(--primary)]">陪跑者</span>',
@@ -15,7 +15,7 @@ window.siteContent = {
     ]
   },
   philosophy: {
-    img: './img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
+    img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
     label: 'ABOUT / 理念',
     title: '穩定的笑容與溫柔，<br>人生相伴',
     content: '透過在地產業串聯與動機引導，協助安置機構與高關懷青少年，在成年自立前獲得長期且系統化的探索資源。我們相信每個孩子都有無限可能，只需要適當的引導與支持。'
@@ -24,28 +24,28 @@ window.siteContent = {
     {
       title: '生涯探索模組',
       desc: '職涯體驗與學習場景',
-      img: './img/1000012016_6e6b5da647.jpg',
+      img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.jpg',
       icon: 'fas fa-compass',
       link: './explore.html'
     },
     {
       title: '冒險挑戰模組',
       desc: '攀樹與戶外探索活動',
-      img: './img/DSC09555___ba0754ae5a.jpg',
+      img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.jpg',
       icon: 'fas fa-tree',
       link: './explore.html'
     },
     {
       title: '自立生活課程',
       desc: '烹飪、理財等生活技能',
-      img: './img/1000012756_61e30f039f.jpg',
+      img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.jpg',
       icon: 'fas fa-home',
       link: './explore.html'
     },
     {
       title: '家庭支持',
       desc: '陪伴家庭共創美好記憶',
-      img: './img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
+      img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
       icon: 'fas fa-heart',
       link: './explore.html'
     }
@@ -96,7 +96,7 @@ window.siteContent = {
       date: '2025/12/15',
       category: 'daily',
       excerpt: '孩子們在冬日暖陽下挑戰自我，攀上大樹感受不一樣的視野...',
-      image: './img/DSC01739__8a8686e4b1.jpg',
+      image: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg',
       link: './blog.html'
     },
     {
@@ -105,7 +105,7 @@ window.siteContent = {
       date: '2025/11/28',
       category: 'daily',
       excerpt: '孩子們展示自己學會的烹飪與生活技能，令人感動...',
-      image: './img/1000010964_bdb0404a99.jpg',
+      image: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.jpg',
       link: './blog.html'
     },
     {
@@ -114,7 +114,7 @@ window.siteContent = {
       date: '2025/10/20',
       category: 'interview',
       excerpt: '訪談合作夥伴分享如何與青少年一起工作的經驗與心得...',
-      image: './img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
+      image: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
       link: './blog.html'
     }
   ],

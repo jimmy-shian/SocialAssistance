@@ -14,7 +14,7 @@
     lb.id = 'global-lightbox';
     lb.className = 'lightbox';
     lb.innerHTML = `
-      <img alt="擴大顯示" />
+      <img decoding="async" alt="擴大顯示" />
       <div class="nav" aria-hidden="true">
         <button class="nav-btn prev" aria-label="上一張">‹</button>
         <button class="nav-btn next" aria-label="下一張">›</button>
@@ -276,10 +276,10 @@ function open() {
 
     const imgs = (Array.isArray(provider.images) ? provider.images : []).slice(0, 4);
     const fallbackImages = [
-      './img/DSC01739__8a8686e4b1.jpg',
-      './img/DSC09555___ba0754ae5a.jpg',
-      './img/1000012756_61e30f039f.jpg',
-      './img/1000012016_6e6b5da647.jpg'
+      'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg',
+      'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.jpg',
+      'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.jpg',
+      'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.jpg'
     ];
     const heroImages = (imgs.length ? imgs : fallbackImages).slice(0, 4);
 
@@ -349,7 +349,7 @@ function open() {
         const hasImg = Array.isArray(c.images) && c.images.length;
         const mediaHtml = hasImg ? `
           <div class="rounded-xl overflow-hidden shadow-md case-media" data-images="${(c.images || []).join('|')}">
-            <img src="${c.images[0]}" alt="${c.title || ''}" class="w-full h-64 md:h-80 object-cover" />
+            <img decoding="async" src="${c.images[0]}" alt="${c.title || ''}" class="w-full h-64 md:h-80 object-cover" />
           </div>` : `
           <button class="case-video w-full aspect-video rounded-xl overflow-hidden shadow-md bg-black text-white grid place-items-center" data-video="${c.video}">
             <span class="inline-flex items-center gap-2 font-semibold"><span class="text-2xl">▶</span> 觀看影片</span>
@@ -371,7 +371,7 @@ function open() {
         const cards = withMedia.map((c) => {
           const mediaBlock = (Array.isArray(c.images) && c.images.length) ? `
             <div class="rounded-lg overflow-hidden case-media" data-images="${(c.images || []).join('|')}">
-              <img src="${c.images[0]}" alt="${c.title || ''}" class="w-full h-56 object-cover" />
+              <img decoding="async" src="${c.images[0]}" alt="${c.title || ''}" class="w-full h-56 object-cover" />
             </div>` : (c.video ? `
             <button class="case-video w-full aspect-video rounded-lg overflow-hidden bg-black text-white grid place-items-center" data-video="${c.video}">
               <span class="inline-flex items-center gap-2 font-semibold"><span class="text-xl">▶</span> 播放影片</span>
@@ -417,7 +417,7 @@ function open() {
           <p>${provider.description || '透過現場觀察與簡單實作，認識產業日常與工作樣貌。'}</p>
         </div>
         <div class="provider-simple-gallery">
-          ${heroImages.map((src, i) => `<button type="button" class="provider-simple-photo" data-photo-index="${i}"><img src="${src}" loading="lazy" alt="${provider.name} 照片 ${i + 1}"></button>`).join('')}
+          ${heroImages.map((src, i) => `<button type="button" class="provider-simple-photo" data-photo-index="${i}"><img decoding="async" src="${src}" loading="lazy" alt="${provider.name} 照片 ${i + 1}"></button>`).join('')}
         </div>
       </header>
 

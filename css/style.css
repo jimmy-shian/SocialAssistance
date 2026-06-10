@@ -11,7 +11,7 @@ body {
 /* Local fonts */
 @font-face {
   font-family: 'SourceHanSerifTC';
-  src: url('../assets/font/LXGWWenKaiTC-Regular.woff2') format('woff2');
+  src: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/font/LXGWWenKaiTC-Regular.woff2') format('woff2');
   font-weight: 1 999;
   font-style: normal;
   font-display: swap;
@@ -19,7 +19,7 @@ body {
 
 @font-face {
   font-family: 'ChenYuluoyan';
-  src: url('../assets/font/ChenYuluoyan-2.0-Thin.woff2') format('woff2');
+  src: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/font/ChenYuluoyan-2.0-Thin.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -182,7 +182,7 @@ body {
 
 /* Style 1: Corner Reveal (Top-Right & Bottom-Left) */
 .dynamic-reveal-corners::before {
-  background-image: url('../assets/BG1.jpg');
+  background-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
   opacity: 0.6;
   /* Reveal the image */
 }
@@ -194,7 +194,7 @@ body {
 
 /* Style 2: Center Glow (Radial Reveal) */
 .dynamic-reveal-center::before {
-  background-image: url('../assets/BG2.jpg');
+  background-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
   opacity: 0.5;
 }
 
@@ -242,7 +242,7 @@ body {
   position: relative;
   background:
     linear-gradient(135deg, rgba(250, 246, 240, 0.85) 0%, rgba(255, 253, 248, 0.75) 50%, rgba(240, 245, 232, 0.85) 100%),
-    url('../assets/BG1.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -269,7 +269,7 @@ body {
     radial-gradient(circle at 20% 50%, rgba(154, 205, 50, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(107, 142, 35, 0.06) 0%, transparent 50%),
     linear-gradient(135deg, rgba(255, 253, 248, 0.88) 0%, rgba(250, 246, 240, 0.82) 100%),
-    url('../assets/BG2.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
   background-size: cover;
   background-position: center;
 }
@@ -291,7 +291,7 @@ body {
 .dark .section-bg-1 {
   background:
     linear-gradient(135deg, rgba(45, 42, 36, 0.92) 0%, rgba(26, 24, 22, 0.85) 50%, rgba(35, 40, 30, 0.92) 100%),
-    url('../assets/BG1.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.jpg');
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
@@ -302,7 +302,7 @@ body {
     radial-gradient(circle at 20% 50%, rgba(154, 205, 50, 0.05) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(107, 142, 35, 0.04) 0%, transparent 50%),
     linear-gradient(135deg, rgba(26, 24, 22, 0.90) 0%, rgba(45, 42, 36, 0.85) 100%),
-    url('../assets/BG2.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
   background-size: cover;
   background-position: center;
 }
@@ -1233,7 +1233,7 @@ textarea:focus {
 
 /* ==============================
    平台導覽｜圖像遮罩（筆刷不規則邊）
-   使用 assets/mask-brush-left.svg & mask-brush-right.svg 作為 CSS mask
+   使用 mask-brush-left.svg & mask-brush-right.svg 作為 CSS mask
 ============================== */
 .intro-imgwrap {
   position: relative;
@@ -1259,18 +1259,18 @@ textarea:focus {
 }
 
 /* .intro-imgwrap.zig-left > img {
-  -webkit-mask-image: url('../assets/mask-brush-left.svg');
-  mask-image: url('../assets/mask-brush-left.svg');
+  -webkit-mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-left.svg');
+  mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-left.svg');
   -webkit-mask-position: left center;
   mask-position: left center;
 }
 .intro-imgwrap.zig-right > img {
-  -webkit-mask-image: url('../assets/mask-brush-right.svg');
-  mask-image: url('../assets/mask-brush-right.svg');
+  -webkit-mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-right.svg');
+  mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-right.svg');
   -webkit-mask-position: right center;
   mask-position: right center;
 } */
-@supports not (mask-image: url('../assets/mask-brush-left.svg')) {
+@supports not (mask-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/mask-brush-left.svg')) {
 
   /* 瀏覽器不支援 mask 時，退化回原本矩形 */
   .intro-imgwrap>img {
@@ -1988,7 +1988,7 @@ textarea:focus {
 /* Hero Banner - Vibrant Mesh Gradient */
 .hero-banner {
   position: relative;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)), url('../img/index-bg.png');
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)), url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/index-bg.png');
   background-size: cover;
   background-position: center;
   /* background-attachment: fixed; Removed for smoother mobile perf */
@@ -3219,7 +3219,7 @@ html.dark .sdgs-section {
   /* Dynamic Pattern Overlay for Card Back */
   background-image:
     linear-gradient(135deg, rgba(154, 205, 50, 0.9), rgba(107, 142, 35, 0.95)),
-    url('../assets/BG2.jpg');
+    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.jpg');
   background-blend-mode: overlay;
   background-size: cover;
 }

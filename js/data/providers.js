@@ -59,7 +59,7 @@ window.providersData = {
         "images": [
           "https://picsum.photos/seed/fishc1/800/600",
           "https://picsum.photos/seed/fishc2/800/600",
-          "img/_-_.jpg"
+          "https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_-_.jpg"
         ]
       },
       {

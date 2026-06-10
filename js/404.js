@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalTiles = size * size;
     const tileSize = 100;
     const gap = 2;
-    const puzzleImage = './img/puzzle-404.png';
+    const puzzleImage = 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/puzzle-404.png';
 
     // State
     let tiles = [];

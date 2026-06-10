@@ -1,5 +1,5 @@
 // Service Worker for image and data caching (7 days)
-const CACHE_NAME = 'sa-static-v1';
+const CACHE_NAME = 'social-assistance-cache-v2';
 const TTL_MS = 7 * 24 * 60 * 60 * 1000; // 1 week
 
 self.addEventListener('install', (event) => {

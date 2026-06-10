@@ -108,20 +108,20 @@
   // Preview cache for gas://image placeholders
   const previewCache = (window.__imgPreviewCache = window.__imgPreviewCache || {});
   const SITE_IMAGE_LIBRARY = [
-    './img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
-    './img/_2026-06-10_015100_fec24d89d2.png',
-    './img/_-_.jpg',
-    './img/soundcore3co-title.png',
-    './img/soundcore3co-min.png',
-    './img/puzzle-404.png',
-    './img/index-bg.png',
-    './img/DSC09555___ba0754ae5a.jpg',
-    './img/DSC01739__8a8686e4b1_20250917_153644.jpg',
-    './img/DSC01739__8a8686e4b1.jpg',
-    './img/doctor_icon_142653_ce6d756a37.png',
-    './img/1000012756_61e30f039f.jpg',
-    './img/1000012016_6e6b5da647.jpg',
-    './img/1000010964_bdb0404a99.jpg'
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.jpg',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_2026-06-10_015100_fec24d89d2.png',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_-_.jpg',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-title.png',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/soundcore3co-min.png',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/puzzle-404.png',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/index-bg.png',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC09555___ba0754ae5a.jpg',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1_20250917_153644.jpg',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.jpg',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/doctor_icon_142653_ce6d756a37.png',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012756_61e30f039f.jpg',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000012016_6e6b5da647.jpg',
+    'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.jpg'
   ];
   let imagePickerTarget = null;
 
@@ -242,7 +242,7 @@
     grid.innerHTML = items.length ? items.map(src => {
       const name = src.split('/').pop();
       return `<button type="button" class="image-picker-item" data-src="${escHtml(src)}" title="${escHtml(name)}">
-        <img src="${escHtml(src)}" alt="${escHtml(name)}" loading="lazy">
+        <img decoding="async" src="${escHtml(src)}" alt="${escHtml(name)}" loading="lazy">
         <span class="image-picker-name">${escHtml(name)}</span>
       </button>`;
     }).join('') : '<div class="text-sm text-gray-500 dark:text-gray-300">沒有符合的圖片。</div>';
@@ -503,10 +503,10 @@
       cell.draggable = true;
       cell.dataset.index = String(i);
       cell.innerHTML = preview
-        ? `<img src="${preview}" alt="story${i + 1}" class="w-full h-full object-contain opacity-90">
+        ? `<img decoding="async" src="${preview}" alt="story${i + 1}" class="w-full h-full object-contain opacity-90">
             <div class="absolute inset-0 grid place-items-center bg-black/10 text-[10px] text-white">待發佈</div>`
         : url
-          ? `<img src="${url}" alt="story${i + 1}" class="w-full h-full object-contain">`
+          ? `<img decoding="async" src="${url}" alt="story${i + 1}" class="w-full h-full object-contain">`
           : `<div class="w-full h-full grid place-items-center bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300">無圖片</div>`;
       const ctrls = document.createElement('div');
       ctrls.className = 'absolute top-1 right-1 flex gap-1';
@@ -1392,7 +1392,7 @@
       const preview = isGas ? previewCache[url] : null;
       if (isGas && preview) {
         cell.innerHTML = `
-          <img src="${preview}" alt="pending" class="w-full h-full object-contain opacity-90">
+          <img decoding="async" src="${preview}" alt="pending" class="w-full h-full object-contain opacity-90">
           <span class="absolute left-1 bottom-1 text-[10px] px-1 rounded bg-amber-500 text-white">待發佈</span>
           <div class="absolute top-1 right-1 flex gap-1">
             <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
@@ -1411,7 +1411,7 @@
         `;
       } else {
         cell.innerHTML = `
-          <img src="${url}" alt="img${i + 1}" class="w-full h-full object-contain">
+          <img decoding="async" src="${url}" alt="img${i + 1}" class="w-full h-full object-contain">
           <div class="absolute top-1 right-1 flex gap-1">
             <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
             <button type="button" class="pv-img-down bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↓</button>
@@ -1995,7 +1995,7 @@
           <input class="sc-slide-alt w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.alt || ''}">
         </label>
         <div class="h-36 bg-gray-100 dark:bg-gray-800 rounded mt-1 overflow-hidden relative sc-slide-preview-box">
-           <img src="${row.img || ''}" class="sc-slide-preview w-full h-full object-contain" onerror="this.style.display='none'" onload="this.style.display='block'">
+           <img decoding="async" src="${row.img || ''}" class="sc-slide-preview w-full h-full object-contain" onerror="this.style.display='none'" onload="this.style.display='block'">
            <div class="sc-slide-uploading hidden absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs">上傳中...</div>
         </div>
       </div>`;
@@ -2055,7 +2055,7 @@
             <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.image || row.img || ''}" placeholder="./img/... 或上傳">
             <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
             <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden shrink-0">
-              <img src="${row.image || row.img || ''}" class="w-full h-full object-contain sc-svc-thumb" onerror="this.style.display='none'" onload="this.style.display='block'">
+              <img decoding="async" src="${row.image || row.img || ''}" class="w-full h-full object-contain sc-svc-thumb" onerror="this.style.display='none'" onload="this.style.display='block'">
             </div>
           </div>
         </div>
@@ -2781,7 +2781,7 @@
               ${d.story.body ? `<div class="prose prose-lg dark:prose-invert max-w-none leading-relaxed">${d.story.body}</div>` : ''}
             </div>
             <div class="grid grid-cols-2 gap-3">
-              ${imgs.slice(0, 4).map((u, i) => { const src = resolveImage(u); return `<div class=\"rounded-lg overflow-hidden shadow\"><img src=\"${src}\" alt=\"story${i + 1}\" class=\"w-full h-40 md:h-52 object-cover\"></div>`; }).join('')}
+              ${imgs.slice(0, 4).map((u, i) => { const src = resolveImage(u); return `<div class=\"rounded-lg overflow-hidden shadow\"><img decoding="async" src=\"${src}\" alt=\"story${i + 1}\" class=\"w-full h-40 md:h-52 object-cover\"></div>`; }).join('')}
             </div>
           </div>
         </section>`: ''}
@@ -2794,7 +2794,7 @@
             <div class="intro-row grid md:grid-cols-2 gap-8 items-center">
               <div class="${left ? 'md:order-1' : 'md:order-2'} order-1">
                 <div class="intro-imgwrap ${left ? 'zig-right' : 'zig-left'} shadow-lg">
-                  <img src="${url}" alt="${esc(it.title || '')}" class="w-full h-64 md:h-80 object-cover" />
+                  <img decoding="async" src="${url}" alt="${esc(it.title || '')}" class="w-full h-64 md:h-80 object-cover" />
                 </div>
               </div>
               <div class="${left ? 'md:order-2' : 'md:order-1'} order-2">
@@ -2815,7 +2815,7 @@
       const img = resolveImage(s.img || s.image || '');
       return `
               <div class="relative h-72 rounded-2xl overflow-hidden shadow-lg group">
-                ${img ? `<img src="${img}" alt="${esc(s.title || '')}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
+                ${img ? `<img decoding="async" src="${img}" alt="${esc(s.title || '')}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">` : ''}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 <div class="absolute bottom-4 left-4"><span class="px-3 py-1 rounded-full bg-white text-gray-900 text-sm font-semibold shadow">${esc(s.title || '')}</span></div>
               </div>`;
@@ -2865,7 +2865,7 @@
           <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             ${team.map(t => `
               <article class="overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900">
-                ${t.photo ? `<img class=\"w-full h-64 object-cover\" src=\"${resolveImage(t.photo)}\" alt=\"${t.name || ''}\">` : ''}
+                ${t.photo ? `<img decoding="async" class=\"w-full h-64 object-cover\" src=\"${resolveImage(t.photo)}\" alt=\"${t.name || ''}\">` : ''}
                 <div class="p-5 space-y-3">
                   <div class="flex items-center gap-2 flex-wrap">${(t.roles || []).map(r => `<span class='inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>${r}</span>`).join('')}</div>
                   <h3 class="text-xl font-semibold">${t.name || ''}</h3>
@@ -2895,7 +2895,7 @@
     function mediaBlock(c) {
       if (Array.isArray(c.images) && c.images.length) {
         const src = resolveImage(c.images[0]);
-        return `<div class='rounded-lg overflow-hidden'><img src='${src}' alt='${c.title || ''}' class='w-full h-56 object-cover'/></div>`;
+        return `<div class='rounded-lg overflow-hidden'><img decoding="async" src='${src}' alt='${c.title || ''}' class='w-full h-56 object-cover'/></div>`;
       }
       if (c.video) { return `<div class='w-full aspect-video rounded-lg overflow-hidden bg-black text-white grid place-items-center'><span class='text-sm'>影片</span></div>`; }
       return '';
@@ -2943,7 +2943,7 @@
              ${posts.map(p => `
                <article class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow">
                   <div class="h-48 overflow-hidden bg-gray-200">
-                     ${p.cover ? `<img src="${p.cover}" class="w-full h-full object-cover">` : ''}
+                     ${p.cover ? `<img decoding="async" src="${p.cover}" class="w-full h-full object-cover">` : ''}
                   </div>
                   <div class="p-4">
                      <div class="text-xs text-gray-500 mb-1">${p.date || ''}</div>
@@ -3134,7 +3134,7 @@ ${sel === 'site' ? `window.aboutContent = ${JSON.stringify(window.aboutContent |
               <input class="bl-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.image || '')}" placeholder="./img/... 或上傳">
               <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden bl-image-upload" accept="image/*"></label>
               <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden relative shrink-0">
-                 <img src="${p.image || ''}" class="w-full h-full object-contain bl-image-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
+                 <img decoding="async" src="${p.image || ''}" class="w-full h-full object-contain bl-image-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
               </div>
            </div>
         </label>
