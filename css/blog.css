@@ -360,7 +360,7 @@ body.blog-spatial-open > #footer-placeholder {
 .blog-lightbox-modal {
   position: fixed;
   inset: 0;
-  z-index: 1300;
+  z-index: 500;
   display: grid;
   place-items: center;
   padding: clamp(1rem, 4vw, 2rem);
@@ -505,5 +505,108 @@ body.blog-spatial-open > #footer-placeholder {
 
   .blog-lightbox-body {
     padding: 0.75rem;
+  }
+}
+
+/* Glory Parallax Sticky Layout */
+.glory-parallax-container {
+  width: 100%;
+}
+
+.glory-main-card {
+  transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.glory-main-card img {
+  will-change: opacity, transform;
+}
+
+.glory-thumb {
+  transition: all 0.3s ease;
+  opacity: 0.6;
+}
+
+.glory-thumb:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.glory-thumb.active {
+  opacity: 1;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.glory-node-item {
+  will-change: transform, opacity;
+}
+
+.glory-node-item.active {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.glory-node-dot {
+  position: absolute;
+  transition: all 0.5s ease;
+}
+
+.glory-node-dot::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 999px;
+  background: white;
+  transition: background 0.3s;
+}
+
+html.dark .glory-node-dot::after {
+  background: #111;
+}
+
+.glory-node-item.active .glory-node-dot::after {
+  background: var(--primary);
+}
+
+.glory-node-ripple {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+@keyframes glory-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+/* 響應式降級，在手機版將雙欄改為單欄，且取消 sticky 效果 */
+@media (max-width: 768px) {
+  .glory-parallax-container {
+    flex-direction: column !important;
+  }
+  
+  .glory-sticky-col {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+    width: 100% !important;
+    margin-bottom: 2rem;
+  }
+  
+  .glory-timeline-col {
+    width: 100% !important;
+    padding-left: 2rem !important;
+  }
+  
+  .glory-node-dot {
+    left: -27px !important;
   }
 }

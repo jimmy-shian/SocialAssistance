@@ -234,6 +234,28 @@
     // Team：點擊/鍵盤卡片翻面顯示學經歷（忽略卡片內連結與互動元素）
     try {
       const cards = Array.from(root.querySelectorAll('.team-card'));
+      
+      // Mobile auto-flip when scrolled into view (once only)
+      if (window.innerWidth <= 768 && 'IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const card = entry.target;
+              if (card.dataset.autoFlipped !== 'true') {
+                card.dataset.autoFlipped = 'true';
+                setTimeout(() => {
+                  card.classList.add('flipped');
+                }, 300);
+                observer.unobserve(card);
+              }
+            }
+          });
+        }, {
+          threshold: 0.4
+        });
+        cards.forEach(card => observer.observe(card));
+      }
+
       cards.forEach(card => {
         card.addEventListener('keydown', (e) => {
           if (e.key !== 'Enter' && e.key !== ' ') return;

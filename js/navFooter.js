@@ -418,6 +418,7 @@ function renderNavFooter() {
         './js/toast.js',
         './js/data-loader.js',
         './js/data/providers.js',
+        './js/lightbox.js',
         './js/main.js'
       ];
       const perPage = [];

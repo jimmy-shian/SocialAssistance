@@ -5,15 +5,11 @@ window.aboutContent = {
   "model": [
     {
       "title": "1. 基礎探索 (我做你看)",
-      "desc": "透過專業引導，初步認識不同產業的樣貌與可能性。",
-      "href": "https://example.com/explore",
-      "linkText": "了解更多"
+      "desc": "透過專業引導，初步認識不同產業的樣貌與可能性。"
     },
     {
       "title": "2. 內在探索 (我聽你說)",
-      "desc": "藉由深度對話與反思，連結個人興趣、價值觀與生涯方向。",
-      "href": "https://example.com/inner",
-      "linkText": "延伸閱讀"
+      "desc": "藉由深度對話與反思，連結個人興趣、價值觀與生涯方向。"
     },
     {
       "title": "3. 冒險挑戰 (你說我幫)",

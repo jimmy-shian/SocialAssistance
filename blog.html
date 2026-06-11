@@ -42,14 +42,45 @@
                 </div>
             </section>
 
-            <!-- Blog Grid -->
-            <section id="blog-glory-section" class="mb-12" aria-live="polite"></section>
-            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="blog-grid">
-                <!-- Posts rendered dynamically by script below -->
+            <!-- Blog Sections (Rendered Vertically) -->
+            <!-- Blog Glory Section (榮耀時刻) -->
+            <section id="blog-glory-section" class="mb-16 blog-section-container" aria-live="polite"></section>
+
+            <!-- Blog Daily Section (聽見日常) -->
+            <section id="blog-daily-section" class="mb-16 blog-section-container">
+                <div class="text-center mb-8">
+                    <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">DAILY LIFE</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mt-1">聽見日常</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="blog-daily-grid">
+                    <!-- Cards rendered dynamically -->
+                </div>
             </section>
 
-            <!-- Load More Button -->
-            <div class="text-center mt-12">
+            <!-- Blog News Section (重要資訊) -->
+            <section id="blog-news-section" class="mb-16 blog-section-container">
+                <div class="text-center mb-8">
+                    <span class="text-sm text-[var(--accent)] font-semibold uppercase tracking-wider">IMPORTANT INFO</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mt-1">重要資訊</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto" id="blog-news-grid">
+                    <!-- Cards rendered dynamically -->
+                </div>
+            </section>
+
+            <!-- Blog Interview Section (人物造訪) -->
+            <section id="blog-interview-section" class="mb-16 blog-section-container">
+                <div class="text-center mb-8">
+                    <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">INTERVIEWS</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mt-1">人物造訪</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="blog-interview-grid">
+                    <!-- Cards rendered dynamically -->
+                </div>
+            </section>
+
+            <!-- Load More Button (Hidden by default in structured view) -->
+            <div class="text-center mt-12" id="load-more-container" style="display: none;">
                 <button id="btn-load-more"
                     class="px-8 py-3 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 font-medium group">
                     顯示更多

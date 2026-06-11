@@ -3337,6 +3337,9 @@ if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about
         <label class="text-sm">時間軸 (timeline，每行：時間｜標題｜說明；榮耀時刻會自動套用)
           <textarea class="bl-timeline w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${escHtml(formatBlogTimeline(p.timeline))}</textarea>
         </label>
+        <label class="text-sm">活動照片 (images，每行一張圖片路徑；聽見日常與榮耀時刻會自動套用)
+          <textarea class="bl-images w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="3" placeholder="每行一張圖，例如：./img/photo1.webp">${escHtml((p.images || []).join('\n'))}</textarea>
+        </label>
          <label class="text-sm">圖片 (image)
            <div class="flex gap-2 items-end">
               <input class="bl-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.image || '')}" placeholder="./img/... 或上傳">
@@ -3431,6 +3434,7 @@ if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about
       const id = get('.bl-id')?.value || '';
       const previous = existingPosts.find(p => String(p.id) === String(id)) || {};
       const timeline = parseBlogTimeline(get('.bl-timeline')?.value || '');
+      const images = (get('.bl-images')?.value || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
       return {
         ...previous,
         id,
@@ -3441,7 +3445,8 @@ if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about
         content: get('.bl-content')?.value || '',
         image: get('.bl-image')?.value || '',
         link: get('.bl-link')?.value || './blog.html',
-        timeline: timeline
+        timeline: timeline,
+        images: images
       };
     });
     return { posts };
