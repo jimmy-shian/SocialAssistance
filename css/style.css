@@ -197,7 +197,7 @@ body {
 
 /* Style 2: Center Glow (Radial Reveal) */
 .dynamic-reveal-center::before {
-  background-image: url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
+  background-image: url('../assets/BG2.webp');
   opacity: 0.5;
 }
 
@@ -272,9 +272,11 @@ body {
     radial-gradient(circle at 20% 50%, rgba(154, 205, 50, 0.08) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(107, 142, 35, 0.06) 0%, transparent 50%),
     linear-gradient(135deg, rgba(255, 253, 248, 0.88) 0%, rgba(250, 246, 240, 0.82) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
+    url('../assets/BG2.webp');
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .section-bg-2::after {
@@ -305,9 +307,11 @@ body {
     radial-gradient(circle at 20% 50%, rgba(154, 205, 50, 0.05) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(107, 142, 35, 0.04) 0%, transparent 50%),
     linear-gradient(135deg, rgba(26, 24, 22, 0.90) 0%, rgba(45, 42, 36, 0.85) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
+    url('../assets/BG2.webp');
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 /* Subtle pattern overlay */
@@ -3235,7 +3239,7 @@ html.dark .sdgs-section {
   /* Dynamic Pattern Overlay for Card Back */
   background-image:
     linear-gradient(135deg, rgba(154, 205, 50, 0.9), rgba(107, 142, 35, 0.95)),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG2.webp');
+    url('../assets/BG2.webp');
   background-blend-mode: overlay;
   background-size: cover;
 }
@@ -4448,4 +4452,31 @@ html.dark .admin-modal select {
   .contact-flip-backdrop {
     transition: none;
   }
+}
+
+/* Custom mobile card overlays and container margin enforcement */
+.container.mx-auto.px-8 {
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+@media (max-width: 768px) {
+  /* Wrap homepage sections (#services, #sdgs, #team) in clean card panels on mobile */
+  section#services,
+  section#sdgs,
+  section#team {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem !important;
+    box-shadow: var(--ui-shadow-soft, 0 8px 28px rgba(45, 42, 36, 0.06));
+    margin-bottom: 2.5rem !important;
+    margin-top: 2.5rem !important;
+  }
+}
+
+/* Prevent philosophy image box content/shadow clipping on mobile */
+.philosophy-image-box {
+  padding: 1.5rem !important;
+  overflow: visible !important;
 }

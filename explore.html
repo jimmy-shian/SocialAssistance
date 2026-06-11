@@ -35,6 +35,191 @@
     </script>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preload" href="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/font/LXGWWenKaiTC-Regular.woff2" as="font" type="font/woff2" crossorigin>
+    <style>
+      /* Category chips styles */
+      .category-chips-container {
+        position: relative;
+        width: 100%;
+      }
+      .category-chips-wrapper {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .category-chips-wrapper::-webkit-scrollbar {
+        display: none;
+      }
+      
+      @media (min-width: 768px) {
+        .category-chips-wrapper {
+          overflow: visible !important;
+          white-space: normal !important;
+        }
+        #category-chips {
+          flex-wrap: wrap !important;
+          justify-content: center !important;
+          min-width: auto !important;
+        }
+      }
+
+      @media (max-width: 767px) {
+        .category-chips-container::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 32px;
+          background: linear-gradient(to right, rgba(0, 0, 0, 0.18), transparent);
+          z-index: 10;
+          pointer-events: none;
+        }
+        .category-chips-container::after {
+          content: '';
+          position: absolute;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          width: 32px;
+          background: linear-gradient(to left, rgba(0, 0, 0, 0.18), transparent);
+          z-index: 10;
+          pointer-events: none;
+        }
+      }
+
+      .chip {
+        display: inline-block;
+        padding: 0.5rem 1.25rem;
+        border-radius: 9999px;
+        background: var(--bg-surface);
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        white-space: nowrap;
+      }
+      .chip:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .chip.active {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+      }
+
+      /* Horizontal List Item Style */
+      .provider-list-item {
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--border);
+        transition: all 0.2s ease;
+      }
+      @media (min-width: 768px) {
+        .provider-list-item {
+          flex-direction: row;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 2rem;
+        }
+      }
+      .provider-list-left {
+        flex: 1.2;
+      }
+      .provider-list-right {
+        flex: 1.8;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      @media (min-width: 768px) {
+        .provider-list-right {
+          align-items: flex-end;
+          text-align: right;
+        }
+      }
+      .provider-list-item h3 {
+        font-size: 1.35rem;
+        font-weight: 750;
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+      .provider-category-tag {
+        display: inline-block;
+        padding: 0.15rem 0.6rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 9999px;
+        background: rgba(107, 142, 35, 0.12);
+        color: var(--primary);
+        border: 1px solid rgba(107, 142, 35, 0.2);
+      }
+      .provider-location {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--primary);
+      }
+      .provider-description {
+        font-size: 0.95rem;
+        line-height: 1.65;
+        color: var(--text-secondary);
+        margin: 0.25rem 0 0.75rem 0;
+      }
+      .provider-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-decoration: none;
+        transition: color 0.2s ease;
+      }
+      .provider-link:hover {
+        color: var(--primary-light);
+      }
+
+      /* Horizontal line separator: Double line */
+      .divider-double {
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        height: 4px;
+        margin: 2rem 0;
+      }
+
+      /* Show More Button */
+      .show-more-btn-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+      .show-more-btn {
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        border: 1px solid var(--border-strong);
+        padding: 0.65rem 2rem;
+        border-radius: 9999px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .show-more-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+    </style>
   </head>
 
   <body class="section-bg-2">
@@ -44,46 +229,47 @@
       <h1 class="text-4xl font-bold text-center mb-12">探索資源平台</h1>
 
       <!-- Filters and Search -->
-      <section class="mb-12">
-        <div class="flex flex-wrap gap-4 justify-center">
-          <input id="search-input" type="text" placeholder="搜尋關鍵字..."
-            class="px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 transition-colors duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
-            aria-label="輸入搜尋關鍵字">
-          <div id="category-dropdown" class="relative">
-            <button id="category-button"
-              class="px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2 transition-colors duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
-              aria-haspopup="true" aria-expanded="false" aria-controls="category-menu">
-              <span id="category-button-label">所有產業</span>
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            <div id="category-menu"
-              class="absolute z-10 mt-2 w-56 max-h-80 overflow-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg origin-top transition transform duration-150 ease-out scale-95 opacity-0 pointer-events-none">
-              <button type="button" data-value="所有產業"
-                class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">所有產業</button>
-              <button type="button" data-value="農林漁牧業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">農林漁牧業</button>
-              <button type="button" data-value="殯葬業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">殯葬業</button>
-              <button type="button" data-value="通訊業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">通訊業</button>
-              <button type="button" data-value="花藝類" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">花藝類</button>
-              <button type="button" data-value="樂器零售業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">樂器零售業</button>
-              <button type="button" data-value="餐飲業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">餐飲業</button>
-              <button type="button" data-value="汽車美容業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">汽車美容業</button>
-              <button type="button" data-value="量販通訊業" class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200">量販通訊業</button>
-            </div>
-            <input type="hidden" id="category-select" value="所有產業">
+      <section class="mb-8">
+        <div class="flex flex-col gap-6 items-center">
+          <div class="flex gap-4 w-full justify-center">
+            <input id="search-input" type="text" placeholder="搜尋關鍵字..."
+              class="w-full sm:w-auto px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 transition-colors duration-200 focus:outline-none focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]"
+              aria-label="輸入搜尋關鍵字">
+            <button id="search-btn" class="btn-soft btn-purple focus:outline-none">搜尋</button>
           </div>
-          <button id="search-btn" class="btn-soft btn-purple focus:outline-none">搜尋</button>
+          
+          <!-- Chips list -->
+          <div class="category-chips-container w-full">
+            <div class="category-chips-wrapper w-full overflow-x-auto whitespace-nowrap py-2">
+              <div class="flex gap-2 mx-auto justify-start md:justify-center min-w-max px-4" id="category-chips">
+                <button type="button" data-value="所有產業" class="chip active">全部</button>
+                <button type="button" data-value="農林漁牧業" class="chip">農林漁牧業</button>
+                <button type="button" data-value="殯葬業" class="chip">殯葬業</button>
+                <button type="button" data-value="通訊業" class="chip">通訊業</button>
+                <button type="button" data-value="花藝類" class="chip">花藝類</button>
+                <button type="button" data-value="樂器零售業" class="chip">樂器零售業</button>
+                <button type="button" data-value="餐飲業" class="chip">餐飲業</button>
+                <button type="button" data-value="汽車美容業" class="chip">汽車美容業</button>
+              </div>
+            </div>
+          </div>
+          <input type="hidden" id="category-select" value="所有產業">
         </div>
       </section>
 
-      <!-- Courses Grid -->
+      <!-- Horizontal Divider -->
+      <div class="divider-double"></div>
+
+      <!-- Courses List -->
       <section>
-        <div id="providers-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" aria-live="polite" aria-busy="false">
+        <div id="providers-grid" class="flex flex-col" aria-live="polite" aria-busy="false">
+        </div>
+        
+        <!-- Show More Button -->
+        <div class="show-more-btn-container" id="show-more-container">
+          <button id="show-more-btn" class="show-more-btn">查看更多資源</button>
         </div>
       </section>
-
     </main>
 
     <div id="footer-placeholder"></div>

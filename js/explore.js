@@ -1,4 +1,4 @@
-// Explore page dynamic rendering and filtering
+// Explore page dynamic rendering and filtering with horizontal layout and chips
 (function () {
   function qs(sel, root = document) { return root.querySelector(sel); }
   function el(tag, cls) { const e = document.createElement(tag); if (cls) e.className = cls; return e; }
@@ -6,52 +6,50 @@
   const grid = qs('#providers-grid');
   const searchInput = qs('#search-input');
   const categorySelect = qs('#category-select'); // hidden input storing current value
-  const catBtn = qs('#category-button');
-  const catMenu = qs('#category-menu');
-  const catLabel = qs('#category-button-label');
   const searchBtn = qs('#search-btn');
+  const showMoreBtn = qs('#show-more-btn');
+  const showMoreContainer = qs('#show-more-container');
 
   const dataset = () => (window.providersData || {});
+  let itemsToShow = 6;
 
   function providerCard(p) {
-    const wrapper = el('div', 'holo-card-container');
-    const card = el('div', 'holo-card card-dynamic-bg p-6 rounded-xl transition-all duration-300'); // Removed hover:shadow-lg
+    const item = el('div', 'provider-list-item');
 
-    // Layers
-    card.appendChild(el('div', 'holo-layer'));
-    card.appendChild(el('div', 'border-layer'));
-    const content = el('div', 'card-content-layer');
-    card.appendChild(content);
+    // Left container: Title + Category tag
+    const leftCol = el('div', 'provider-list-left');
+    const h3 = el('h3');
+    h3.textContent = p.name;
+    const tag = el('span', 'provider-category-tag');
+    tag.textContent = p.category;
+    h3.appendChild(tag);
+    leftCol.appendChild(h3);
+    item.appendChild(leftCol);
 
-    const title = el('h3', 'text-xl font-bold mb-2 text-[var(--primary)]');
-    title.textContent = p.name;
-    content.appendChild(title);
+    // Right container: Location + Description + Link
+    const rightCol = el('div', 'provider-list-right');
+    
+    // Location (with SVG pin)
+    const loc = el('div', 'provider-location mb-2');
+    loc.innerHTML = `
+      <svg class="w-4 h-4 text-[var(--primary)] fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+      </svg>
+      <span>${p.location || ''}</span>
+    `;
+    rightCol.appendChild(loc);
 
-    const cat = el('span', 'inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300');
-    cat.textContent = p.category;
-    content.appendChild(cat);
-    content.appendChild(el('div', 'mb-2')); // Spacer
-
-    const paramRow = (label, val) => {
-      const pEl = el('p', 'text-sm text-gray-500 dark:text-gray-400 mb-1');
-      pEl.textContent = `${label}：${val || '-'}`;
-      return pEl;
-    };
-
-    content.appendChild(paramRow('時間', p.schedule));
-    content.appendChild(paramRow('地點', p.location));
-
-    const desc = el('p', 'text-gray-700 dark:text-gray-300 mt-4 mb-4 leading-relaxed line-clamp-3');
+    const desc = el('p', 'provider-description');
     desc.textContent = p.description || '';
-    content.appendChild(desc);
+    rightCol.appendChild(desc);
 
-    const link = el('a', 'link-soft text-sm font-medium');
+    const link = el('a', 'provider-link');
     link.href = `./provider.html?id=${encodeURIComponent(p.id)}`;
-    link.innerHTML = '查看詳情';
-    content.appendChild(link);
+    link.innerHTML = `查看詳情 <span class="arrow">→</span>`;
+    rightCol.appendChild(link);
+    item.appendChild(rightCol);
 
-    wrapper.appendChild(card);
-    return wrapper;
+    return item;
   }
 
   function filterList(list, keyword, category) {
@@ -60,7 +58,7 @@
     return list.filter(p => {
       const kwok = !kw || (p.name + ' ' + (p.description || '')).toLowerCase().includes(kw);
       const catok = !cat || cat === '所有產業' || p.category === cat ||
-                    (cat === '農林漁牧業' && (p.category === '農業' || p.category === '養殖漁業' || p.category === '農林漁牧業'));
+                    (cat === '農林漁牧業' && (p.category === '農業' || p.category === '農林漁牧業'));
       return kwok && catok;
     });
   }
@@ -69,74 +67,75 @@
     if (!grid) return;
     grid.setAttribute('aria-busy', 'true');
     grid.innerHTML = '';
-    // 確保每個 provider 皆有 id（若缺則以鍵名補上）
+    
+    // Ensure each provider has an ID
     const all = Object.entries(dataset()).map(([k, p]) => ({ ...p, id: p && p.id ? p.id : k }));
     const filtered = filterList(all, searchInput && searchInput.value, categorySelect && categorySelect.value);
+    
     if (!filtered.length) {
-      const empty = el('div', 'text-center text-gray-500 col-span-full');
+      const empty = el('div', 'text-center text-gray-500 col-span-full py-8');
       empty.textContent = '未找到符合條件的課程';
       grid.appendChild(empty);
+      if (showMoreContainer) showMoreContainer.style.display = 'none';
     } else {
-      for (const p of filtered) {
+      const visibleItems = filtered.slice(0, itemsToShow);
+      for (const p of visibleItems) {
         grid.appendChild(providerCard(p));
+      }
+      
+      if (showMoreContainer) {
+        showMoreContainer.style.display = filtered.length > itemsToShow ? 'flex' : 'none';
       }
     }
     grid.setAttribute('aria-busy', 'false');
   }
 
   function init() {
-    if (searchBtn) searchBtn.addEventListener('click', render);
-    if (searchInput) searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') render(); });
+    if (searchBtn) searchBtn.addEventListener('click', () => { itemsToShow = 6; render(); });
+    if (searchInput) searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { itemsToShow = 6; render(); } });
+    
     // live filtering while typing with debounce
     if (searchInput) {
       let t;
       searchInput.addEventListener('input', () => {
         clearTimeout(t);
-        t = setTimeout(render, 150);
+        t = setTimeout(() => {
+          itemsToShow = 6;
+          render();
+        }, 150);
       });
     }
-    if (categorySelect) categorySelect.addEventListener('change', render);
 
-    // Custom dropdown
-    function openMenu() {
-      if (!catMenu || !catBtn) return;
-      catMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-      catMenu.classList.add('opacity-100', 'scale-100');
-      catBtn.setAttribute('aria-expanded', 'true');
-    }
-    function closeMenu() {
-      if (!catMenu || !catBtn) return;
-      catMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-      catMenu.classList.remove('opacity-100', 'scale-100');
-      catBtn.setAttribute('aria-expanded', 'false');
-    }
-    if (catBtn) {
-      catBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const expanded = catBtn.getAttribute('aria-expanded') === 'true';
-        expanded ? closeMenu() : openMenu();
-      });
-    }
-    if (catMenu) {
-      catMenu.addEventListener('click', (e) => {
-        const btn = e.target.closest('button[data-value]');
+    // Chips filtering
+    const chipsContainer = qs('#category-chips');
+    if (chipsContainer) {
+      chipsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.chip');
         if (!btn) return;
+        
+        // Remove active class from all chips
+        chipsContainer.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+
         const val = btn.getAttribute('data-value');
-        if (categorySelect) categorySelect.value = val;
-        if (catLabel) catLabel.textContent = val;
+        if (categorySelect) {
+          categorySelect.value = val;
+          categorySelect.dispatchEvent(new Event('change'));
+        }
+        
+        itemsToShow = 6;
         render();
-        closeMenu();
       });
     }
-    document.addEventListener('click', (e) => {
-      if (!catMenu || !catBtn) return;
-      if (!catMenu.contains(e.target) && !catBtn.contains(e.target)) {
-        closeMenu();
-      }
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMenu();
-    });
+
+    // Show more button action
+    if (showMoreBtn) {
+      showMoreBtn.addEventListener('click', () => {
+        itemsToShow += 6;
+        render();
+      });
+    }
+
     render();
   }
 
@@ -153,60 +152,7 @@
       const ds = (window.AppConfig && window.AppConfig.datasets && window.AppConfig.datasets.providers) || 'providers';
       const keys = (ev && ev.detail && ev.detail.keys) || [];
       if (!keys.length || keys.includes(ds)) {
-        // re-render to reflect latest providers
-        const grid = document.getElementById('providers-grid');
-        if (grid) {
-          // call local render by triggering a microtask
-          Promise.resolve().then(() => {
-            // reuse local render via dispatching input change or direct call
-            try {
-              (function () {
-                const all = Object.values(window.providersData || {});
-                // minimal rebuild similar to render()
-                grid.setAttribute('aria-busy', 'true');
-                grid.innerHTML = '';
-                const searchInput = document.getElementById('search-input');
-                const categorySelect = document.getElementById('category-select');
-                const kw = (searchInput && searchInput.value) || '';
-                const cat = (categorySelect && categorySelect.value) || '';
-                 const filtered = all.filter(p => {
-                  const kwok = !kw || (p.name + ' ' + (p.description || '')).toLowerCase().includes(kw.toLowerCase());
-                  const catok = !cat || cat === '所有產業' || p.category === cat ||
-                                (cat === '農林漁牧業' && (p.category === '農業' || p.category === '養殖漁業' || p.category === '農林漁牧業'));
-                  return kwok && catok;
-                });
-                if (!filtered.length) {
-                  const empty = document.createElement('div');
-                  empty.className = 'text-center text-gray-500 col-span-full';
-                  empty.textContent = '未找到符合條件的課程';
-                  grid.appendChild(empty);
-                } else {
-                  filtered.forEach(p => {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'holo-card-container';
-                    wrapper.innerHTML = `
-                      <div class="holo-card card-dynamic-bg p-6 rounded-xl transition-all duration-300">
-                        <div class="holo-layer"></div>
-                        <div class="border-layer"></div>
-                        <div class="card-content-layer">
-                            <h3 class="text-xl font-bold mb-2 text-[var(--primary)]">${p.name}</h3>
-                            <span class="inline-block px-2 py-1 bg-gray-100 dark:bg-gray-800 text-xs rounded mb-3 text-gray-600 dark:text-gray-300">${p.category}</span>
-                            <div class="mb-2"></div>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">時間：${p.schedule || '-'}</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">地點：${p.location || '-'}</p>
-                            <p class="text-gray-700 dark:text-gray-300 mt-4 mb-4 leading-relaxed line-clamp-3">${p.description || ''}</p>
-                            <a class="link-soft text-sm font-medium" href="./provider.html?id=${encodeURIComponent(p.id)}">查看詳情</a>
-                        </div>
-                      </div>
-                    `;
-                    grid.appendChild(wrapper);
-                  });
-                }
-                grid.setAttribute('aria-busy', 'false');
-              })();
-            } catch (e) { }
-          });
-        }
+        render();
       }
     });
   } catch (e) { }
