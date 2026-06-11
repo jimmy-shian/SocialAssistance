@@ -73,7 +73,7 @@
       </div>
     </section>
 
-    <div class="container mx-auto relative z-10">
+    <div class="container mx-auto relative z-10 px-8">
       <!-- Philosophy / About Section - Dynamically rendered from siteContent.js -->
       <section class="philosophy-section asym-layout mt-16 mb-16" id="about">
         <div class="philosophy-image-box">
@@ -200,52 +200,8 @@
         })();
       </script>
 
-      <!-- Resources / Blog Section -->
-      <section class="resources-section mb-12" id="resources">
-        <h2 class="section-title">資源與部落格</h2>
-        <div class="resources-tags">
-          <a href="./member.html" class="resource-tag">問卷與回饋</a>
-          <a href="./member.html" class="resource-tag">自立評估</a>
-          <a href="./member.html" class="resource-tag">活動認證/照片</a>
-          <a href="./member.html" class="resource-tag">學習歷程檔案</a>
-        </div>
-        <div class="blog-grid" id="blog-posts">
-          <!-- Blog posts will be loaded dynamically or can be static -->
-          <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
-            <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-              <figure class="image-frame image-frame--card w-full h-full">
-                <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.webp" alt="活動紀錄" loading="lazy">
-              </figure>
-            </div>
-            <div class="blog-card-content flex flex-col flex-1">
-              <p class="blog-card-date ui-eyebrow">2025/12/15</p>
-              <h4 class="ui-card-title">冬季攀樹營隊精彩回顧</h4>
-            </div>
-          </a>
-          <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
-            <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-              <figure class="image-frame image-frame--card w-full h-full">
-                <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.webp" alt="活動紀錄" loading="lazy">
-              </figure>
-            </div>
-            <div class="blog-card-content flex flex-col flex-1">
-              <p class="blog-card-date ui-eyebrow">2025/11/28</p>
-              <h4 class="ui-card-title">自立生活技能工作坊成果發表</h4>
-            </div>
-          </a>
-          <a href="./member.html" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
-            <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-              <figure class="image-frame image-frame--card w-full h-full">
-                <img decoding="async" src="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp" alt="活動紀錄" loading="lazy">
-              </figure>
-            </div>
-            <div class="blog-card-content flex flex-col flex-1">
-              <p class="blog-card-date ui-eyebrow">2025/10/20</p>
-              <h4 class="ui-card-title">與在地產業夥伴的合作交流</h4>
-            </div>
-          </a>
-        </div>
-      </section>
+      <!-- Achievements Section -->
+      <div id="achievements-placeholder" class="mb-12"></div>
 
       <!-- Map Section (保留原有功能) -->
       <section class="mt-5 text-center">
@@ -270,6 +226,7 @@
   <div id="footer-placeholder"></div>
 
   <script src="./js/data/siteContent.js"></script>
+  <script src="./js/achievements.js"></script>
   <script src="./js/render-index.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -57,10 +57,7 @@
       const pData = data.philosophy;
       const imgBox = p.querySelector('.philosophy-image-box');
       if (imgBox) imgBox.innerHTML = `
-        <!-- 原代碼: <img decoding="async" src="${pData.img}" alt="philosophy" loading="lazy"> -->
-        <figure class="image-frame image-frame--card w-full h-full">
-          <img decoding="async" src="${pData.img}" alt="philosophy" loading="lazy">
-        </figure>`;
+        <img decoding="async" src="${pData.img}" alt="philosophy" loading="lazy">`;
       const txt = p.querySelector('.philosophy-content');
       if (txt) txt.innerHTML = `
         <span class="section-label">${pData.label || 'ABOUT'}</span>
@@ -72,42 +69,9 @@
 
   // Services section now rendered inline in index.html from servicesContent.js
  
-  // Resources Section
-  if (data.resources) {
-    const section = document.querySelector('.resources-section');
-    if (section) {
-      const titleEl = section.querySelector('.section-title');
-      if (titleEl && data.resources.title) {
-        titleEl.textContent = data.resources.title;
-      }
-      const tagsContainer = section.querySelector('.resources-tags');
-      if (tagsContainer && data.resources.tags) {
-        tagsContainer.innerHTML = data.resources.tags.map(t =>
-          `<a href="${t.link || './member.html'}" class="resource-tag">${t.text}</a>`
-        ).join('');
-      }
-    }
-  }
-
-  // Blog Posts on Index
-  if (data.blogPosts && Array.isArray(data.blogPosts)) {
-    const grid = document.getElementById('blog-posts');
-    if (grid) {
-      grid.innerHTML = data.blogPosts.slice(0, 3).map(post => `
-        <a href="${post.link || './blog.html'}" class="blog-card ui-card card-dynamic-bg flex flex-col gap-3">
-          <div class="blog-card-image -mx-5 -mt-5 mb-1 overflow-hidden rounded-t-xl">
-            <!-- 原代碼: <img decoding="async" src="${post.image}" alt="${post.title}" class="w-full h-48 object-cover" loading="lazy"> -->
-            <figure class="image-frame image-frame--card w-full h-full">
-              <img decoding="async" src="${post.image}" alt="${post.title}" loading="lazy">
-            </figure>
-          </div>
-          <div class="blog-card-content flex flex-col flex-1">
-            <p class="blog-card-date ui-eyebrow">${post.date}</p>
-            <h4 class="ui-card-title">${post.title}</h4>
-          </div>
-        </a>
-      `).join('');
-    }
+  // Achievements Section (replacing Resources and Blog Posts)
+  if (window.renderAchievements && window.aboutContent) {
+    window.renderAchievements('achievements-placeholder', window.aboutContent);
   }
 // SDGs Section
 if (data.sdgs && Array.isArray(data.sdgs)) {

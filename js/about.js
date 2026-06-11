@@ -41,31 +41,7 @@
     }, 50);
   }
 
-  function numberSpan(text) {
-    // Wrap first number in span for count-up
-    const m = String(text).match(/(\d+)/);
-    if (!m) return { html: text, to: null };
-    const to = parseInt(m[1], 10);
-    const html = text.replace(m[1], `<span class="count" data-to="${to}">${0}</span>`);
-    return { html, to };
-  }
 
-  function countUpOnce(root) {
-    const els = root.querySelectorAll('.count[data-to]');
-    const dur = 1200;
-    els.forEach(sp => {
-      if (sp.dataset.done) return;
-      const to = parseInt(sp.dataset.to, 10);
-      const start = performance.now();
-      function tick(t) {
-        const p = Math.min(1, (t - start) / dur);
-        const val = Math.round(to * (0.5 - Math.cos(Math.PI * p) / 2));
-        sp.textContent = val.toString();
-        if (p < 1) requestAnimationFrame(tick); else { sp.textContent = to.toString(); sp.dataset.done = '1'; }
-      }
-      requestAnimationFrame(tick);
-    })
-  }
 
   function attachCardInteractions(container) {
     container.querySelectorAll('.about-card, .team-card').forEach(card => {
@@ -121,8 +97,10 @@
               </div>
             </div>`;
     }).join('')}
-          </div>
       </section>
+
+      <div id="achievements-placeholder"></div>
+
 
       ${Array.isArray(data.team) && data.team.length ? `
       <section id=\"team\" class=\"mt-16 team-section rounded-lg\">
@@ -191,6 +169,10 @@
       </section>
       ` : ''}
     `;
+
+    if (window.renderAchievements) {
+      window.renderAchievements('achievements-placeholder', data);
+    }
 
     // typing effects with click-to-shatter
     const heroEl = qs('#hero-typed', root);

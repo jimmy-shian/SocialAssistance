@@ -4,71 +4,7 @@
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
   
-  function achievementText(item) {
-    if (typeof item === 'string') return { text: item, href: '' };
-    return { text: item && (item.text || item.title) || '', href: item && item.href || '' };
-  }
 
-  function parseAchievement(str) {
-    const match = str.match(/(\d+)/);
-    if (!match) return { num: 0, prefix: '', suffix: str };
-    const num = parseInt(match[1], 10);
-    const index = match.index;
-    const prefix = str.slice(0, index);
-    const suffix = str.slice(index + match[1].length);
-    return { num, prefix, suffix };
-  }
-
-  function animateCount(el, target) {
-    const duration = 1600; // 1.6 seconds animation duration
-    const start = performance.now();
-
-    function tick(now) {
-      const elapsed = now - start;
-      const progress = Math.min(1, elapsed / duration);
-      
-      // Easing function: easeOutExpo (starts fast, decelerates to a precise stop)
-      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      
-      const currentVal = Math.round(target * easeProgress);
-      el.textContent = currentVal;
-
-      if (progress < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        el.textContent = target;
-      }
-    }
-
-    requestAnimationFrame(tick);
-  }
-
-  function initAchievementsCountUp() {
-    const numbers = document.querySelectorAll('.achievement-number');
-    if (!numbers.length) return;
-
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const el = entry.target;
-            const targetVal = parseInt(el.dataset.to, 10) || 0;
-            animateCount(el, targetVal);
-            observer.unobserve(el);
-          }
-        });
-      }, {
-        threshold: 0.15
-      });
-
-      numbers.forEach(num => observer.observe(num));
-    } else {
-      // Fallback if IntersectionObserver not supported
-      numbers.forEach(num => {
-        num.textContent = num.dataset.to;
-      });
-    }
-  }
 
   const serviceDetailContent = {
     "體驗教育": "引導孩子參與各類低空、高空探索活動及團隊建立任務，學習溝通協調、問題解決與團隊共識，並透過反思引導建立內在自信。",
@@ -137,27 +73,8 @@
         }).join('')}
       </div>
 
-      <!-- Glassmorphism Achievement Section -->
-      <section class="mt-16 glass-surface rounded-3xl p-8 md:p-12 border border-white/20 bg-white/5 dark:bg-black/10 backdrop-blur-md shadow-lg">
-        <h2 class="heading-section text-center mb-10 text-2xl md:text-3xl font-extrabold tracking-tight">${esc(data.achievementsTitle || about.achievementsTitle || '成就經歷')}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="achievements-container">
-          ${achievements.map((a) => {
-            const row = achievementText(a);
-            const parsed = parseAchievement(row.text);
-            const cardInner = `
-              <div class="text-5xl font-black text-[var(--primary)] mb-4 tracking-tight select-none">
-                <span class="achievement-number" data-to="${parsed.num}">0</span><span class="text-3xl font-bold text-[var(--primary)]/90 ml-0.5">+</span>
-              </div>
-              <p class="text-[var(--text-secondary)] text-sm md:text-base font-semibold leading-relaxed">
-                ${esc(parsed.prefix)}<strong class="text-[var(--text-primary)] font-black mx-0.5">${parsed.num}</strong>${esc(parsed.suffix)}
-              </p>
-            `;
-            return row.href
-              ? `<a href="${esc(row.href)}" target="_blank" rel="noopener" class="achievement-glass-card block rounded-2xl p-6 md:p-8 text-center border border-white/30 dark:border-white/10 bg-gradient-to-br from-white/30 to-white/10 dark:from-white/10 dark:to-transparent backdrop-blur-xl shadow-md hover:shadow-xl hover:scale-105 hover:-translate-y-1.5 transition-all duration-300 no-underline cursor-pointer">${cardInner}</a>`
-              : `<div class="achievement-glass-card rounded-2xl p-6 md:p-8 text-center border border-white/30 dark:border-white/10 bg-gradient-to-br from-white/30 to-white/10 dark:from-white/10 dark:to-transparent backdrop-blur-xl shadow-md hover:shadow-xl hover:scale-105 hover:-translate-y-1.5 transition-all duration-300">${cardInner}</div>`;
-          }).join('')}
-        </div>
-      </section>
+      <!-- Achievements Section -->
+      <div id="achievements-placeholder"></div>
 
       <section class="service-gallery-full mt-16" aria-label="服務照片輪播">
         <div class="service-gallery-track">
@@ -166,8 +83,12 @@
       </section>
     `;
 
-    // Initialize the count up animations after elements are rendered in DOM
-    initAchievementsCountUp();
+    if (window.renderAchievements) {
+      window.renderAchievements('achievements-placeholder', {
+        achievementsTitle: data.achievementsTitle || about.achievementsTitle,
+        achievements: achievements
+      });
+    }
 
     // Smooth scroll to hash anchor on page load
     scrollToHash();
