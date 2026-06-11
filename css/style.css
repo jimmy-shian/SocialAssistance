@@ -3151,7 +3151,7 @@ html.dark .sdgs-section {
 
 /* Team Section - Flip Card Style */
 .team-section {
-  padding: 4rem 0;
+  padding: 2rem 0;
 }
 
 .team-grid {
@@ -3873,10 +3873,10 @@ html.dark .sdgs-section {
 /* --- Safe Area for Notched Phones --- */
 @supports (padding: max(0px)) {
   @media (max-width: 767px) {
-    body {
+    /* body {
       padding-left: max(1rem, env(safe-area-inset-left));
       padding-right: max(1rem, env(safe-area-inset-right));
-    }
+    } */
 
     #footer-placeholder {
       padding-bottom: max(1rem, env(safe-area-inset-bottom));

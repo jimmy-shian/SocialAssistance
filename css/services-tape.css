@@ -1,432 +1,92 @@
-/* ================================
-   Services Tape Stack Effect
-   Desktop Only - Sticky Scroll Cards
-================================ */
+/* ========================================================
+   Services Circular Grid Layout (Figure 1 Style)
+   ======================================================== */
 
-/* Hide on mobile by default */
-.services-tape-section {
-  display: none;
+.services-circular-section {
+  position: relative;
+  background-color: #e2ede0; /* Pastel green base from Figure 1 */
+  border-radius: 24px;
+  border: 1px solid rgba(107, 142, 35, 0.15);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+html.dark .services-circular-section {
+  background-color: #232a20; /* Dark olive tone */
+  border-color: rgba(154, 205, 50, 0.15);
+}
+
+.service-circular-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.18, 0.88, 0.24, 1);
+}
+
+.service-circular-card .circle-wrapper {
+  width: 176px;
+  height: 176px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 6px solid #b9dca8; /* Thick light green border */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.5s ease;
+  position: relative;
+  background: var(--bg-inset, #EDE8DE);
 }
 
 @media (min-width: 768px) {
-  .services-tape-section {
-    display: block;
+  .service-circular-card .circle-wrapper {
+    width: 200px;
+    height: 200px;
   }
 }
 
-.services-tape-section {
-  position: relative;
-
-  /*
-    高度越高，卡片切換越慢。
-    7 張卡片建議 520vh ~ 680vh。
-  */
-  height: 620vh;
-
-  background: #f8fafc;
-  overflow: visible;
+.service-circular-card:hover .circle-wrapper {
+  border-color: #6B8E23; /* Sprout Green highlight */
+  box-shadow: 0 12px 28px rgba(107, 142, 37, 0.25);
+  transform: scale(1.05);
 }
 
-.services-tape-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  overflow: hidden;
-  padding: 4rem 2rem;
-}
-
-.services-tape-stage {
-  width: min(1180px, 100%);
-  margin: 2.5rem auto 0;
-  display: grid;
-  grid-template-columns: minmax(420px, 560px) minmax(320px, 1fr);
-  gap: 4rem;
-  align-items: center;
-}
-
-/* 左側卡片舞台 */
-.services-tape-stack {
-  position: relative;
-  width: 100%;
-  height: 540px;
-  perspective: 1200px;
-}
-
-/* 每一張卡片 */
-.service-tape-card {
-  position: absolute;
-  inset: 0;
-  border-radius: 32px;
-  overflow: hidden;
-  isolation: isolate;
-  background: #ffffff;
-  box-shadow:
-    0 34px 90px rgba(15, 23, 42, 0.22),
-    0 10px 30px rgba(15, 23, 42, 0.12);
-
-  transform-origin: center center;
-  will-change: transform, opacity, filter;
-  transition: none;
-}
-
-/* 圖片 */
-.service-tape-card .service-card-img {
+.service-circular-card .circle-wrapper img {
   width: 100%;
   height: 100%;
-  display: block;
   object-fit: cover;
-  transform: scale(1.05);
   transition: transform 0.5s ease;
 }
 
-/* 圖片暗角 */
-.service-tape-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      to top,
-      rgba(15, 23, 42, 0.78) 0%,
-      rgba(15, 23, 42, 0.34) 48%,
-      rgba(15, 23, 42, 0.06) 100%
-    );
+.service-circular-card:hover .circle-wrapper img {
+  transform: scale(1.08);
 }
 
-/* 卡片內文字泡泡 */
-.service-tape-card .service-bubble {
-  position: absolute;
-  left: 1.25rem;
-  right: 1.25rem;
-  bottom: 1.25rem;
-  z-index: 2;
-
-  padding: 1.3rem 1.25rem 1.2rem;
-  border-radius: 24px;
-
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.service-tape-card .service-bubble h3 {
-  margin: 0 0 0.45rem;
-  font-size: 1.45rem;
+.service-circular-badge {
+  margin-top: 1rem;
+  padding: 0.45rem 1.4rem;
+  border-radius: 999px;
+  background-color: #b9dca8; /* Light green badge background */
+  color: #224419; /* Dark green text */
   font-weight: 800;
+  font-size: 0.9rem;
   letter-spacing: 0.04em;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
-.service-tape-card .service-bubble p {
-  margin: 0;
-  font-size: 0.98rem;
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.92);
-}
-
-.service-icon-float {
-  position: absolute;
-  top: -20px;
-  right: 20px;
-
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-
-  border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #f5d80b, #82ef44);
-  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.35);
-}
-
-.service-icon-float i {
-  font-size: 0.75rem;
-}
-
-/* 右側文字說明 */
-.services-tape-info {
-  position: relative;
-  padding: 2.5rem 2.25rem;
-  border-radius: 32px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.76));
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  box-shadow:
-    0 24px 70px rgba(15, 23, 42, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-}
-
-.services-tape-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-
-  margin-bottom: 1rem;
-  padding: 0.45rem 0.8rem;
-  border-radius: 999px;
-
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-
-  color: #ea580c;
-  background: rgba(251, 146, 60, 0.14);
-}
-
-.services-tape-label::before {
-  content: "";
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-  background: #f97316;
-}
-
-.services-tape-info h3 {
-  margin: 0 0 1rem;
-  font-size: clamp(2rem, 3vw, 3.25rem);
-  font-weight: 900;
-  line-height: 1.1;
-  color: #0f172a;
-}
-
-.services-tape-info p {
-  margin: 0;
-  max-width: 34rem;
-  font-size: 1.05rem;
-  line-height: 1.9;
-  color: #475569;
-}
-
-/* 進度條 */
-.services-tape-progress {
-  position: relative;
-  width: 100%;
-  height: 8px;
-  margin-top: 2.2rem;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.22);
-}
-
-.services-tape-progress-bar {
-  width: 0%;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #f97316, #ef4444);
-  transition: width 0.18s ease;
-}
-
-/* 數字 */
-.services-tape-counter {
-  display: flex;
-  gap: 0.45rem;
-  align-items: baseline;
-  margin-top: 1.1rem;
-
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.services-tape-counter span:first-child {
-  font-size: 1.7rem;
-  color: #ea580c;
-}
-
-.services-tape-counter span:not(:first-child) {
-  font-size: 1rem;
-  color: #94a3b8;
-}
-
-/* hover：只保留微互動 */
-.service-tape-card:hover .service-card-img {
-  transform: scale(1.09);
-}
-
-/* 使用者偏好減少動畫 */
-@media (prefers-reduced-motion: reduce) {
-  .service-tape-card,
-  .service-tape-progress-bar,
-  .service-tape-card .service-card-img {
-    transition: none;
-  }
-}
-
-/* Dark mode support */
-html.dark .services-tape-section {
-  border-radius: 20px;
-  background: #1a1816;
-}
-
-html.dark .services-tape-info {
-  background:
-    linear-gradient(135deg, rgba(45, 42, 36, 0.96), rgba(26, 24, 22, 0.76));
-  border-color: rgba(148, 163, 184, 0.15);
-}
-
-html.dark .services-tape-info h3 {
+html.dark .service-circular-badge {
+  background-color: #38552f;
   color: #f5f0e8;
 }
 
-html.dark .services-tape-info p {
-  color: #d9d0c1;
-}
-
-html.dark .services-tape-progress {
-  background: rgba(148, 163, 184, 0.15);
-}
-
-html.dark .services-tape-counter {
-  color: #f5f0e8;
-}
-
-/* ================================
-   Mobile Carousel Styles
-================================ */
-
-/* Mobile services section - show only on small screens */
-.services-mobile-section {
-  position: relative;
-  background:
-    linear-gradient(135deg, rgba(250, 246, 240, 0.85) 0%, rgba(255, 253, 248, 0.75) 50%, rgba(240, 245, 232, 0.85) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.webp');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
-
-html.dark .services-mobile-section {
-  background:
-    linear-gradient(135deg, rgba(45, 42, 36, 0.92) 0%, rgba(26, 24, 22, 0.85) 50%, rgba(35, 40, 30, 0.92) 100%),
-    url('https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/BG1.webp');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
-
-/* Mobile carousel wrapper */
-.services-carousel-wrapper {
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none; /* Firefox */
-  padding-bottom: 1rem;
-}
-
-.services-carousel-wrapper::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-
-/* Carousel cards */
-.services-carousel {
-  display: flex;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
-}
-
-/* Individual carousel card */
-.service-card-carousel {
-  flex: 0 0 280px;
-  scroll-snap-align: start;
-  position: relative;
-  border-radius: 24px;
-  overflow: hidden;
-  isolation: isolate;
-  background: #ffffff;
-  box-shadow:
-    0 10px 40px rgba(15, 23, 42, 0.15),
-    0 4px 12px rgba(15, 23, 42, 0.08);
-  height: 380px;
-}
-
-.service-card-carousel .service-card-img {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-.service-card-carousel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(
-      to top,
-      rgba(15, 23, 42, 0.75) 0%,
-      rgba(15, 23, 42, 0.3) 45%,
-      rgba(15, 23, 42, 0.05) 100%
-    );
-}
-
-/* Service bubble on mobile cards */
-.service-card-carousel .service-bubble {
-  position: absolute;
-  left: 1rem;
-  right: 1rem;
-  bottom: 1rem;
-  z-index: 2;
-  padding: 1rem;
-  border-radius: 20px;
+.service-circular-card:hover .service-circular-badge {
+  background-color: #6B8E23; /* Sprout Green */
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 0.28);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(107, 142, 37, 0.2);
 }
 
-.service-card-carousel .service-bubble h3 {
-  margin: 0 0 0.35rem;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+html.dark .service-circular-card:hover .service-circular-badge {
+  background-color: #9ACD32;
+  color: #0d1711;
 }
-
-.service-card-carousel .service-bubble p {
-  margin: 0;
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.service-card-carousel .service-icon-float {
-  position: absolute;
-  top: -16px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 999px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
-  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
-}
-
-.service-card-carousel .service-icon-float i {
-  font-size: 0.85rem;
-}
-
-@media (min-width: 768px) {
-  .services-mobile-section {
-    display: none;
-  }
-}
-
-@media (max-width: 767px) {
-  .services-tape-section {
-    display: none !important;
-  }
-}
-
-

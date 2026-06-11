@@ -59,7 +59,8 @@
     const cat = (category || '').trim();
     return list.filter(p => {
       const kwok = !kw || (p.name + ' ' + (p.description || '')).toLowerCase().includes(kw);
-      const catok = !cat || cat === '所有產業' || p.category === cat;
+      const catok = !cat || cat === '所有產業' || p.category === cat ||
+                    (cat === '農林漁牧業' && (p.category === '農業' || p.category === '養殖漁業' || p.category === '農林漁牧業'));
       return kwok && catok;
     });
   }
@@ -168,9 +169,10 @@
                 const categorySelect = document.getElementById('category-select');
                 const kw = (searchInput && searchInput.value) || '';
                 const cat = (categorySelect && categorySelect.value) || '';
-                const filtered = all.filter(p => {
+                 const filtered = all.filter(p => {
                   const kwok = !kw || (p.name + ' ' + (p.description || '')).toLowerCase().includes(kw.toLowerCase());
-                  const catok = !cat || cat === '所有產業' || p.category === cat;
+                  const catok = !cat || cat === '所有產業' || p.category === cat ||
+                                (cat === '農林漁牧業' && (p.category === '農業' || p.category === '養殖漁業' || p.category === '農林漁牧業'));
                   return kwok && catok;
                 });
                 if (!filtered.length) {

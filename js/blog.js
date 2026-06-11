@@ -51,7 +51,7 @@
           <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
           <span class="blog-post-tag absolute right-3 bottom-3" data-category="${esc(post.category)}">${esc(categoryLabels[post.category] || post.category)}</span>
         </div>
-        <div class="py-3 px-1">
+        <div class="py-3 px-4">
           <h3 class="font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors text-sm md:text-base leading-snug">${esc(post.title)}</h3>
           <p class="text-[var(--text-muted)] text-xs mt-1">${esc(post.date)}</p>
         </div>
@@ -321,7 +321,15 @@
       thumbs.forEach((t, tIdx) => {
         if (tIdx === idx) {
           t.classList.add('active', 'border-[var(--primary)]');
-          t.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          if (thumbsContainer) {
+            const containerWidth = thumbsContainer.clientWidth;
+            const thumbOffsetLeft = t.offsetLeft;
+            const thumbWidth = t.clientWidth;
+            thumbsContainer.scrollTo({
+              left: thumbOffsetLeft - containerWidth / 2 + thumbWidth / 2,
+              behavior: 'smooth'
+            });
+          }
         } else {
           t.classList.remove('active', 'border-[var(--primary)]');
         }

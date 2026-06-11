@@ -125,7 +125,7 @@
       </section>
 
       ${Array.isArray(data.team) && data.team.length ? `
-      <section class=\"mt-16 team-section rounded-lg\">
+      <section id=\"team\" class=\"mt-16 team-section rounded-lg\">
         <h2 class=\"heading-section mb-8 text-center\">Our Team.</h2>
         <div class=\"team-grid\">
           ${data.team.map(t => {
@@ -211,6 +211,18 @@
     attachCardInteractions(root);
     const toAnimate = Array.from(root.querySelectorAll('.about-card, .team-card, .model-step'));
     animateOnView(toAnimate);
+
+    // Smooth scroll to hash anchor on page load
+    if (window.location.hash) {
+      setTimeout(() => {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+          const yOffset = -90;
+          const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 300);
+    }
 
     // // 進場時重新計算階梯位移（考慮到每張卡片原始高度）
     // function adjustModelStairs() {

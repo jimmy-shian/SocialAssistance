@@ -48,6 +48,11 @@ body.blog-spatial-open > #footer-placeholder {
   opacity: .72;
 }
 
+body.blog-spatial-open {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
 .blog-tab {
   background: color-mix(in srgb, var(--bg-surface) 88%, transparent);
   color: var(--text-secondary);
@@ -426,6 +431,18 @@ body.blog-spatial-open > #footer-placeholder {
   cursor: pointer;
   font-size: 1.4rem;
   line-height: 1;
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: background-color var(--duration-base) var(--motion-standard), transform var(--duration-base) var(--motion-emphasized);
+}
+
+.blog-lightbox-close:hover {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+  transform: scale(1.05);
 }
 
 .blog-lightbox-body {

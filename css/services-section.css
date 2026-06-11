@@ -216,6 +216,16 @@ html.dark .service-feature-image {
 }
 
 html.dark .service-feature-card {
+.achievement-pill:hover {
+  color: var(--primary, #6b8e23);
+  border-color: color-mix(in srgb, var(--primary, #6b8e23) 38%, transparent);
+}
+
+html.dark .service-feature-image {
+  background: var(--bg-inset);
+}
+
+html.dark .service-feature-card {
   background: var(--glass-bg);
   border-color: var(--glass-border);
   box-shadow: var(--surface-shadow);
@@ -224,4 +234,59 @@ html.dark .service-feature-card {
 html.dark .service-feature-card:hover {
   border-color: color-mix(in srgb, var(--primary) 38%, var(--border));
   box-shadow: var(--surface-shadow-strong);
+}
+
+/* ========================================================
+   Figure 2 Alternating Service Cards Styles
+   ======================================================== */
+.service-alt-card {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  overflow: visible !important;
+}
+
+.service-alt-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 48px rgba(107, 142, 35, 0.08);
+}
+
+html.dark .service-alt-card {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+html.dark .service-alt-card:hover {
+  box-shadow: 0 20px 48px rgba(154, 205, 50, 0.15);
+}
+
+.service-alt-card img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-alt-card .group:hover img {
+  transform: scale(1.06);
+}
+
+/* Offset margins for overlapping circular images */
+@media (min-width: 768px) {
+  .service-alt-card {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 767px) {
+  .service-alt-card {
+    flex-direction: column-reverse !important;
+    gap: 1.5rem !important;
+    text-align: center;
+  }
+  
+  .service-alt-card .flex {
+    justify-content: center;
+  }
+  
+  .service-alt-card .w-60 {
+    margin-top: 1rem;
+    width: 200px;
+    height: 200px;
+  }
 }

@@ -46,8 +46,7 @@
         <h1 class="font-black mb-4 leading-tight">${h.title || ''}</h1>
         <p class="mb-6 italic">${h.subtitle || ''}</p>
         ${h.info ? `<div class="mb-6 font-semibold leading-relaxed">${h.info}</div>` : ''}
-        <div class="flex gap-4">${btns}</div>
-      `;
+        `;
     }
   }
 

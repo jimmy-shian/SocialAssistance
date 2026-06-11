@@ -7,6 +7,10 @@
     return url.searchParams.get(name);
   }
 
+  function esc(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function ensureLightbox() {
     return window.Lightbox ? window.Lightbox.ensureLightbox() : null;
   }
@@ -342,8 +346,8 @@ function open() {
 
       <section aria-labelledby="sec-info" class="provider-simple-info mb-12">
         <article>
-          <span>時間</span>
-          <strong>${provider.schedule || '-'}</strong>
+          <span>地點</span>
+          <strong>${provider.address || provider.location || '-'}</strong>
         </article>
         <article>
           <span>聯絡方式</span>
@@ -357,21 +361,26 @@ function open() {
       <section aria-labelledby="sec-timeline" class="mb-12">
         <h2 id="sec-timeline" class="text-2xl font-bold mb-6 flex items-center gap-3">
           課程安排
-          <span class="text-sm font-normal text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">Timeline</span>
+          <span class="text-sm font-normal text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">Steps</span>
         </h2>
-        <div class="relative pl-8 border-l-2 border-[var(--primary)]/20 space-y-8">
-          ${(provider.timeline || []).map(item => `
-            <div class="relative group">
-              <span class="absolute -left-[39px] top-1 w-5 h-5 rounded-full border-4 border-white dark:border-gray-900 bg-[var(--primary)] shadow-sm group-hover:scale-125 transition-transform"></span>
-              <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
-                 <div class="font-mono font-bold text-[var(--primary)] text-lg min-w-[5rem]">${item.time}</div>
-                 <div class="flex-1 card-dynamic-bg p-4 rounded-lg hover:shadow-md transition-shadow">
-                    <h3 class="font-bold text-lg mb-1">${item.title}</h3>
-                    <p class="text-gray-600 dark:text-gray-300">${item.detail}</p>
-                 </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          ${(provider.timeline || []).map((item, idx) => {
+            const stepImg = (provider.images && provider.images.length) ? provider.images[idx % provider.images.length] : fallbackImages[idx % fallbackImages.length];
+            return `
+              <div class="card-dynamic-bg rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-[var(--border)] flex flex-col">
+                ${stepImg ? `
+                  <div class="image-frame image-frame--card aspect-[4/3] overflow-hidden">
+                    <img decoding="async" src="${stepImg}" alt="${esc(item.title || '探索步驟')}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" />
+                  </div>
+                ` : ''}
+                <div class="p-5 flex-1 flex flex-col">
+                  <div class="text-xs font-mono font-bold text-[var(--primary)] mb-1">STEP ${String(idx + 1).padStart(2, '0')}</div>
+                  <h3 class="font-bold text-lg mb-2 text-[var(--text-primary)]">${esc(item.title || '探索活動')}</h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed flex-1">${esc(item.detail || '')}</p>
+                </div>
               </div>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
       </section>
 
