@@ -27,10 +27,6 @@ window.aboutContent = {
     {
       "text": "開發 20+ 小時的體驗式課程教材",
       "href": "https://example.com/courses"
-    },
-    {
-      "text": "榮獲 2023 年 XX 青年發展獎",
-      "href": "https://example.com/award"
     }
   ],
   "team": [

@@ -3,7 +3,7 @@ window.providersData = {
   "dongshi-fisher": {
     "id": "dongshi-fisher",
     "name": "東石漁囡仔",
-    "category": "養殖漁業",
+    "category": "農林漁牧業",
     "schedule": "每週六 09:00–12:00",
     "location": "嘉義縣 東石鄉",
     "address": "嘉義縣東石鄉東石村XX路XX號",
@@ -31,8 +31,6 @@ window.providersData = {
     ],
     "images": [
       "https://picsum.photos/seed/fish1/800/500",
-      "https://picsum.photos/seed/fish2/800/500",
-      "https://picsum.photos/seed/fish3/800/500"
     ],
     "timeline": [
       {
