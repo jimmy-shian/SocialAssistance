@@ -71,7 +71,7 @@
           top: 0;
           bottom: 0;
           width: 32px;
-          background: linear-gradient(to right, rgba(0, 0, 0, 0.18), transparent);
+          background: linear-gradient(to right, rgba(98, 98, 98, 0.3), transparent);
           z-index: 10;
           pointer-events: none;
         }
@@ -82,7 +82,7 @@
           top: 0;
           bottom: 0;
           width: 32px;
-          background: linear-gradient(to left, rgba(0, 0, 0, 0.18), transparent);
+          background: linear-gradient(to left,  rgba(98, 98, 98, 0.3), transparent);
           z-index: 10;
           pointer-events: none;
         }
@@ -113,11 +113,29 @@
 
       /* Horizontal List Item Style */
       .provider-list-item {
-        display: flex;
-        flex-direction: column;
-        padding: 1.5rem 0;
-        border-bottom: 1px solid var(--border);
-        transition: all 0.2s ease;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          padding: 1.5rem 5rem 1.5rem 1.5rem;
+          border-bottom: 1px solid var(--border);
+          transition: background-color 0.25s ease;
+      }
+        .provider-list-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 1.5rem;      /* 控制起始位置 */
+            width: 4px;
+            height: 60%;     /* 控制短線長度 */
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+      .provider-list-item:hover {
+        background: rgba(52, 122, 85, 0.05);
+      }
+      .dark .provider-list-item:hover {
+        background: rgba(142, 208, 129, 0.08);
       }
       @media (min-width: 768px) {
         .provider-list-item {

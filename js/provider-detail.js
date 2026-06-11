@@ -368,16 +368,16 @@ function open() {
             const stepImg = (provider.images && provider.images.length) ? provider.images[idx % provider.images.length] : fallbackImages[idx % fallbackImages.length];
             return `
               <div class="card-dynamic-bg rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-[var(--border)] flex flex-col">
-                ${stepImg ? `
-                  <div class="image-frame image-frame--card aspect-[4/3] overflow-hidden">
-                    <img decoding="async" src="${stepImg}" alt="${esc(item.title || '探索步驟')}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" />
-                  </div>
-                ` : ''}
                 <div class="p-5 flex-1 flex flex-col">
                   <div class="text-xs font-mono font-bold text-[var(--primary)] mb-1">STEP ${String(idx + 1).padStart(2, '0')}</div>
                   <h3 class="font-bold text-lg mb-2 text-[var(--text-primary)]">${esc(item.title || '探索活動')}</h3>
                   <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed flex-1">${esc(item.detail || '')}</p>
                 </div>
+                ${stepImg ? `
+                  <div class="image-frame image-frame--card aspect-[4/3] overflow-hidden">
+                    <img decoding="async" src="${stepImg}" alt="${esc(item.title || '探索步驟')}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" />
+                  </div>
+                ` : ''}
               </div>
             `;
           }).join('')}
