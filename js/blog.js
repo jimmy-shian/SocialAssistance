@@ -47,13 +47,16 @@
   function renderStandardPost(post, index) {
     return `
       <article class="blog-post-card group cursor-pointer flex flex-col" role="button" tabindex="0" data-post-id="${esc(post.id)}" data-category="${esc(post.category)}">
-        <div class="w-full aspect-square rounded-2xl overflow-hidden bg-[var(--bg-inset)] border border-[var(--border)] shadow-md transition-all duration-300 group-hover:-translate-y-1.5 group-hover:shadow-lg relative">
+        <div class="w-full aspect-[4/3] rounded-xl overflow-hidden bg-[var(--bg-inset)] border border-[var(--border)] shadow-sm transition-all duration-300 group-hover:shadow-md relative">
           <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
           <span class="blog-post-tag absolute right-3 bottom-3" data-category="${esc(post.category)}">${esc(categoryLabels[post.category] || post.category)}</span>
         </div>
-        <div class="py-3 px-4">
-          <h3 class="font-bold text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors text-sm md:text-base leading-snug">${esc(post.title)}</h3>
-          <p class="text-[var(--text-muted)] text-xs mt-1">${esc(post.date)}</p>
+        <div class="py-4 px-2 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-black text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors text-base md:text-lg leading-snug tracking-wide mb-2">${esc(post.title)}</h3>
+            <p class="text-[var(--text-secondary)] text-sm leading-relaxed line-clamp-2 mb-3 font-semibold">${esc(post.excerpt || '')}</p>
+          </div>
+          <p class="text-[var(--text-muted)] text-xs font-bold">${esc(post.date)}</p>
         </div>
       </article>
     `;
@@ -275,7 +278,7 @@
             <line x1="50%" y1="0" x2="50%" y2="100%" stroke="var(--border)" stroke-width="2" stroke-dasharray="4 4" opacity="0.3"></line>
             <line id="glory-beam-line" x1="50%" y1="0" x2="50%" y2="0%" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"></line>
           </svg>
-          <div class="glory-nodes-container space-y-36 relative z-10 pt-8">
+          <div class="glory-nodes-container space-y-14 relative z-10 pt-8">
             ${allTimelineNodes.map((node, idx) => `
               <div class="glory-node-item relative opacity-0 transform translate-y-8 transition-all duration-700 ease-out" data-index="${idx}">
                 <span class="glory-node-dot absolute -left-[39px] md:-left-[47px] top-1.5 w-4 h-4 rounded-full border-4 border-white dark:border-gray-900 bg-gray-300 dark:bg-gray-700 shadow-sm transition-all duration-500">
@@ -460,11 +463,7 @@
           renderGloryParallaxLayout(gloryPosts);
         } else {
           glorySection.innerHTML = `
-            <div class="text-center mb-8">
-              <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">GLORY TIMELINE</span>
-              <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mt-1">榮耀時刻</h2>
-            </div>
-            <div class="blog-glory-stack">
+            <div class="blog-glory-stack mt-8">
               ${gloryPosts.map((post, index) => renderGloryPost(post, index)).join('')}
             </div>
           `;
@@ -559,25 +558,75 @@
   function renderInterviewContent(content) {
     if (!content) return '';
     const paragraphs = content.split('\n').map(p => p.trim()).filter(Boolean);
-    return `
-      <div class="interview-article space-y-4">
-        ${paragraphs.map(p => {
-          if (p.startsWith('Q:') || p.startsWith('問:')) {
-            return `
-              <div class="interview-q text-[var(--primary)] font-extrabold text-base md:text-lg mt-6 mb-2 flex items-start gap-2.5">
-                <span class="bg-[var(--primary)] text-white text-xs font-black px-2 py-0.5 rounded-md mt-1 shrink-0">問</span>
-                <span class="leading-snug">${esc(p.slice(2).trim())}</span>
-              </div>`;
-          } else if (p.startsWith('A:') || p.startsWith('答:')) {
-            return `
-              <div class="interview-a text-[var(--text-secondary)] pl-8 mb-4 leading-relaxed text-sm md:text-base border-l-2 border-gray-200 dark:border-gray-700">
-                ${esc(p.slice(2).trim())}
-              </div>`;
-          }
-          return `<p class="leading-relaxed text-[var(--text-secondary)] text-sm md:text-base pl-8">${esc(p)}</p>`;
-        }).join('')}
-      </div>
-    `;
+    let html = '<div class="interview-article space-y-6 mt-4">';
+    let currentQ = '';
+
+    paragraphs.forEach(p => {
+      if (p.startsWith('Q:') || p.startsWith('問:') || p.startsWith('問：')) {
+        if (currentQ) {
+          html += `
+            <div class="qa-group">
+              <div class="qa-q">
+                <span class="qa-q-badge">問</span>
+                <span class="qa-q-text">${esc(currentQ)}</span>
+              </div>
+            </div>
+          `;
+        }
+        currentQ = p.replace(/^(Q:|問:|問：)\s*/, '');
+      } else if (p.startsWith('A:') || p.startsWith('答:') || p.startsWith('答：')) {
+        const aText = p.replace(/^(A:|答:|答：)\s*/, '');
+        if (currentQ) {
+          html += `
+            <div class="qa-group">
+              <div class="qa-q">
+                <span class="qa-q-badge">問</span>
+                <span class="qa-q-text">${esc(currentQ)}</span>
+              </div>
+              <div class="qa-a">
+                <span class="qa-a-badge">答</span>
+                <span class="qa-a-text">${esc(aText)}</span>
+              </div>
+            </div>
+          `;
+          currentQ = '';
+        } else {
+          html += `
+            <div class="qa-group">
+              <div class="qa-a">
+                <span class="qa-a-badge">答</span>
+                <span class="qa-a-text">${esc(aText)}</span>
+              </div>
+            </div>
+          `;
+        }
+      } else {
+        if (currentQ) {
+          html += `
+            <div class="qa-group">
+              <div class="qa-q">
+                <span class="qa-q-badge">問</span>
+                <span class="qa-q-text">${esc(currentQ)}</span>
+              </div>
+            </div>
+          `;
+          currentQ = '';
+        }
+        html += `<p class="leading-relaxed text-[var(--text-secondary)] text-base md:text-lg pl-2">${esc(p)}</p>`;
+      }
+    });
+    if (currentQ) {
+      html += `
+        <div class="qa-group">
+          <div class="qa-q">
+            <span class="qa-q-badge">問</span>
+            <span class="qa-q-text">${esc(currentQ)}</span>
+          </div>
+        </div>
+      `;
+    }
+    html += '</div>';
+    return html;
   }
 
   function openFullscreenImage(src) {
@@ -616,27 +665,27 @@
       contentHtml = renderTimeline(post);
     } else if (post.category === 'daily') {
       contentHtml = `
-        <p class="leading-relaxed text-[var(--text-secondary)] text-sm md:text-base mb-4">${esc(post.content || post.excerpt || '')}</p>
+        <p class="leading-relaxed text-[var(--text-secondary)] text-base md:text-lg font-medium mb-4">${esc(post.content || post.excerpt || '')}</p>
         ${renderDailyGallery(post.images)}
       `;
     } else if (post.category === 'news') {
       contentHtml = `
-        <p class="leading-relaxed text-[var(--text-secondary)] text-sm md:text-base mb-4">${esc(post.content || post.excerpt || '')}</p>
+        <p class="leading-relaxed text-[var(--text-secondary)] text-base md:text-lg font-medium mb-4">${esc(post.content || post.excerpt || '')}</p>
         ${renderNewsCTA(post)}
       `;
     } else if (post.category === 'interview') {
       contentHtml = renderInterviewContent(post.content || post.excerpt || '');
     } else {
-      contentHtml = `<p class="leading-relaxed text-[var(--text-secondary)] text-sm md:text-base">${esc(post.content || post.excerpt || '')}</p>`;
+      contentHtml = `<p class="leading-relaxed text-[var(--text-secondary)] text-base md:text-lg font-medium">${esc(post.content || post.excerpt || '')}</p>`;
     }
 
     body.innerHTML = `
       <div class="blog-modal-hero mb-6">
         <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" class="w-full h-auto max-h-[350px] object-cover rounded-xl shadow-md">
       </div>
-      <div class="blog-modal-meta text-xs uppercase font-bold tracking-wider text-[var(--primary)] mb-1">${esc(label)}</div>
-      <h2 class="blog-modal-title text-2xl md:text-3xl font-extrabold text-[var(--text-primary)] mb-2" id="blog-modal-title">${esc(post.title)}</h2>
-      <p class="blog-modal-date text-xs text-[var(--text-muted)] mb-6">${esc(post.date)}</p>
+      <div class="blog-modal-meta text-xs uppercase font-extrabold tracking-wider text-[var(--primary)] mb-1">${esc(label)}</div>
+      <h2 class="blog-modal-title text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-2" id="blog-modal-title">${esc(post.title)}</h2>
+      <p class="blog-modal-date text-xs text-[var(--text-muted)] font-bold mb-6">${esc(post.date)}</p>
       <div class="blog-modal-content border-t border-gray-100 dark:border-gray-800 pt-6">
         ${contentHtml}
       </div>
@@ -695,16 +744,7 @@
       });
     });
 
-    // Also support clicking features in glory stack
-    if (glorySection) {
-      glorySection.addEventListener('click', (event) => {
-        const feat = event.target.closest('.blog-glory-feature');
-        if (feat) {
-          const post = posts().find(item => String(item.id) === String(feat.dataset.postId));
-          if (post) openPost(post, feat);
-        }
-      });
-    }
+    // Glory items shouldn't support clicking to open a window
 
     renderPosts();
   }

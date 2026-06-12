@@ -4,6 +4,7 @@
    Load this after style.css
 ============================== */
 #nav-placeholder header {
+  background-color: #d0f9ff85 !important;
   height: 52px !important;
   transition: height 0.25s ease, box-shadow 0.25s ease !important;
 }

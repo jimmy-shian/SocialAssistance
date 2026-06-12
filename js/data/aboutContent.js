@@ -26,7 +26,7 @@ window.aboutContent = {
     "與嘉義地區 10+ 家在地業者建立合作關係",
     {
       "text": "開發 20+ 小時的體驗式課程教材",
-      "href": "https://example.com/courses"
+      "href": "./blog.html"
     }
   ],
   "team": [

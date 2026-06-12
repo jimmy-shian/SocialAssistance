@@ -5,17 +5,6 @@
   }
   
 
-
-  const serviceDetailContent = {
-    "體驗教育": "引導孩子參與各類低空、高空探索活動及團隊建立任務，學習溝通協調、問題解決與團隊共識，並透過反思引導建立內在自信。",
-    "自立培育": "開辦自立生活技能工作坊，包含日常收支管理、簡易烹飪、情緒管理與人際關係整理，協助孩子做好成年自立的全面準備。",
-    "職業探索": "串接在地友善職人與店家，提供多元職場參訪、一日職業體驗及做中學機會，幫助青少年了解產業現況與技能需求。",
-    "生涯規劃": "透過一對一的諮詢與團體引導，協助青少年釐清生涯方向，訂定學習計畫與行動路徑，陪伴其實現短中長期成長目標。",
-    "親子互動": "設計親子攀樹、木作共創等戶外與手作體驗，營造安全的對話情境，改善溝通模式，增進家庭成員間的情感連結與默契。",
-    "冒險挑戰": "提供攀樹、野外探索等高感官、高張力的挑戰情境，在專業安全的引導下，帶領青少年走出舒適圈，體驗挑戰自我的勇氣。",
-    "寒暑營隊": "利用假期舉辦密集的探索與成長營隊，結合戶外挑戰、生涯工作坊與職人交流，為孩子提供全面且深刻的假期學習體驗。"
-  };
-
   function render() {
     const root = qs('#services-root');
     if (!root) return;
@@ -27,9 +16,9 @@
     
     root.innerHTML = `
       <header class="text-center max-w-3xl mx-auto mb-12">
-        <span class="ui-eyebrow text-[var(--primary)] font-bold tracking-wider">SERVICES</span>
-        <h1 class="heading-display mt-3">${esc(data.title || '服務項目')}</h1>
-        <p class="lead-text mt-4 text-[var(--text-secondary)]">${esc(data.lead || '')}</p>
+        <span class="ui-eyebrow text-[var(--primary)] font-black tracking-wider text-base md:text-lg">SERVICES</span>
+        <h1 class="heading-display mt-3 font-black tracking-tight text-[var(--text-primary)]">${esc(data.title || '服務項目')}</h1>
+        <p class="lead-text mt-4 text-[var(--text-secondary)] font-semibold text-lg md:text-xl">${esc(data.lead || '')}</p>
       </header>
 
       <div class="space-y-16 mb-16">
@@ -39,26 +28,26 @@
           const cardBorder = isEven ? 'border-[#dfc8b8]' : 'border-[#b9dca8]';
           const imgBorder = isEven ? 'border-[#d2b6a0]' : 'border-[#a9c9a0]';
           const delay = (i * 0.05).toFixed(2);
-          const detail = serviceDetailContent[item.title] || item.content || item.desc;
+          const detail = item.detail || item.content || item.desc;
           
           return `
             <article id="service-${i + 1}" class="service-alt-card flex flex-col ${isEven ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12 p-6 md:p-10 rounded-3xl border-2 ${cardBorder} bg-white/40 dark:bg-black/20 backdrop-blur-md relative overflow-visible transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5" style="animation-delay:${delay}s">
               <!-- Text Area -->
               <div class="flex-1 z-10">
                 <div class="flex items-center gap-3 mb-4">
-                  <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg ${badgeBg} font-mono font-bold text-lg shadow-sm">
+                  <span class="inline-flex items-center justify-center w-10 h-10 rounded-lg ${badgeBg} font-mono font-black text-lg shadow-sm">
                     ${String(i + 1).padStart(2, '0')}
                   </span>
-                  <h2 class="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">${esc(item.title)}</h2>
+                  <h2 class="text-2xl md:text-3xl font-black text-[var(--text-primary)] tracking-wide">${esc(item.title)}</h2>
                 </div>
                 
-                <p class="text-[var(--text-primary)] font-semibold leading-relaxed mb-4 text-base md:text-lg">
+                <p class="text-[var(--text-primary)] font-bold leading-relaxed mb-4 text-lg md:text-xl">
                   ${esc(item.desc)}
                 </p>
                 
                 <div class="mt-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
-                  <span class="text-sm font-bold text-[var(--primary)] block mb-1">內容：</span>
-                  <p class="text-[var(--text-secondary)] leading-relaxed text-sm md:text-base">
+                  <span class="text-base md:text-lg font-black text-[var(--primary)] block mb-1">內容：</span>
+                  <p class="text-[var(--text-secondary)] leading-relaxed text-base md:text-lg font-medium">
                     ${esc(detail)}
                   </p>
                 </div>
@@ -92,6 +81,43 @@
 
     // Smooth scroll to hash anchor on page load
     scrollToHash();
+
+    // Initialize scroll animations
+    initScrollReveal();
+  }
+
+  function initScrollReveal() {
+    const root = qs('#services-root');
+    if (!root) return;
+
+    // Elements to animate
+    const animElements = root.querySelectorAll('header, .service-alt-card, #achievements-placeholder > section, .service-gallery-full');
+    
+    animElements.forEach(el => {
+      el.classList.add('scroll-anim');
+    });
+
+    if ('IntersectionObserver' in window) {
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -8% 0px',
+        threshold: 0.1
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('scroll-visible');
+          } else {
+            entry.target.classList.remove('scroll-visible');
+          }
+        });
+      }, observerOptions);
+
+      animElements.forEach(el => observer.observe(el));
+    } else {
+      animElements.forEach(el => el.classList.add('scroll-visible'));
+    }
   }
 
   function scrollToHash() {

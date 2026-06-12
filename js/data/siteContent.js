@@ -17,7 +17,7 @@ window.siteContent = {
   philosophy: {
     img: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp',
     label: 'ABOUT / 理念',
-    title: '穩定的笑容與溫柔，<br>人生相伴',
+    title: '在真實場域裡<br>練習把自己站穩',
     content: '透過在地產業串聯與動機引導，協助安置機構與高關懷青少年，在成年自立前獲得長期且系統化的探索資源。我們相信每個孩子都有無限可能，只需要適當的引導與支持。'
   },
   services: [

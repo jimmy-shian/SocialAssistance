@@ -87,19 +87,28 @@ if (data.sdgs && Array.isArray(data.sdgs)) {
   };
 
   // Render HTML
-  sdgsGrid.innerHTML = data.sdgs.map(sdg => `
-    <a href="${sdg.link}" target="_blank" rel="noopener"
-       class="sdgs-item text-[${sdg.color}]">
-      <div class="mb-3 text-center font-black text-xl">
-        SDG ${sdg.id}
-      </div>
-      <div class="sdg-icon-wrapper">
-        ${svgs[sdg.id] || ''}
-      </div>
-      <h4>${sdg.title}</h4>
-      <p>${sdg.desc}</p>
-    </a>
-  `).join('');
+  const displayOrder = [4, 17, 11, 10];
+  const sortedSdgs = [...data.sdgs].sort((a, b) => displayOrder.indexOf(a.id) - displayOrder.indexOf(b.id));
+
+  sdgsGrid.innerHTML = `
+    <svg class="sdgs-path-svg" viewBox="0 0 1000 320" preserveAspectRatio="none">
+      <path d="M 125,100 C 225,100 275,220 375,220 C 475,220 525,100 625,100 C 725,100 775,220 875,220" fill="none" stroke="rgba(74, 222, 128, 0.15)" stroke-width="8" stroke-linecap="round"/>
+      <path d="M 125,100 C 225,100 275,220 375,220 C 475,220 525,100 625,100 C 725,100 775,220 875,220" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" class="sdgs-path-glow"/>
+    </svg>
+    ${sortedSdgs.map(sdg => `
+      <a href="${sdg.link}" target="_blank" rel="noopener"
+         class="sdgs-item sdgs-item-${sdg.id} text-[${sdg.color}]">
+        <div class="mb-3 text-center font-black text-xl sdg-label">
+          SDG ${sdg.id}
+        </div>
+        <div class="sdg-icon-wrapper">
+          ${svgs[sdg.id] || ''}
+        </div>
+        <h4>${sdg.title}</h4>
+        <p>${sdg.desc}</p>
+      </a>
+    `).join('')}
+  `;
 
   // Inject animation style (only once)
   if (!document.getElementById('sdg-anim-style')) {

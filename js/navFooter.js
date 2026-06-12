@@ -180,7 +180,7 @@ function renderNavFooter() {
               </a>
 
               <!-- Tax ID -->
-              <div class="pt-4 mt-2 border-t border-white/10 flex items-center gap-2 text-xs text-gray-500">
+              <div class="pt-4 mt-2 border-t border-white/10 flex items-center gap-2 text-xs text-gray-100">
                  <i class="fas fa-id-badge"></i>
                  <span>統編：${CONTACT.taxId}</span>
               </div>
@@ -244,6 +244,72 @@ function renderNavFooter() {
   const footerPlaceholder = document.getElementById('footer-placeholder');
   if (navPlaceholder) navPlaceholder.innerHTML = navHTML;
   if (footerPlaceholder) footerPlaceholder.innerHTML = footerHTML;
+
+  // Append style to document head for border wrap hover effect on nav buttons
+  if (!document.getElementById('nav-hover-style')) {
+    const style = document.createElement('style');
+    style.id = 'nav-hover-style';
+    style.textContent = `
+      .hidden.md\\:flex .nav-link {
+        position: relative;
+        padding: 6px 12px;
+        margin: 0 4px;
+        border-radius: 4px;
+        overflow: visible;
+        display: inline-block;
+        transition: color 0.3s ease;
+      }
+      
+      .hidden.md\\:flex .nav-link::before,
+      .hidden.md\\:flex .nav-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 0;
+        border: 2px solid transparent;
+        box-sizing: border-box;
+        border-radius: 4px;
+        pointer-events: none;
+      }
+      
+      .hidden.md\\:flex .nav-link::before {
+        top: 0;
+        left: 0;
+      }
+      
+      .hidden.md\\:flex .nav-link::after {
+        bottom: 0;
+        right: 0;
+      }
+      
+      /* Clockwise drawing on hover */
+      .hidden.md\\:flex .nav-link:hover::before {
+        width: 100%;
+        height: 100%;
+        border-top-color: var(--primary);
+        border-right-color: var(--primary);
+        transition: width 0.08s linear, height 0.08s linear 0.08s;
+      }
+      
+      .hidden.md\\:flex .nav-link:hover::after {
+        width: 100%;
+        height: 100%;
+        border-bottom-color: var(--primary);
+        border-left-color: var(--primary);
+        transition: width 0.08s linear 0.16s, height 0.08s linear 0.24s;
+      }
+      
+      /* Counter-clockwise retraction on mouse out */
+      .hidden.md\\:flex .nav-link::before {
+        transition: height 0.08s linear 0.16s, width 0.08s linear 0.24s;
+      }
+      
+      .hidden.md\\:flex .nav-link::after {
+        transition: height 0.08s linear, width 0.08s linear 0.08s;
+      }
+    `;
+    document.head.appendChild(style);
+  }
 
   function ensureFooterDrawer() {
     let drawer = document.getElementById('footer-info-drawer');

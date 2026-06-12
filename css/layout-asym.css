@@ -92,6 +92,7 @@
 }
 
 .hero-content-asym p {
+    color: rgb(245 133 18);
     font-size: calc(1.5rem + 0.5rem);
 }
 
@@ -174,9 +175,10 @@ html.dark .hero-content-asym .italic {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     border-radius: var(--radius, 1rem);
-    border: 1px solid var(--border);
+    border: 5px double var(--border);
     box-shadow: var(--ui-shadow-soft, 0 8px 28px rgba(45, 42, 36, 0.06));
     padding: 1.5rem;
+    height: 100%;
 }
 
 /* Dark mode for philosophy-content */

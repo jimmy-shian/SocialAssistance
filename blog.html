@@ -14,6 +14,7 @@
         <link rel="preload" href="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/font/LXGWWenKaiTC-Regular.woff2" as="font" type="font/woff2" crossorigin>
         <link href="./css/style.css" rel="stylesheet">
         <link href="./css/holo-card.css" rel="stylesheet">
+        <link href="./css/ui-refine.css" rel="stylesheet">
         <link href="./css/blog.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     </head>
@@ -22,17 +23,10 @@
         <div id="nav-placeholder"></div>
 
         <main class="container mx-auto px-6 py-12">
-            <!-- Hero Banner -->
-            <section class="text-center mb-12">
+            <!-- Blog Header & Tabs (Merged) -->
+            <header class="blog-header-section text-center mb-12">
                 <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">BLOG</span>
-                <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mt-2">部落格</h1>
-                <p class="text-[var(--text-secondary)] mt-3 max-w-xl mx-auto">
-                    聽見日常、重要通知、人物專訪、榮耀時刻
-                </p>
-            </section>
-
-            <!-- Category Tabs -->
-            <section class="mb-10">
+                <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-6">部落格</h1>
                 <div class="flex flex-wrap justify-center gap-3" id="blog-tabs">
                     <button class="blog-tab active px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="all">全部</button>
                     <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="daily">聽見日常</button>
@@ -40,7 +34,7 @@
                     <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="interview">人物專訪</button>
                     <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="glory">榮耀時刻</button>
                 </div>
-            </section>
+            </header>
 
             <!-- Blog Sections (Rendered Vertically) -->
             <!-- Blog Glory Section (榮耀時刻) -->

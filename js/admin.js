@@ -2202,6 +2202,9 @@
         <label class="text-sm md:col-span-2">描述
           <textarea class="sc-svc-desc w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${row.desc || ''}</textarea>
         </label>
+        <label class="text-sm md:col-span-2">詳細內容 (detail)
+          <textarea class="sc-svc-detail w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${row.detail || ''}</textarea>
+        </label>
         <label class="text-sm">連結 (HTML Path)
           <input class="sc-svc-link w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.link || ''}">
         </label>
@@ -2369,6 +2372,7 @@
       items.forEach((item, i) => list.appendChild(buildServiceItem({
         title: item.title || '',
         desc: item.desc || item.description || '',
+        detail: item.detail || '',
         image: item.image || item.img || '',
         link: item.link || '',
         icon: item.icon || ''
@@ -2386,8 +2390,9 @@
       items: Array.from(qs('#svc-item-list')?.children || []).map(el => ({
         title: el.querySelector('.sc-svc-title')?.value?.trim() || '',
         desc: el.querySelector('.sc-svc-desc')?.value?.trim() || '',
+        detail: el.querySelector('.sc-svc-detail')?.value?.trim() || '',
         image: el.querySelector('.sc-svc-image')?.value?.trim() || ''
-      })).filter(item => item.title || item.desc || item.image),
+      })).filter(item => item.title || item.desc || item.detail || item.image),
       achievementsTitle: qs('#svc-ach-title')?.value?.trim() || '成就經歷',
       achievements: (qs('#svc-achievements')?.value || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean),
       gallery: (qs('#svc-gallery')?.value || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean)
