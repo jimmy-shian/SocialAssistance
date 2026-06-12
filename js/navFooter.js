@@ -499,7 +499,7 @@ function renderNavFooter() {
         perPage.push('./js/auth.js', './js/member-ui.js');
       } else if (page === 'index.html') {
         styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
-        perPage.push('./js/data/siteContent.js', './js/content-render.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-index.js');
+        perPage.push('./js/data/siteContent.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-index.js');
       } else if (page === 'provider.html') {
         styles.push('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
         perPage.push('./js/provider-detail.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', './js/map-provider.js');
