@@ -4078,8 +4078,6 @@ html.dark .sdgs-section {
 }
 
 .provider-simple-photo img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   transition: transform .55s var(--motion-emphasized, cubic-bezier(.16,1,.3,1));
 }
@@ -5001,6 +4999,48 @@ body.category-page.section-bg-1 {
 .category-page .provider-category-tag {
   background: color-mix(in srgb, var(--category-primary) 13%, transparent);
   border-color: color-mix(in srgb, var(--category-primary) 24%, transparent);
+}
+
+.category-page .provider-list-item[data-category-theme="category-agriculture"] {
+  --category-primary: #4f7f3f;
+  --category-secondary: #6f9fb0;
+  --category-line: rgba(74, 99, 55, 0.13);
+}
+
+.category-page .provider-list-item[data-category-theme="category-funeral"] {
+  --category-primary: #73727e;
+  --category-secondary: #b59663;
+  --category-line: rgba(84, 82, 78, 0.10);
+}
+
+.category-page .provider-list-item[data-category-theme="category-communication"] {
+  --category-primary: #2d72b8;
+  --category-secondary: #696fd6;
+  --category-line: rgba(45, 114, 184, 0.13);
+}
+
+.category-page .provider-list-item[data-category-theme="category-floral"] {
+  --category-primary: #bd5a88;
+  --category-secondary: #669460;
+  --category-line: rgba(142, 88, 112, 0.12);
+}
+
+.category-page .provider-list-item[data-category-theme="category-music"] {
+  --category-primary: #8a643c;
+  --category-secondary: #456b7a;
+  --category-line: rgba(97, 66, 34, 0.12);
+}
+
+.category-page .provider-list-item[data-category-theme="category-food"] {
+  --category-primary: #c46f2f;
+  --category-secondary: #a7423b;
+  --category-line: rgba(158, 88, 45, 0.12);
+}
+
+.category-page .provider-list-item[data-category-theme="category-car-beauty"] {
+  --category-primary: #308197;
+  --category-secondary: #65717d;
+  --category-line: rgba(48, 91, 103, 0.12);
 }
 
 .category-page .provider-list-item {

@@ -47,14 +47,11 @@ window.blogContent = {
     "category": "daily",
     "excerpt": "寒假攀樹與自立生活營隊，孩子們在寒風中攀上高樹，戰勝恐懼與自我極限。",
     "content": "寒假營隊順利落幕！孩子們在教練引導下，穿戴裝備，手腳並用，一步一步攀上高處。從一開始的害怕發抖，到後來的自信歡笑，這不僅是一場攀樹體驗，更是一場心靈的冒險。同時，自立生活技能工作坊也讓大家學會了自己準備午餐、分工合作，體驗自立生活的樂趣。",
-    "image": "./img/DSC01739__8a8686e4b1.webp",
+    "image": "./img/soundcore3co-title.webp",
     "link": "./blog.html",
     "timeline": [],
     "images": [
-      "./img/DSC01739__8a8686e4b1.webp",
-      "./img/DSC09555___ba0754ae5a.webp",
-      "./img/1000012756_61e30f039f.webp",
-      "./img/1000010964_bdb0404a99.webp"
+      "./img/soundcore3co-title.webp",
     ]
   },
   {
@@ -64,14 +61,11 @@ window.blogContent = {
     "category": "daily",
     "excerpt": "新春攀樹與野外探索營，帶領青少年走入山林，開啟自我對話與潛能開發。",
     "content": "新一年度的寒假營隊順利完成！這次我們走得更深，孩子們在自然環境中學習野外求生、地圖判讀，並完成難度更高的攀樹挑戰。透過晚會的分享，每個孩子都寫下了給未來的自己的一封信，期待這顆探索的種子在心中萌芽。",
-    "image": "./img/DSC09555___ba0754ae5a.webp",
+    "image": "./img/soundcore3co-title.webp",
     "link": "./blog.html",
     "timeline": [],
     "images": [
-      "./img/DSC09555___ba0754ae5a.webp",
-      "./img/DSC01739__8a8686e4b1.webp",
-      "./img/1000010964_bdb0404a99.webp",
-      "./img/1000012756_61e30f039f.webp"
+      "./img/soundcore3co-title.webp",
     ]
   },
   {
@@ -81,14 +75,11 @@ window.blogContent = {
     "category": "daily",
     "excerpt": "盛夏冒險祭！水上挑戰與木工實作營，讓青少年在汗水與笑聲中收穫成長。",
     "content": "回顧113年的暑假，我們與孩子們一起在烈日下完成了獨木舟挑戰，並在木工教室裡揮灑汗水，親手打造了屬於自己班級的公用桌椅。這段充滿挑戰與合作的暑期時光，成為大家心中最難忘的夏日回憶。",
-    "image": "./img/1000012756_61e30f039f.webp",
+    "image": "./img/soundcore3co-title.webp",
     "link": "./blog.html",
     "timeline": [],
     "images": [
-      "./img/1000012756_61e30f039f.webp",
-      "./img/DSC01739__8a8686e4b1.webp",
-      "./img/DSC09555___ba0754ae5a.webp",
-      "./img/1000010964_bdb0404a99.webp"
+      "./img/soundcore3co-title.webp",
     ]
   },
   {
@@ -98,14 +89,11 @@ window.blogContent = {
     "category": "daily",
     "excerpt": "自主旅行與在地產業探索營，帶領孩子用腳步丈量土地，用雙手體驗職人精神。",
     "content": "114年暑假營隊以「職人探索」為主題，孩子們分為三組，分別造訪了在地的汽車美容店、通訊行以及養殖魚場。他們記錄下職人們的工作日常，並親自參與實作，完成了屬於自己的職業探索報告。",
-    "image": "./img/1000010964_bdb0404a99.webp",
+    "image": "./img/soundcore3co-title.webp",
     "link": "./blog.html",
     "timeline": [],
     "images": [
-      "./img/1000010964_bdb0404a99.webp",
-      "./img/DSC01739__8a8686e4b1.webp",
-      "./img/1000012756_61e30f039f.webp",
-      "./img/DSC09555___ba0754ae5a.webp"
+      "./img/soundcore3co-title.webp",
     ]
   },
   {
@@ -115,7 +103,7 @@ window.blogContent = {
     "category": "news",
     "excerpt": "寒假攀樹營隊即將開始，名額有限，歡迎青少年與家長踴躍報名！",
     "content": "114年度寒假營隊報名正式啟動！本次營隊包含攀樹療癒、自立技能工作坊及職人參訪，名額僅限 15 名。點擊下方連結即可填寫報名表單，我們將在收到報名後與您聯繫確認。",
-    "image": "./img/1000010964_bdb0404a99.webp",
+    "image": "./img/soundcore3co-title.webp",
     "link": "https://forms.gle/sampleWinterCamp1",
     "timeline": [],
     "images": []
@@ -127,7 +115,7 @@ window.blogContent = {
     "category": "news",
     "excerpt": "115寒假營隊最新資訊公佈，提前開放早鳥登記，名額有限！",
     "content": "115年度寒假探索營隊提前開放報名！我們規劃了更豐富的山林冒險與自立學習課程，早鳥報名可享優先錄取。點擊下方按鈕連結到報名表單進行登記。",
-    "image": "./img/1000012756_61e30f039f.webp",
+    "image": "./img/soundcore3co-title.webp",
     "link": "https://forms.gle/sampleWinterCamp2",
     "timeline": [],
     "images": []
@@ -193,6 +181,19 @@ window.blogContent = {
     "image": "./img/explore/許正寶喪禮司儀/課程安排2/Q＆A時間/LINE_ALBUM_2025723_250727_16.webp",
     "images": [
       "./img/explore/許正寶喪禮司儀/課程安排2/Q＆A時間/LINE_ALBUM_2025723_250727_16.webp"
+    ]
+  },
+  {
+    "id": "interview-baoge",
+    "title": "寶哥有酵農場專訪",
+    "date": "2025/11/12",
+    "category": "interview",
+    "excerpt": "「用最純粹的發酵時間，釀造少年的堅韌與自信。」專訪有機農場職人寶哥。",
+    "content": "問：為什麼會想推廣有機農業，並帶領青少年進行體驗？\n答：土地是最誠實的，你付出多少汗水，它就給多少收成。我想讓孩子們親手摸摸泥土，知道食物的得來不易，同時藉由植物發酵的過程，讓他們體會耐心等待的價值。\n問：在與青少年的互動中，有什麼讓您印象深刻的事？\n答：很多孩子一開始怕髒、怕蟲，不敢下田。但當他們穿上雨鞋，拿著鏟子，跟著大家一起把雜草除乾淨、把作物採收上來時，每個人臉上都是最燦爛的笑容。那種戰勝心防的改變，真的很動人。\n問：對於未來想投入綠色產業或農創的年輕人有什麼勉勵？\n答：有酵才能有心。要對土地有敬畏，對生命有熱情。踏踏實實做人，就像我們釀酵素一樣，經得起時間的發酵，最後一定會散發出最芬芳的成果。",
+    "image": "./img/explore/寶哥有酵農場/課程安排2/Q＆A時間/Q＆A時間1.webp",
+    "images": [
+      "./img/explore/寶哥有酵農場/課程安排2/Q＆A時間/Q＆A時間1.webp",
+      "./img/explore/寶哥有酵農場/課程安排2/Q＆A時間/Q＆A時間2.webp"
     ]
   }
 ]
