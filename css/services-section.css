@@ -147,12 +147,6 @@ transform: translateY(20px);
 animation: fadeInUp .6s ease-out forwards;
 transition: all 0.5s cubic-bezier(.16, 1, .3, 1), border-color .24s ease, box-shadow .24s ease;
 }
-.service-feature-card:hover {
-transform: translateY(-6px) scale(1.01);
-border-color: color-mix(in srgb, var(--primary, #6b8e23) 38%, var(--border, rgba(74, 66, 56, .12)));
-box-shadow: var(--surface-shadow-strong, 0 28px 80px rgba(15, 23, 42, .18));
-transition: all 0.5s cubic-bezier(.16, 1, .3, 1);
-}
 .service-feature-card:active {
   transform: scale(0.97);
   transition: transform .2s ease;
@@ -160,16 +154,6 @@ transition: all 0.5s cubic-bezier(.16, 1, .3, 1);
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
-}
-.service-feature-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  border-color: color-mix(in srgb, var(--primary, #6b8e23) 38%, var(--border, rgba(74, 66, 56, .12)));
-  box-shadow: var(--surface-shadow-strong, 0 28px 80px rgba(15, 23, 42, .18));
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.service-feature-card:active {
-  transform: scale(0.97);
-  transition: transform .2s ease;
 }
 .services-grid > article {
   opacity: 0;
@@ -206,16 +190,6 @@ transition: all 0.5s cubic-bezier(.16, 1, .3, 1);
   backdrop-filter: blur(16px) saturate(135%);
 }
 
-.achievement-pill:hover {
-  color: var(--primary, #6b8e23);
-  border-color: color-mix(in srgb, var(--primary, #6b8e23) 38%, transparent);
-}
-
-html.dark .service-feature-image {
-  background: var(--bg-inset);
-}
-
-html.dark .service-feature-card {
 .achievement-pill:hover {
   color: var(--primary, #6b8e23);
   border-color: color-mix(in srgb, var(--primary, #6b8e23) 38%, transparent);

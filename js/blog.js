@@ -681,7 +681,7 @@
 
     body.innerHTML = `
       <div class="blog-modal-hero mb-6">
-        <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" class="w-full h-auto max-h-[350px] object-cover rounded-xl shadow-md">
+        <img decoding="async" src="${esc(post.image)}" alt="${esc(post.title)}" class="w-full h-auto object-cover rounded-xl shadow-md">
       </div>
       <div class="blog-modal-meta text-xs uppercase font-extrabold tracking-wider text-[var(--primary)] mb-1">${esc(label)}</div>
       <h2 class="blog-modal-title text-3xl md:text-4xl font-black text-[var(--text-primary)] mb-2" id="blog-modal-title">${esc(post.title)}</h2>

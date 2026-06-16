@@ -11,6 +11,33 @@
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  const categoryThemeMap = window.categoryThemeMap || {
+    agriculture: 'category-agriculture',
+    '農業': 'category-agriculture',
+    '農林漁牧業': 'category-agriculture',
+    funeral: 'category-funeral',
+    '殯葬業': 'category-funeral',
+    communication: 'category-communication',
+    '通訊業': 'category-communication',
+    floral: 'category-floral',
+    '花藝類': 'category-floral',
+    music: 'category-music',
+    '樂器零售業': 'category-music',
+    food: 'category-food',
+    '餐飲業': 'category-food',
+    'car-beauty': 'category-car-beauty',
+    '汽車美容業': 'category-car-beauty'
+  };
+  window.categoryThemeMap = categoryThemeMap;
+  const categoryThemeClasses = Array.from(new Set(Object.values(categoryThemeMap)));
+
+  function setCategoryTheme(category) {
+    document.body.classList.add('category-page');
+    document.body.classList.remove(...categoryThemeClasses);
+    const themeClass = categoryThemeMap[(category || '').trim()] || '';
+    if (themeClass) document.body.classList.add(themeClass);
+  }
+
   function ensureLightbox() {
     return window.Lightbox ? window.Lightbox.ensureLightbox() : null;
   }
@@ -184,6 +211,7 @@ function open() {
   function render(provider) {
     const root = qs('#provider-root');
     if (!root) return;
+    setCategoryTheme(provider.category);
 
     const imgs = (Array.isArray(provider.images) ? provider.images : []).slice(0, 4);
     const fallbackImages = [
@@ -327,7 +355,7 @@ function open() {
         <span class="text-gray-500 dark:text-gray-300">${provider.name}</span>
       </nav>
 
-      <header class="provider-simple-hero mb-10">
+      <header class="category-section provider-simple-hero mb-10">
         <div>
           <div class="provider-simple-kicker">${provider.category || '探索體驗'}</div>
           <h1>${provider.name}</h1>
@@ -344,7 +372,7 @@ function open() {
         </div>
       </header>
 
-      <section aria-labelledby="sec-info" class="provider-simple-info mb-12">
+      <section aria-labelledby="sec-info" class="category-section provider-simple-info mb-12">
         <article>
           <span>地點</span>
           <strong>${provider.address || provider.location || '-'}</strong>
@@ -358,7 +386,7 @@ function open() {
         </article>
       </section>
 
-      <section aria-labelledby="sec-timeline" class="mb-12">
+      <section aria-labelledby="sec-timeline" class="category-section mb-12">
         <h2 id="sec-timeline" class="text-2xl font-bold mb-6 flex items-center gap-3">
           課程安排
           <span class="text-sm font-normal text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">Steps</span>
@@ -384,7 +412,7 @@ function open() {
         </div>
       </section>
 
-      <section aria-labelledby="sec-cases" class="mb-12">
+      <section aria-labelledby="sec-cases" class="category-section mb-12">
         <h2 id="sec-cases" class="text-2xl font-bold mb-4">精選案例</h2>
         ${renderCases(provider)}
       </section>
@@ -459,6 +487,7 @@ const trigger = root.querySelector('.contact-flip-trigger');
     const root = qs('#provider-root');
     if (!root) return;
     if (!id || !provider) {
+      setCategoryTheme('');
       root.innerHTML = `<div class="text-center text-red-500">找不到此業者，請回到「探索資源平台」。</div>`;
       return;
     }

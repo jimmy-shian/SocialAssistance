@@ -13,8 +13,41 @@
   const dataset = () => (window.providersData || {});
   let itemsToShow = 6;
 
+  const categoryThemeMap = {
+    agriculture: 'category-agriculture',
+    '農業': 'category-agriculture',
+    '農林漁牧業': 'category-agriculture',
+    funeral: 'category-funeral',
+    '殯葬業': 'category-funeral',
+    communication: 'category-communication',
+    '通訊業': 'category-communication',
+    floral: 'category-floral',
+    '花藝類': 'category-floral',
+    music: 'category-music',
+    '樂器零售業': 'category-music',
+    food: 'category-food',
+    '餐飲業': 'category-food',
+    'car-beauty': 'category-car-beauty',
+    '汽車美容業': 'category-car-beauty'
+  };
+  window.categoryThemeMap = categoryThemeMap;
+  const categoryThemeClasses = Array.from(new Set(Object.values(categoryThemeMap)));
+
+  function getCategoryThemeClass(category) {
+    return categoryThemeMap[(category || '').trim()] || '';
+  }
+
+  function setCategoryTheme(category) {
+    document.body.classList.add('category-page');
+    document.body.classList.remove(...categoryThemeClasses);
+    const themeClass = getCategoryThemeClass(category);
+    if (themeClass) document.body.classList.add(themeClass);
+  }
+
   function providerCard(p) {
     const item = el('div', 'provider-list-item');
+    const themeClass = getCategoryThemeClass(p.category);
+    if (themeClass) item.dataset.categoryTheme = themeClass;
 
     // Add faint background image
     const bg = el('div', 'provider-list-bg');
@@ -70,6 +103,7 @@
 
   function render() {
     if (!grid) return;
+    setCategoryTheme(categorySelect && categorySelect.value);
     grid.setAttribute('aria-busy', 'true');
     grid.innerHTML = '';
     

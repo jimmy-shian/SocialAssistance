@@ -1,0 +1,94 @@
+/* css/pages/about.css
+ * Styling specific to the About Us page, including history timelines and mission/goal cards.
+ */
+
+.about-hero-section {
+  padding-block: var(--section-y-desktop) var(--space-8);
+  text-align: center;
+}
+
+.history-timeline {
+  position: relative;
+  margin-block: var(--space-8);
+  padding-left: var(--space-8);
+  border-left: 2px solid var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: var(--space-6);
+}
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--space-8) - 7px);
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  border: 2px solid var(--bg);
+}
+
+.timeline-date {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: var(--space-1);
+}
+
+.timeline-content {
+  background-color: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--elev-flat);
+}
+
+.timeline-content h4 {
+  margin: 0 0 8px;
+  font-size: var(--text-base);
+  color: var(--fg);
+}
+
+.timeline-content p {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--fg-2);
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-6);
+  margin-block-start: var(--space-8);
+}
+
+.about-fade,
+.about-reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.about-fade.is-visible,
+.about-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 767px) {
+  .about-hero-section {
+    padding-block: 2rem;
+  }
+
+  .history-timeline {
+    padding-left: 1.25rem;
+  }
+
+  .mission-grid {
+    grid-template-columns: 1fr;
+  }
+}

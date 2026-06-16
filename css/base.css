@@ -1,0 +1,183 @@
+/* css/base.css
+ * Global design tokens, variables, themes, reset, and core typography definitions.
+ */
+
+:root {
+  /* ==================== Warm Editorial: Light Mode ==================== */
+  --bg: #fbf6ee;
+  --surface: #fffdf8;
+  --surface-warm: #f1e3cf;
+  
+  --fg: #201914;
+  --fg-2: #4c4037;
+  --muted: #7a6d63;
+  --meta: #9b5b32;
+  
+  --border: #ded2c3;
+  --border-soft: #eee4d7;
+  
+  --accent: #9b5b32;
+  --accent-on: #ffffff;
+  --accent-hover: #a6673d;
+  --accent-active: #844c2a;
+  
+  --success: #4f8a4f;
+  --warn:    #c9822f;
+  --danger:  #b33a3a;
+  
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "SF Mono", ui-monospace, "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+
+  /* Typography Scale */
+  --text-xs:   12px;
+  --text-sm:   14px;
+  --text-base: 17px;
+  --text-lg:   20px;
+  --text-xl:   28px;
+  --text-2xl:  42px;
+  --text-3xl:  64px;
+  --text-4xl:  88px;
+  
+  --leading-body: 1.62;
+  --leading-tight: 1.1;
+  --tracking-display: -0.025em;
+
+  /* Spacing Grid */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-12: 48px;
+
+  /* Section Rhythm */
+  --section-y-desktop: 80px;
+  --section-y-tablet:  60px;
+  --section-y-phone:   40px;
+
+  /* Corner Radius */
+  --radius-sm:   10px;
+  --radius-md:   16px;
+  --radius-lg:   24px;
+  --radius-pill: 9999px;
+
+  /* Stacking & Elevation */
+  --elev-flat:   none;
+  --elev-ring:   0 0 0 1px var(--border);
+  --elev-raised: 0 20px 52px rgba(32, 25, 20, 0.12);
+  --focus-ring: 0 0 0 4px rgba(155, 91, 50, 0.24);
+
+  /* Animation */
+  --motion-fast:   150ms;
+  --motion-base:   240ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Container */
+  --container-max:            1180px;
+  --container-gutter-desktop: 36px;
+  --container-gutter-tablet:  24px;
+  --container-gutter-phone:   16px;
+
+  /* Legacy layout configurations */
+  --primary: var(--accent);
+  --primary-light: var(--accent-hover);
+  --primary-dark: var(--accent-active);
+  --text-primary: var(--fg);
+  --text-secondary: var(--fg-2);
+  --text-tertiary: var(--muted);
+  --text-muted: var(--muted);
+  --bg-base: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-elevated: var(--surface);
+  --bg-highlight: var(--border-soft);
+  --bg-inset: var(--surface-warm);
+}
+
+/* ==================== Warm Editorial: Dark Mode ==================== */
+html.dark {
+  --bg: #17120e;
+  --surface: #221a15;
+  --surface-warm: #2d231d;
+  
+  --fg: #f1e3cf;
+  --fg-2: #ded2c3;
+  --muted: #9b8d82;
+  --meta: #d97d54;
+  
+  --border: #4c4037;
+  --border-soft: #3a3028;
+  
+  --accent: #d97d54;
+  --accent-on: #ffffff;
+  --accent-hover: #e0926f;
+  --accent-active: #c5683e;
+  
+  --success: #6da66d;
+  --warn:    #e09e53;
+  --danger:  #c95555;
+  
+  --elev-raised: 0 20px 52px rgba(0, 0, 0, 0.5);
+  --focus-ring: 0 0 0 4px rgba(217, 125, 84, 0.3);
+
+  /* Legacy updates */
+  --primary: var(--accent);
+  --primary-light: var(--accent-hover);
+  --primary-dark: var(--accent-active);
+  --text-primary: var(--fg);
+  --text-secondary: var(--fg-2);
+  --text-tertiary: var(--muted);
+  --text-muted: var(--muted);
+  --bg-base: var(--bg);
+  --bg-surface: var(--surface);
+  --bg-elevated: var(--surface);
+  --bg-highlight: var(--border-soft);
+  --bg-inset: var(--surface-warm);
+}
+
+/* Reset rules */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: var(--text-base);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  line-height: var(--leading-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--motion-base) var(--ease-standard), color var(--motion-base) var(--ease-standard);
+}
+
+/* Focus indicator outline */
+*:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Accessibility reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *, *::before, *::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+}

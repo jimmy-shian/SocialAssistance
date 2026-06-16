@@ -478,7 +478,7 @@ html.dark .blog-post-card:hover {
 
 .blog-modal-hero img {
   width: 100%;
-  height: min(42vh, 320px);
+  /* height: min(42vh, 320px); */
   object-fit: cover;
 }
 

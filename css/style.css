@@ -3021,6 +3021,7 @@ html.dark .hero-content {
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 1.5rem;
+  line-height: normal;
 }
 
 .philosophy-content blockquote {
@@ -3116,20 +3117,14 @@ html.dark .sdgs-section {
 
 .sdgs-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   grid-template-rows: auto auto;
   gap: 2rem 1.5rem;
   position: relative;
 }
 
 .sdgs-path-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
+  display: none !important;
 }
 
 .sdgs-path-glow {
@@ -3139,13 +3134,20 @@ html.dark .sdgs-section {
 .sdgs-item {
   position: relative;
   z-index: 2;
-  text-align: center;
-  padding: 2.2rem 1.8rem;
   text-decoration: none;
-  display: flex;
-  flex-direction: column;
+  display: grid !important;
+  grid-template-columns: 100px 1fr;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "icon label"
+    "icon title"
+    "icon desc";
   align-items: center;
-  justify-content: center;
+  justify-content: start;
+  text-align: left !important;
+  padding: 1.8rem 1.6rem !important;
+  gap: 0.1rem 1.2rem !important;
+  border-radius: 20px !important;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-radius 0.4s ease !important;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
   border: none !important;
@@ -3154,63 +3156,64 @@ html.dark .sdgs-section {
 }
 
 .sdgs-item .sdg-label {
-  font-size: 1.5rem;
+  grid-area: label;
+  font-size: 1.25rem !important;
   opacity: 0.9;
   letter-spacing: 0.05em;
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.1rem !important;
   font-weight: 800;
+  text-align: left !important;
 }
 
 .sdgs-item h4 {
+  grid-area: title;
   font-size: 1.35rem;
   font-weight: 800;
   color: #ffffff !important;
-  margin-top: 1rem;
-  margin-bottom: 0.6rem;
+  margin-top: 0 !important;
+  margin-bottom: 0.3rem !important;
+  text-align: left !important;
 }
 
 .sdgs-item p {
+  grid-area: desc;
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.9) !important;
   line-height: 1.5;
   font-weight: 500;
+  margin: 0 !important;
+  text-align: left !important;
 }
 
 /* Specific Positions for Wavy Curve */
 .sdgs-item-4 {
-  align-self: start;
   background: linear-gradient(135deg, #C5192D 0%, #a31021 100%) !important;
-  border-radius: 42% 58% 70% 30% / 45% 45% 55% 55% !important;
 }
 
 .sdgs-item-17 {
-  align-self: end;
   background: linear-gradient(135deg, #19486A 0%, #0f3049 100%) !important;
-  border-radius: 70% 30% 52% 48% / 60% 40% 60% 40% !important;
 }
 
 .sdgs-item-11 {
-  align-self: start;
   background: linear-gradient(135deg, #FD9D24 0%, #e08210 100%) !important;
-  border-radius: 48% 52% 35% 65% / 50% 55% 45% 50% !important;
 }
 
 .sdgs-item-10 {
-  align-self: end;
   background: linear-gradient(135deg, #DD1367 0%, #b80c51 100%) !important;
-  border-radius: 55% 45% 60% 40% / 48% 52% 48% 52% !important;
 }
 
 /* Icon Wrap */
 .sdgs-item .sdg-icon-wrapper {
+  grid-area: icon;
   background: #ffffffa1;
-  border-radius: 50%;
-  width: 95%;
-  height: 100%;
+  border-radius: 50% !important;
+  width: 100px !important;
+  height: 100px !important;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 12px !important;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   transition: transform 0.4s ease;
 }
@@ -3228,19 +3231,6 @@ html.dark .sdgs-section {
 
 .sdgs-item:hover .sdg-icon-wrapper {
   transform: rotate(12deg) scale(1.1);
-}
-
-.sdgs-item-4:hover {
-  border-radius: 50% 50% 50% 50% / 50% 50% 50% 50% !important;
-}
-.sdgs-item-17:hover {
-  border-radius: 55% 45% 50% 50% / 50% 50% 50% 50% !important;
-}
-.sdgs-item-11:hover {
-  border-radius: 50% 50% 45% 55% / 55% 45% 55% 45% !important;
-}
-.sdgs-item-10:hover {
-  border-radius: 50% 50% 50% 50% / 45% 55% 45% 55% !important;
 }
 
 /* Responsive adjustments */
@@ -3265,6 +3255,22 @@ html.dark .sdgs-section {
   .sdgs-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+  .sdgs-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 2.2rem 1.8rem !important;
+  }
+  .sdgs-item .sdg-icon-wrapper {
+    margin: 0.5rem auto 1rem auto !important;
+  }
+  .sdgs-item .sdg-label,
+  .sdgs-item h4,
+  .sdgs-item p {
+    text-align: center !important;
   }
 }
 
@@ -4844,5 +4850,417 @@ body.section-bg-1 main > section:first-of-type {
   #about-root::before {
     width: 82vw;
     opacity: 0.62;
+  }
+}
+
+/* Services Section Spacing Fix (Prevent clipping of top circular card items) */
+.services-circular-section {
+  margin-top: 5rem !important;
+  padding-top: clamp(4rem, 8vw, 6rem) !important;
+  padding-bottom: clamp(3rem, 6vw, 4rem) !important;
+}
+
+/* Achievements Card Entry Animation */
+.achievement-card {
+  opacity: 0;
+  transform: translateY(-50px);
+  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease, box-shadow 0.3s ease, background-color 0.3s ease !important;
+}
+
+.achievement-card.animate-drop {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==============================
+   Category Page Background Themes
+   Decorative-only layers for explore.html and provider.html category views.
+============================== */
+.category-page {
+  --category-bg-base: #f4f7fa;
+  --category-bg-top: rgba(255, 255, 255, 0.72);
+  --category-bg-wash: rgba(56, 189, 248, 0.10);
+  --category-bg-warm: rgba(99, 102, 241, 0.08);
+  --category-primary: var(--primary);
+  --category-secondary: var(--accent);
+  --category-line: rgba(29, 29, 31, 0.10);
+  --category-line-strong: rgba(29, 29, 31, 0.18);
+  --category-panel: rgba(255, 255, 255, 0.52);
+  --category-panel-strong: rgba(255, 255, 255, 0.72);
+  --category-texture:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.42), transparent 36%),
+    repeating-linear-gradient(100deg, var(--category-line) 0 1px, transparent 1px 34px);
+  --category-motif:
+    linear-gradient(90deg, var(--category-line) 1px, transparent 1px),
+    linear-gradient(0deg, var(--category-line) 1px, transparent 1px);
+  --category-motif-size: 72px 72px, 72px 72px;
+  --category-illustration:
+    linear-gradient(128deg, transparent 0 44%, var(--category-line) 44% 45%, transparent 45% 100%),
+    linear-gradient(32deg, transparent 0 54%, color-mix(in srgb, var(--category-primary) 16%, transparent) 54% 55%, transparent 55% 100%);
+  position: relative;
+  isolation: isolate;
+  overflow-x: hidden;
+}
+
+body.category-page.section-bg-2,
+body.category-page.section-bg-1 {
+  background:
+    linear-gradient(150deg, var(--category-bg-top), transparent 34%),
+    linear-gradient(30deg, transparent 0 46%, var(--category-bg-wash) 46% 72%, transparent 72%),
+    linear-gradient(128deg, var(--category-bg-base) 0%, color-mix(in srgb, var(--category-bg-base) 82%, var(--category-bg-warm)) 100%) !important;
+  background-attachment: fixed !important;
+}
+
+.category-bg-decor {
+  position: fixed;
+  inset: -10vh -8vw;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.9;
+  background:
+    var(--category-texture),
+    linear-gradient(115deg, color-mix(in srgb, var(--category-primary) 12%, transparent), transparent 34%),
+    linear-gradient(245deg, color-mix(in srgb, var(--category-secondary) 12%, transparent), transparent 40%);
+  background-blend-mode: multiply, normal, normal;
+}
+
+.category-bg-decor::before,
+.category-bg-decor::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.category-bg-decor::before {
+  opacity: 0.66;
+  background: var(--category-illustration);
+  background-size: min(62vw, 720px) min(42vw, 460px);
+  background-position: right -6vw top 6vh;
+  background-repeat: no-repeat;
+  mask-image: linear-gradient(100deg, transparent 0%, #000 28%, #000 78%, transparent 100%);
+}
+
+.category-bg-decor::after {
+  opacity: 0.28;
+  background-image: var(--category-motif);
+  background-size: var(--category-motif-size);
+  background-position: center top;
+  mask-image: linear-gradient(180deg, #000 0%, #000 68%, transparent 100%);
+}
+
+.category-page .main-content,
+.category-page main,
+.category-page header,
+.category-page nav,
+.category-page footer,
+.category-page #nav-placeholder,
+.category-page #footer-placeholder {
+  position: relative;
+  z-index: 2;
+}
+
+.category-page #nav-placeholder > header {
+  z-index: 60;
+}
+
+.category-section {
+  position: relative;
+  isolation: isolate;
+}
+
+.category-section::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--category-panel-strong) 78%, transparent), transparent 48%),
+    linear-gradient(280deg, color-mix(in srgb, var(--category-primary) 8%, transparent), transparent 56%);
+  opacity: 0.46;
+}
+
+.category-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.category-page .chip.active,
+.category-page .show-more-btn:hover,
+.category-page .provider-link,
+.category-page .provider-location,
+.category-page .provider-category-tag,
+.category-page .provider-simple-kicker {
+  --primary: var(--category-primary);
+  --accent: var(--category-primary);
+}
+
+.category-page .provider-category-tag {
+  background: color-mix(in srgb, var(--category-primary) 13%, transparent);
+  border-color: color-mix(in srgb, var(--category-primary) 24%, transparent);
+}
+
+.category-page .provider-list-item {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--category-panel) 88%, transparent), transparent 62%),
+    color-mix(in srgb, var(--category-panel) 42%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--category-line) 68%, transparent) !important;
+  transition:
+    background-color var(--duration-base, 280ms) var(--motion-standard, ease),
+    transform var(--duration-base, 280ms) var(--motion-standard, ease),
+    box-shadow var(--duration-base, 280ms) var(--motion-standard, ease);
+}
+
+.category-page .provider-list-item::before {
+  background:
+    linear-gradient(180deg, transparent, var(--category-primary), color-mix(in srgb, var(--category-secondary) 70%, var(--category-primary)), transparent) !important;
+}
+
+.category-page .provider-list-item:hover {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--category-primary) 9%, transparent), transparent 70%),
+    color-mix(in srgb, var(--category-panel-strong) 44%, transparent);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--category-primary) 10%, transparent);
+}
+
+@media (min-width: 768px) {
+  .category-page #provider-root section[aria-labelledby="sec-cases"] .grid > .card-dynamic-bg:nth-child(3n+2),
+  .category-page #provider-root section[aria-labelledby="sec-cases"] .grid > article:nth-child(3n+2) {
+    transform: translateY(1rem);
+  }
+
+  .category-page #provider-root section[aria-labelledby="sec-cases"] .grid > .card-dynamic-bg:nth-child(3n),
+  .category-page #provider-root section[aria-labelledby="sec-cases"] .grid > article:nth-child(3n) {
+    transform: translateY(-0.45rem);
+  }
+}
+
+.category-agriculture {
+  --category-bg-base: #f2f6eb;
+  --category-bg-top: rgba(250, 252, 244, 0.82);
+  --category-bg-wash: rgba(92, 135, 64, 0.13);
+  --category-bg-warm: rgba(154, 117, 72, 0.10);
+  --category-primary: #4f7f3f;
+  --category-secondary: #6f9fb0;
+  --category-line: rgba(74, 99, 55, 0.13);
+  --category-line-strong: rgba(68, 91, 49, 0.24);
+  --category-texture:
+    repeating-linear-gradient(0deg, rgba(103, 79, 48, 0.055) 0 2px, transparent 2px 18px),
+    repeating-linear-gradient(118deg, rgba(71, 119, 80, 0.08) 0 1px, transparent 1px 42px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.52), transparent);
+  --category-motif:
+    radial-gradient(ellipse at center, transparent 0 48%, rgba(74, 127, 63, 0.18) 49% 51%, transparent 52%),
+    repeating-radial-gradient(ellipse at 16% 78%, rgba(77, 136, 158, 0.13) 0 1px, transparent 1px 18px);
+  --category-motif-size: 150px 76px, 220px 56px;
+  --category-illustration:
+    linear-gradient(68deg, transparent 0 48%, rgba(82, 102, 51, 0.18) 49% 50%, transparent 51%),
+    radial-gradient(ellipse at 68% 38%, rgba(89, 132, 72, 0.18) 0 18%, transparent 19%),
+    radial-gradient(ellipse at 76% 58%, rgba(89, 132, 72, 0.14) 0 15%, transparent 16%),
+    repeating-linear-gradient(170deg, transparent 0 32px, rgba(101, 75, 45, 0.11) 33px 34px, transparent 35px 70px);
+}
+
+.category-funeral {
+  --category-bg-base: #f4f2ee;
+  --category-bg-top: rgba(255, 255, 255, 0.78);
+  --category-bg-wash: rgba(110, 112, 122, 0.12);
+  --category-bg-warm: rgba(191, 174, 135, 0.11);
+  --category-primary: #73727e;
+  --category-secondary: #b59663;
+  --category-line: rgba(84, 82, 78, 0.10);
+  --category-line-strong: rgba(84, 82, 78, 0.18);
+  --category-texture:
+    repeating-linear-gradient(88deg, rgba(84, 82, 78, 0.035) 0 1px, transparent 1px 38px),
+    repeating-linear-gradient(178deg, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px 26px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.52), transparent 52%);
+  --category-motif:
+    radial-gradient(ellipse at center, transparent 0 58%, rgba(115, 114, 126, 0.08) 59% 60%, transparent 61%),
+    linear-gradient(115deg, transparent 0 42%, rgba(181, 150, 99, 0.06) 42% 43%, transparent 43%);
+  --category-motif-size: 280px 170px, 240px 240px;
+  --category-illustration:
+    radial-gradient(ellipse at 78% 24%, rgba(255, 255, 255, 0.42) 0 16%, transparent 42%),
+    radial-gradient(ellipse at 72% 56%, rgba(115, 114, 126, 0.14) 0 22%, transparent 62%),
+    radial-gradient(ellipse at 86% 76%, rgba(181, 150, 99, 0.12) 0 10%, transparent 34%);
+}
+
+.category-communication {
+  --category-bg-base: #eef5fb;
+  --category-bg-top: rgba(255, 255, 255, 0.70);
+  --category-bg-wash: rgba(46, 111, 178, 0.13);
+  --category-bg-warm: rgba(95, 100, 220, 0.10);
+  --category-primary: #2d72b8;
+  --category-secondary: #696fd6;
+  --category-line: rgba(45, 114, 184, 0.13);
+  --category-line-strong: rgba(45, 114, 184, 0.26);
+  --category-texture:
+    linear-gradient(90deg, rgba(45, 114, 184, 0.09) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(45, 114, 184, 0.08) 1px, transparent 1px),
+    radial-gradient(circle, rgba(105, 111, 214, 0.16) 0 1px, transparent 2px);
+  --category-motif:
+    repeating-radial-gradient(circle at 78% 24%, transparent 0 28px, rgba(45, 114, 184, 0.14) 29px 30px, transparent 31px 48px),
+    radial-gradient(circle, rgba(45, 114, 184, 0.20) 0 2px, transparent 3px);
+  --category-motif-size: 360px 360px, 96px 96px;
+  --category-illustration:
+    repeating-radial-gradient(circle at 80% 28%, transparent 0 38px, rgba(45, 114, 184, 0.16) 39px 41px, transparent 42px 78px),
+    linear-gradient(90deg, transparent 0 49%, rgba(105, 111, 214, 0.16) 49% 50%, transparent 50%);
+}
+
+.category-floral {
+  --category-bg-base: #fbf2f6;
+  --category-bg-top: rgba(255, 255, 255, 0.78);
+  --category-bg-wash: rgba(200, 91, 134, 0.12);
+  --category-bg-warm: rgba(93, 145, 91, 0.10);
+  --category-primary: #bd5a88;
+  --category-secondary: #669460;
+  --category-line: rgba(142, 88, 112, 0.12);
+  --category-line-strong: rgba(142, 88, 112, 0.23);
+  --category-texture:
+    radial-gradient(ellipse at 20% 30%, rgba(189, 90, 136, 0.10), transparent 34%),
+    radial-gradient(ellipse at 84% 62%, rgba(102, 148, 96, 0.10), transparent 38%),
+    repeating-linear-gradient(132deg, rgba(142, 88, 112, 0.06) 0 1px, transparent 1px 38px);
+  --category-motif:
+    radial-gradient(ellipse at center, rgba(189, 90, 136, 0.12) 0 28%, transparent 29%),
+    radial-gradient(ellipse at center, transparent 0 46%, rgba(102, 148, 96, 0.16) 47% 49%, transparent 50%);
+  --category-motif-size: 120px 86px, 210px 140px;
+  --category-illustration:
+    radial-gradient(ellipse at 72% 26%, rgba(189, 90, 136, 0.18) 0 14%, transparent 15%),
+    radial-gradient(ellipse at 82% 34%, rgba(219, 142, 173, 0.16) 0 12%, transparent 13%),
+    radial-gradient(ellipse at 72% 48%, rgba(189, 90, 136, 0.13) 0 16%, transparent 17%),
+    linear-gradient(108deg, transparent 0 56%, rgba(102, 148, 96, 0.16) 56% 57%, transparent 57%);
+}
+
+.category-music {
+  --category-bg-base: #f8f3eb;
+  --category-bg-top: rgba(255, 255, 255, 0.74);
+  --category-bg-wash: rgba(139, 98, 55, 0.13);
+  --category-bg-warm: rgba(58, 91, 108, 0.08);
+  --category-primary: #8a643c;
+  --category-secondary: #456b7a;
+  --category-line: rgba(97, 66, 34, 0.12);
+  --category-line-strong: rgba(97, 66, 34, 0.24);
+  --category-texture:
+    repeating-linear-gradient(96deg, rgba(97, 66, 34, 0.08) 0 1px, transparent 1px 16px),
+    repeating-linear-gradient(4deg, transparent 0 9px, rgba(69, 107, 122, 0.08) 10px 11px, transparent 12px 44px);
+  --category-motif:
+    repeating-linear-gradient(0deg, transparent 0 14px, rgba(97, 66, 34, 0.13) 15px 16px, transparent 17px 22px),
+    radial-gradient(circle, transparent 0 28%, rgba(138, 100, 60, 0.17) 29% 32%, transparent 33%);
+  --category-motif-size: 260px 96px, 150px 150px;
+  --category-illustration:
+    repeating-linear-gradient(0deg, transparent 0 16px, rgba(69, 107, 122, 0.15) 17px 18px, transparent 19px 32px),
+    radial-gradient(circle at 80% 44%, transparent 0 16%, rgba(138, 100, 60, 0.18) 17% 20%, transparent 21%);
+}
+
+.category-food {
+  --category-bg-base: #fff4e8;
+  --category-bg-top: rgba(255, 255, 255, 0.74);
+  --category-bg-wash: rgba(218, 130, 56, 0.13);
+  --category-bg-warm: rgba(178, 70, 60, 0.09);
+  --category-primary: #c46f2f;
+  --category-secondary: #a7423b;
+  --category-line: rgba(158, 88, 45, 0.12);
+  --category-line-strong: rgba(158, 88, 45, 0.24);
+  --category-texture:
+    radial-gradient(circle, rgba(196, 111, 47, 0.14) 0 1.4px, transparent 2px),
+    radial-gradient(circle, rgba(167, 66, 59, 0.10) 0 1px, transparent 1.8px),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.48), transparent 44%);
+  --category-motif:
+    radial-gradient(circle, transparent 0 42%, rgba(196, 111, 47, 0.14) 43% 45%, transparent 46%),
+    repeating-linear-gradient(92deg, transparent 0 22px, rgba(255, 255, 255, 0.22) 23px 24px, transparent 25px 52px);
+  --category-motif-size: 170px 170px, 130px 130px;
+  --category-illustration:
+    radial-gradient(circle at 78% 56%, transparent 0 20%, rgba(196, 111, 47, 0.18) 21% 24%, transparent 25%),
+    repeating-radial-gradient(ellipse at 72% 16%, rgba(255, 255, 255, 0.20) 0 1px, transparent 2px 22px);
+}
+
+.category-car-beauty {
+  --category-bg-base: #eef4f7;
+  --category-bg-top: rgba(255, 255, 255, 0.72);
+  --category-bg-wash: rgba(48, 129, 151, 0.13);
+  --category-bg-warm: rgba(115, 129, 143, 0.10);
+  --category-primary: #308197;
+  --category-secondary: #65717d;
+  --category-line: rgba(48, 91, 103, 0.12);
+  --category-line-strong: rgba(48, 91, 103, 0.24);
+  --category-texture:
+    linear-gradient(122deg, transparent 0 42%, rgba(255, 255, 255, 0.42) 43% 45%, transparent 46%),
+    repeating-linear-gradient(118deg, rgba(48, 129, 151, 0.08) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(0deg, rgba(101, 113, 125, 0.08) 0 1px, transparent 1px 64px);
+  --category-motif:
+    radial-gradient(circle, rgba(48, 129, 151, 0.13) 0 7px, transparent 8px),
+    linear-gradient(116deg, transparent 0 48%, rgba(255, 255, 255, 0.34) 49% 51%, transparent 52%);
+  --category-motif-size: 128px 128px, 260px 260px;
+  --category-illustration:
+    linear-gradient(116deg, transparent 0 44%, rgba(255, 255, 255, 0.42) 45% 47%, transparent 48%),
+    linear-gradient(116deg, transparent 0 58%, rgba(48, 129, 151, 0.14) 59% 60%, transparent 61%),
+    radial-gradient(circle at 78% 34%, rgba(48, 129, 151, 0.13) 0 8%, transparent 9%);
+}
+
+html.dark .category-page {
+  --category-bg-base: #0b0f19;
+  --category-bg-top: rgba(255, 255, 255, 0.045);
+  --category-bg-wash: rgba(47, 128, 237, 0.10);
+  --category-bg-warm: rgba(121, 40, 202, 0.08);
+  --category-line: rgba(255, 255, 255, 0.10);
+  --category-line-strong: rgba(255, 255, 255, 0.16);
+  --category-panel: rgba(255, 255, 255, 0.045);
+  --category-panel-strong: rgba(255, 255, 255, 0.075);
+}
+
+html.dark .category-bg-decor {
+  opacity: 0.72;
+  background-blend-mode: screen, normal, normal;
+}
+
+html.dark .category-section::before {
+  opacity: 0.26;
+}
+
+@media (max-width: 767px) {
+  .category-page {
+    overflow-x: hidden;
+  }
+
+  body.category-page.section-bg-2,
+  body.category-page.section-bg-1 {
+    background-attachment: scroll !important;
+  }
+
+  .category-bg-decor {
+    inset: 0;
+    opacity: 0.42;
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--category-primary) 10%, transparent), transparent 52%),
+      linear-gradient(15deg, transparent 0 48%, color-mix(in srgb, var(--category-secondary) 8%, transparent) 48% 78%, transparent 78%);
+  }
+
+  .category-bg-decor::before {
+    display: none;
+  }
+
+  .category-bg-decor::after {
+    opacity: 0.16;
+    background-size: 92px 92px;
+    mask-image: linear-gradient(180deg, #000 0%, transparent 76%);
+  }
+
+  .category-section::before {
+    display: none;
+  }
+
+  .category-page #providers-grid {
+    overflow-x: hidden;
+  }
+
+  .category-page #providers-grid .provider-list-item,
+  .category-page #providers-grid .provider-list-item:hover,
+  .category-page #provider-root section[aria-labelledby="sec-cases"] .grid > .card-dynamic-bg,
+  .category-page #provider-root section[aria-labelledby="sec-cases"] .grid > article {
+    transform: none !important;
+  }
+
+  .category-page .provider-list-item {
+    margin-inline: 0 !important;
   }
 }
