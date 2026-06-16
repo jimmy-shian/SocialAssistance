@@ -7,7 +7,7 @@ window.blogContent = {
     "date": "2026/04/15",
     "category": "glory",
     "excerpt": "感謝各界肯定，我們將持續為青少年自立努力...",
-    "image": "./img/1000012016_6e6b5da647.webp",
+    "image": "./img/部落格/榮耀時刻.webp",
     "link": "./blog.html",
     "timeline": [
       {
@@ -37,7 +37,7 @@ window.blogContent = {
       }
     ],
     "images": [
-      "./img/1000012016_6e6b5da647.webp",
+      "./img/部落格/榮耀時刻.webp",
       "./img/1000012756_61e30f039f.webp",
       "./img/DSC09555___ba0754ae5a.webp",
       "./img/DSC01739__8a8686e4b1.webp"

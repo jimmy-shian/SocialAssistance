@@ -81,9 +81,9 @@
 
       <section class="sc-section split-grid">
         <div class="sc-card split-image" style="--i:0">
-          <!-- 原代碼: <img decoding="async" src="${esc(data.philosophy?.img || 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp')}" alt="理念" loading="lazy"> -->
+          <!-- 原代碼: <img decoding="async" src="${esc(data.philosophy?.img || './img/主頁/理念圖片/philosophy_concept.webp')}" alt="理念" loading="lazy"> -->
           <figure class="image-frame image-frame--card w-full h-full">
-            <img decoding="async" src="${esc(data.philosophy?.img || 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp')}" alt="理念" loading="lazy">
+            <img decoding="async" src="${esc(data.philosophy?.img || './img/主頁/理念圖片/philosophy_concept.webp')}" alt="理念" loading="lazy">
           </figure>
         </div>
         <div class="sc-card split-copy" style="--i:1">
