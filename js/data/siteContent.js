@@ -98,7 +98,7 @@ window.siteContent = {
       date: '2025/12/15',
       category: 'daily',
       excerpt: '孩子們在冬日暖陽下挑戰自我，攀上大樹感受不一樣的視野...',
-      image: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/DSC01739__8a8686e4b1.webp',
+      image: './img/DSC01739__8a8686e4b1.webp',
       link: './blog.html'
     },
     {
@@ -107,7 +107,7 @@ window.siteContent = {
       date: '2025/11/28',
       category: 'daily',
       excerpt: '孩子們展示自己學會的烹飪與生活技能，令人感動...',
-      image: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/1000010964_bdb0404a99.webp',
+      image: './img/1000010964_bdb0404a99.webp',
       link: './blog.html'
     },
     {
@@ -116,7 +116,7 @@ window.siteContent = {
       date: '2025/10/20',
       category: 'interview',
       excerpt: '訪談合作夥伴分享如何與青少年一起工作的經驗與心得...',
-      image: 'https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp',
+      image: './img/_a799b8ef-9cac-4078-8e34-851a4c93d040_045c08ee4c.webp',
       link: './blog.html'
     }
   ],

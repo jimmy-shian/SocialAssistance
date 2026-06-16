@@ -31,7 +31,8 @@ function isDataRequest(req) {
   try {
     const url = new URL(req.url);
     if (url.origin !== self.location.origin) return false;
-    if (url.pathname.startsWith('/js/data/')) return true;
+    // Do not cache /js/data/ files to prevent stale caching issues
+    if (url.pathname.startsWith('/js/data/')) return false;
     return false;
   } catch (e) { return false; }
 }

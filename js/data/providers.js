@@ -34,16 +34,46 @@ window.providersData = {
     ],
     "timeline": [
       {
+        "time": "09:00",
+        "title": "職人介紹",
+        "detail": "認識專業汽車美容職人，介紹工作環境與安全規範。",
+        "images": [
+          "./img/explore/Lagic專業汽機車美容/課程安排2/職人介紹/DSC01407.webp"
+        ]
+      },
+      {
         "time": "09:30",
-        "title": "職人工作說明 (1)",
-        "detail": "解說汽機車清潔、打蠟與內裝整理的專業工序與細節。",
-        "image": "./img/explore/Lagic專業汽機車美容/課程安排2/職人工作說明/DSC01413.webp"
+        "title": "職人工作說明",
+        "detail": "解說汽機車清潔、打蠟與內裝整理的專業工序與細節。 說明專業器材的使用、保養與藥劑的調配比例。",
+        "images": [
+          "./img/explore/Lagic專業汽機車美容/課程安排2/職人工作說明/DSC01413.webp",
+          "./img/explore/Lagic專業汽機車美容/課程安排2/職人工作說明/DSC01464.webp"
+        ]
       },
       {
         "time": "10:00",
-        "title": "職人工作說明 (2)",
-        "detail": "說明專業器材的使用、保養與藥劑的調配比例。",
-        "image": "./img/explore/Lagic專業汽機車美容/課程安排2/職人工作說明/DSC01464.webp"
+        "title": "職業體驗內容說明",
+        "detail": "示範高壓水槍、泡沫噴槍及各式清潔工具的操作方式。",
+        "images": [
+          "./img/explore/Lagic專業汽機車美容/課程安排2/職業體驗內容說明/DSC01463.webp"
+        ]
+      },
+      {
+        "time": "10:30",
+        "title": "職業體驗",
+        "detail": "實際進行車身清洗、輪框刷洗與手工擦乾擦亮實作。",
+        "images": [
+          "./img/explore/Lagic專業汽機車美容/課程安排2/職業體驗/DSC01430.webp",
+          "./img/explore/Lagic專業汽機車美容/課程安排2/職業體驗/DSC01439.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "與完成美容的車輛及夥伴合影，分享實作心得。",
+        "images": [
+          "./img/explore/Lagic專業汽機車美容/課程安排2/大合照/DSC01469.webp"
+        ]
       }
     ],
     "cases": [
@@ -67,39 +97,6 @@ window.providersData = {
           "./img/explore/Lagic專業汽機車美容/精選案例3/第二屆有事青年/DSC01463.webp",
           "./img/explore/Lagic專業汽機車美容/精選案例3/第二屆有事青年/DSC01464.webp",
           "./img/explore/Lagic專業汽機車美容/精選案例3/第二屆有事青年/DSC01469.webp"
-        ]
-      },
-      {
-        "id": "大合照",
-        "title": "大合照",
-        "summary": "與完成美容的車輛及夥伴合影，分享實作心得。",
-        "images": [
-          "./img/explore/Lagic專業汽機車美容/課程安排2/大合照/DSC01469.webp"
-        ]
-      },
-      {
-        "id": "職人介紹",
-        "title": "職人介紹",
-        "summary": "認識專業汽車美容職人，介紹工作環境與安全規範。",
-        "images": [
-          "./img/explore/Lagic專業汽機車美容/課程安排2/職人介紹/DSC01407.webp"
-        ]
-      },
-      {
-        "id": "職業體驗",
-        "title": "職業體驗",
-        "summary": "實際進行車身清洗、輪框刷洗與手工擦乾擦亮實作。",
-        "images": [
-          "./img/explore/Lagic專業汽機車美容/課程安排2/職業體驗/DSC01430.webp",
-          "./img/explore/Lagic專業汽機車美容/課程安排2/職業體驗/DSC01439.webp"
-        ]
-      },
-      {
-        "id": "職業體驗內容說明",
-        "title": "職業體驗內容說明",
-        "summary": "示範高壓水槍、泡沫噴槍及各式清潔工具的操作方式。",
-        "images": [
-          "./img/explore/Lagic專業汽機車美容/課程安排2/職業體驗內容說明/DSC01463.webp"
         ]
       }
     ]
@@ -138,16 +135,58 @@ window.providersData = {
     ],
     "timeline": [
       {
-        "time": "09:30",
-        "title": "職人工作說明 (1)",
-        "detail": "介紹多肉植物、觀葉植物的生活習性與日常照顧重點。",
-        "image": "./img/explore/享植。想植園藝店/課程安排2/職人工作說明/LINE_ALBUM_2025129_251216_140.webp"
+        "time": "10:00",
+        "title": "職人介紹",
+        "detail": "認識綠色職人，認識園藝店的日常營運與植栽環境。",
+        "images": [
+          "./img/explore/享植。想植園藝店/課程安排2/職人介紹/LINE_ALBUM_2025129_251216_125.webp",
+          "./img/explore/享植。想植園藝店/課程安排2/職人介紹/LINE_ALBUM_2025129_251216_130.webp"
+        ]
       },
       {
-        "time": "10:00",
-        "title": "職人工作說明 (2)",
-        "detail": "說明土壤調配比例與不同植物的介質選擇要領。",
-        "image": "./img/explore/享植。想植園藝店/課程安排2/職人工作說明/LINE_ALBUM_2025129_251216_145.webp"
+        "time": "10:20",
+        "title": "職人工作說明",
+        "detail": "介紹多肉植物、觀葉植物的生活習性與日常照顧重點。 說明土壤調配比例與不同植物的介質選擇要領。",
+        "images": [
+          "./img/explore/享植。想植園藝店/課程安排2/職人工作說明/LINE_ALBUM_2025129_251216_140.webp",
+          "./img/explore/享植。想植園藝店/課程安排2/職人工作說明/LINE_ALBUM_2025129_251216_145.webp"
+        ]
+      },
+      {
+        "time": "10:40",
+        "title": "職業體驗內容說明",
+        "detail": "示範土壤調配、植株修根、換盆與水分管理技術。",
+        "images": [
+          "./img/explore/享植。想植園藝店/課程安排2/職業體驗內容說明/LINE_ALBUM_2025129_251216_107.webp",
+          "./img/explore/享植。想植園藝店/課程安排2/職業體驗內容說明/LINE_ALBUM_2025129_251216_113.webp"
+        ]
+      },
+      {
+        "time": "11:00",
+        "title": "職業體驗",
+        "detail": "親自動手調配介質，完成多肉植物盆栽的換盆與組盆創作。",
+        "images": [
+          "./img/explore/享植。想植園藝店/課程安排2/職業體驗/LINE_ALBUM_2025129_251216_81.webp",
+          "./img/explore/享植。想植園藝店/課程安排2/職業體驗/LINE_ALBUM_2025129_251216_97.webp"
+        ]
+      },
+      {
+        "time": "11:40",
+        "title": "Q＆A時間",
+        "relatedBlogPostId": "interview-flower",
+        "detail": "與職人進行問答互動，分享今日探索心得，解答生涯規劃與職涯發展的疑問。",
+        "images": [
+          "./img/explore/享植。想植園藝店/課程安排2/Q＆A時間/LINE_ALBUM_2025129_251216_108.webp",
+          "./img/explore/享植。想植園藝店/課程安排2/Q＆A時間/LINE_ALBUM_2025129_251216_110.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "手持自己親手完成的園藝作品合影留念。",
+        "images": [
+          "./img/explore/享植。想植園藝店/課程安排2/大合照/LINE_ALBUM_2025129_251216_40.webp"
+        ]
       }
     ],
     "cases": [
@@ -174,41 +213,6 @@ window.providersData = {
           "./img/explore/享植。想植園藝店/精選案例3/可負擔蒙特梭利/LINE_ALBUM_2025129_251216_96.webp",
           "./img/explore/享植。想植園藝店/精選案例3/可負擔蒙特梭利/LINE_ALBUM_2025129_251216_97.webp",
           "./img/explore/享植。想植園藝店/精選案例3/可負擔蒙特梭利/LINE_ALBUM_2025129_251216_98.webp"
-        ]
-      },
-      {
-        "id": "大合照",
-        "title": "大合照",
-        "summary": "手持自己親手完成的園藝作品合影留念。",
-        "images": [
-          "./img/explore/享植。想植園藝店/課程安排2/大合照/LINE_ALBUM_2025129_251216_40.webp"
-        ]
-      },
-      {
-        "id": "職人介紹",
-        "title": "職人介紹",
-        "summary": "認識綠色職人，認識園藝店的日常營運與植栽環境。",
-        "images": [
-          "./img/explore/享植。想植園藝店/課程安排2/職人介紹/LINE_ALBUM_2025129_251216_125.webp",
-          "./img/explore/享植。想植園藝店/課程安排2/職人介紹/LINE_ALBUM_2025129_251216_130.webp"
-        ]
-      },
-      {
-        "id": "職業體驗",
-        "title": "職業體驗",
-        "summary": "親自動手調配介質，完成多肉植物盆栽的換盆與組盆創作。",
-        "images": [
-          "./img/explore/享植。想植園藝店/課程安排2/職業體驗/LINE_ALBUM_2025129_251216_81.webp",
-          "./img/explore/享植。想植園藝店/課程安排2/職業體驗/LINE_ALBUM_2025129_251216_97.webp"
-        ]
-      },
-      {
-        "id": "職業體驗內容說明",
-        "title": "職業體驗內容說明",
-        "summary": "示範土壤調配、植株修根、換盆與水分管理技術。",
-        "images": [
-          "./img/explore/享植。想植園藝店/課程安排2/職業體驗內容說明/LINE_ALBUM_2025129_251216_107.webp",
-          "./img/explore/享植。想植園藝店/課程安排2/職業體驗內容說明/LINE_ALBUM_2025129_251216_113.webp"
         ]
       }
     ]
@@ -247,10 +251,49 @@ window.providersData = {
     ],
     "timeline": [
       {
+        "time": "09:00",
+        "title": "職人介紹",
+        "detail": "攀樹教練自我介紹，解說攀樹師的職業內容與發展前景。",
+        "images": [
+          "./img/explore/佇嘉木/課程安排2/職人介紹/DSC04082.webp",
+          "./img/explore/佇嘉木/課程安排2/職人介紹/DSC04091.webp"
+        ]
+      },
+      {
         "time": "09:30",
         "title": "職人工作說明",
         "detail": "解說攀樹繩索技術、樹木修剪與樹藝工作的日常安全要點。",
-        "image": "./img/explore/佇嘉木/課程安排2/職人工作說明/DSC04085.webp"
+        "images": [
+          "./img/explore/佇嘉木/課程安排2/職人工作說明/DSC04085.webp"
+        ]
+      },
+      {
+        "time": "10:00",
+        "title": "職業體驗內容說明",
+        "detail": "攀樹操作與安全事項說明，設定個人的攀爬高度與挑戰目標。",
+        "images": [
+          "./img/explore/佇嘉木/課程安排2/職業體驗內容說明/DSC09476.webp",
+          "./img/explore/佇嘉木/課程安排2/職業體驗內容說明/LINE_ALBUM_2022212_220214_12.webp"
+        ]
+      },
+      {
+        "time": "10:30",
+        "title": "職業體驗",
+        "detail": "穿戴專業安全裝備，實際操作繩索攀爬大樹，體驗空中視野。",
+        "images": [
+          "./img/explore/佇嘉木/課程安排2/職業體驗/DSC04120.webp",
+          "./img/explore/佇嘉木/課程安排2/職業體驗/LINE_ALBUM_2022212_220214_85.webp",
+          "./img/explore/佇嘉木/課程安排2/職業體驗/LINE_ALBUM_2022212_220214_90.webp",
+          "./img/explore/佇嘉木/課程安排2/職業體驗/LINE_ALBUM_2022212_220214_95.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "全體在百年大樹下合影，回顧挑戰過程中的心得收穫。",
+        "images": [
+          "./img/explore/佇嘉木/課程安排2/大合照/LINE_ALBUM_2022212_220214_158.webp"
+        ]
       }
     ],
     "cases": [
@@ -280,43 +323,6 @@ window.providersData = {
           "./img/explore/佇嘉木/精選案例/第二屆有事青年/DSC09627.webp",
           "./img/explore/佇嘉木/精選案例/第二屆有事青年/DSC09629.webp",
           "./img/explore/佇嘉木/精選案例/第二屆有事青年/DSC09633.webp"
-        ]
-      },
-      {
-        "id": "大合照",
-        "title": "大合照",
-        "summary": "全體在百年大樹下合影，回顧挑戰過程中的心得收穫。",
-        "images": [
-          "./img/explore/佇嘉木/課程安排2/大合照/LINE_ALBUM_2022212_220214_158.webp"
-        ]
-      },
-      {
-        "id": "職人介紹",
-        "title": "職人介紹",
-        "summary": "攀樹教練自我介紹，解說攀樹師的職業內容與發展前景。",
-        "images": [
-          "./img/explore/佇嘉木/課程安排2/職人介紹/DSC04082.webp",
-          "./img/explore/佇嘉木/課程安排2/職人介紹/DSC04091.webp"
-        ]
-      },
-      {
-        "id": "職業體驗",
-        "title": "職業體驗",
-        "summary": "穿戴專業安全裝備，實際操作繩索攀爬大樹，體驗空中視野。",
-        "images": [
-          "./img/explore/佇嘉木/課程安排2/職業體驗/DSC04120.webp",
-          "./img/explore/佇嘉木/課程安排2/職業體驗/LINE_ALBUM_2022212_220214_85.webp",
-          "./img/explore/佇嘉木/課程安排2/職業體驗/LINE_ALBUM_2022212_220214_90.webp",
-          "./img/explore/佇嘉木/課程安排2/職業體驗/LINE_ALBUM_2022212_220214_95.webp"
-        ]
-      },
-      {
-        "id": "職業體驗內容說明",
-        "title": "職業體驗內容說明",
-        "summary": "攀樹操作與安全事項說明，設定個人的攀爬高度與挑戰目標。",
-        "images": [
-          "./img/explore/佇嘉木/課程安排2/職業體驗內容說明/DSC09476.webp",
-          "./img/explore/佇嘉木/課程安排2/職業體驗內容說明/LINE_ALBUM_2022212_220214_12.webp"
         ]
       }
     ]
@@ -355,16 +361,57 @@ window.providersData = {
     ],
     "timeline": [
       {
-        "time": "09:30",
-        "title": "職人工作說明 (1)",
-        "detail": "介紹手機配件種類、商品庫存管理與門市服務禮儀規範。",
-        "image": "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職人工作說明/DSC00038.webp"
+        "time": "10:00",
+        "title": "職人介紹",
+        "detail": "認識門市店長與店員，解說通訊產業與門市營運日常。",
+        "images": [
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職人介紹/LINE_ALBUM_202622_260202_91.webp"
+        ]
       },
       {
-        "time": "10:00",
-        "title": "職人工作說明 (2)",
-        "detail": "說明手機螢幕防護原理與包膜材質的防護力差異。",
-        "image": "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職人工作說明/DSC00194.webp"
+        "time": "10:20",
+        "title": "職人工作說明",
+        "detail": "介紹手機配件種類、商品庫存管理與門市服務禮儀規範。 說明手機螢幕防護原理與包膜材質的防護力差異。",
+        "images": [
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職人工作說明/DSC00038.webp",
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職人工作說明/DSC00194.webp"
+        ]
+      },
+      {
+        "time": "10:40",
+        "title": "職業體驗內容說明",
+        "detail": "示範手機包膜與鋼化玻璃保護貼的貼合步驟與技巧。",
+        "images": [
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗內容說明/DSC00226.webp",
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗內容說明/LINE_ALBUM_202622_260202_109.webp"
+        ]
+      },
+      {
+        "time": "11:00",
+        "title": "職業體驗",
+        "detail": "親自動手為模型機進行貼膜與氣泡排除實作，體驗精細手工。",
+        "images": [
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗/DSC00152.webp",
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗/DSC00187.webp"
+        ]
+      },
+      {
+        "time": "11:40",
+        "title": "Q＆A時間",
+        "relatedBlogPostId": "interview-comm",
+        "detail": "與職人進行問答互動，分享今日探索心得，解答生涯規劃與職涯發展的疑問。",
+        "images": [
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/Q＆A時間/DSC00018.webp",
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/Q＆A時間/DSC00036.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "在門市櫃台前與店員大合影，領取體驗成果。",
+        "images": [
+          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/大合照/DSC00267.webp"
+        ]
       }
     ],
     "cases": [
@@ -390,40 +437,6 @@ window.providersData = {
           "./img/explore/傑昇通訊嘉義吳鳳南店/精選案例/可負擔蒙特梭利/LINE_ALBUM_202622_260202_102.webp",
           "./img/explore/傑昇通訊嘉義吳鳳南店/精選案例/可負擔蒙特梭利/LINE_ALBUM_202622_260202_106.webp",
           "./img/explore/傑昇通訊嘉義吳鳳南店/精選案例/可負擔蒙特梭利/LINE_ALBUM_202622_260202_81.webp"
-        ]
-      },
-      {
-        "id": "大合照",
-        "title": "大合照",
-        "summary": "在門市櫃台前與店員大合影，領取體驗成果。",
-        "images": [
-          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/大合照/DSC00267.webp"
-        ]
-      },
-      {
-        "id": "職人介紹",
-        "title": "職人介紹",
-        "summary": "認識門市店長與店員，解說通訊產業與門市營運日常。",
-        "images": [
-          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職人介紹/LINE_ALBUM_202622_260202_91.webp"
-        ]
-      },
-      {
-        "id": "職業體驗",
-        "title": "職業體驗",
-        "summary": "親自動手為模型機進行貼膜與氣泡排除實作，體驗精細手工。",
-        "images": [
-          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗/DSC00152.webp",
-          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗/DSC00187.webp"
-        ]
-      },
-      {
-        "id": "職業體驗內容說明",
-        "title": "職業體驗內容說明",
-        "summary": "示範手機包膜與鋼化玻璃保護貼的貼合步驟與技巧。",
-        "images": [
-          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗內容說明/DSC00226.webp",
-          "./img/explore/傑昇通訊嘉義吳鳳南店/課程安排2/職業體驗內容說明/LINE_ALBUM_202622_260202_109.webp"
         ]
       }
     ]
@@ -462,16 +475,58 @@ window.providersData = {
     ],
     "timeline": [
       {
+        "time": "09:00",
+        "title": "職人介紹",
+        "detail": "認識吉他製琴與維修職人，參觀音樂工作室與工作區。",
+        "images": [
+          "./img/explore/森韻木吉他工作室/課程安排2/職人介紹/DSC00275.webp",
+          "./img/explore/森韻木吉他工作室/課程安排2/職人介紹/DSC00281.webp"
+        ]
+      },
+      {
         "time": "09:30",
-        "title": "職人工作說明 (1)",
-        "detail": "解說吉他結構、面板木料對音色的影響，以及維修保養工序。",
-        "image": "./img/explore/森韻木吉他工作室/課程安排2/職人工作說明/DSC00329.webp"
+        "title": "職人工作說明",
+        "detail": "解說吉他結構、面板木料對音色的影響，以及維修保養工序。 說明琴頸、琴橋及弦距調整對手感與音準的重要關聯。",
+        "images": [
+          "./img/explore/森韻木吉他工作室/課程安排2/職人工作說明/DSC00329.webp",
+          "./img/explore/森韻木吉他工作室/課程安排2/職人工作說明/DSC00339.webp"
+        ]
       },
       {
         "time": "10:00",
-        "title": "職人工作說明 (2)",
-        "detail": "說明琴頸、琴橋及弦距調整對手感與音準的重要關聯。",
-        "image": "./img/explore/森韻木吉他工作室/課程安排2/職人工作說明/DSC00339.webp"
+        "title": "職業體驗內容說明",
+        "detail": "示範吉他換弦步驟、琴頸彎曲度測量與弦枕打磨技巧。",
+        "images": [
+          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗內容說明/DSC00351.webp",
+          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗內容說明/DSC00409.webp"
+        ]
+      },
+      {
+        "time": "10:30",
+        "title": "職業體驗",
+        "detail": "實際進行舊弦拆卸、指板保養、新弦安裝與弦高微調實作。",
+        "images": [
+          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗/DSC00474.webp",
+          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗/DSC00511.webp"
+        ]
+      },
+      {
+        "time": "11:30",
+        "title": "Q＆A時間",
+        "relatedBlogPostId": "interview-guitar",
+        "detail": "與職人進行問答互動，分享今日探索心得，解答生涯規劃與職涯發展的疑問。",
+        "images": [
+          "./img/explore/森韻木吉他工作室/課程安排2/Q＆A時間/DSC00418.webp",
+          "./img/explore/森韻木吉他工作室/課程安排2/Q＆A時間/DSC00546.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "懷抱吉他與工作室職人大合照，奏響體驗的終章。",
+        "images": [
+          "./img/explore/森韻木吉他工作室/課程安排2/大合照/DSC00659.webp"
+        ]
       }
     ],
     "cases": [
@@ -498,41 +553,6 @@ window.providersData = {
           "./img/explore/森韻木吉他工作室/精選案例/可負擔蒙特梭利/DSC00591.webp",
           "./img/explore/森韻木吉他工作室/精選案例/可負擔蒙特梭利/DSC00634.webp",
           "./img/explore/森韻木吉他工作室/精選案例/可負擔蒙特梭利/DSC00658.webp"
-        ]
-      },
-      {
-        "id": "大合照",
-        "title": "大合照",
-        "summary": "懷抱吉他與工作室職人大合照，奏響體驗的終章。",
-        "images": [
-          "./img/explore/森韻木吉他工作室/課程安排2/大合照/DSC00659.webp"
-        ]
-      },
-      {
-        "id": "職人介紹",
-        "title": "職人介紹",
-        "summary": "認識吉他製琴與維修職人，參觀音樂工作室與工作區。",
-        "images": [
-          "./img/explore/森韻木吉他工作室/課程安排2/職人介紹/DSC00275.webp",
-          "./img/explore/森韻木吉他工作室/課程安排2/職人介紹/DSC00281.webp"
-        ]
-      },
-      {
-        "id": "職業體驗",
-        "title": "職業體驗",
-        "summary": "實際進行舊弦拆卸、指板保養、新弦安裝與弦高微調實作。",
-        "images": [
-          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗/DSC00474.webp",
-          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗/DSC00511.webp"
-        ]
-      },
-      {
-        "id": "職業體驗內容說明",
-        "title": "職業體驗內容說明",
-        "summary": "示範吉他換弦步驟、琴頸彎曲度測量與弦枕打磨技巧。",
-        "images": [
-          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗內容說明/DSC00351.webp",
-          "./img/explore/森韻木吉他工作室/課程安排2/職業體驗內容說明/DSC00409.webp"
         ]
       }
     ]
@@ -571,28 +591,41 @@ window.providersData = {
     ],
     "timeline": [
       {
+        "time": "09:00",
+        "title": "職人介紹",
+        "detail": "認識禮儀司儀職人，分享司儀在生命禮儀中扮演的重要角色。",
+        "images": [
+          "./img/explore/許正寶喪禮司儀/課程安排2/職人介紹/LINE_ALBUM_2025723_250727_104.webp",
+          "./img/explore/許正寶喪禮司儀/課程安排2/職人介紹/LINE_ALBUM_2025723_250727_99.webp"
+        ]
+      },
+      {
         "time": "09:30",
-        "title": "職人工作說明 (1)",
-        "detail": "解說公祭儀式流程、主持稿結構與說話語速、情感拿捏。",
-        "image": "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_2.webp"
+        "title": "職人工作說明",
+        "detail": "解說公祭儀式流程、主持稿結構與說話語速、情感拿捏。 說明家屬情緒安撫、臨場狀況排除及公祭秩序維護要領。 介紹告別式現場各單位的協調與流程對接細節。 說明司儀發聲呼吸法與音量控制的實務技巧。",
+        "images": [
+          "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_2.webp",
+          "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_36.webp",
+          "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_75.webp",
+          "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_8.webp"
+        ]
       },
       {
-        "time": "10:00",
-        "title": "職人工作說明 (2)",
-        "detail": "說明家屬情緒安撫、臨場狀況排除及公祭秩序維護要領。",
-        "image": "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_36.webp"
+        "time": "11:30",
+        "title": "Q＆A時間",
+        "relatedBlogPostId": "interview-ceremony",
+        "detail": "與職人進行問答互動，分享今日探索心得，解答生涯規劃與職涯發展的疑問。",
+        "images": [
+          "./img/explore/許正寶喪禮司儀/課程安排2/Q＆A時間/LINE_ALBUM_2025723_250727_16.webp"
+        ]
       },
       {
-        "time": "10:30",
-        "title": "職人工作說明 (3)",
-        "detail": "介紹告別式現場各單位的協調與流程對接細節。",
-        "image": "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_75.webp"
-      },
-      {
-        "time": "11:00",
-        "title": "職人工作說明 (4)",
-        "detail": "說明司儀發聲呼吸法與音量控制的實務技巧。",
-        "image": "./img/explore/許正寶喪禮司儀/課程安排2/職人工作說明/LINE_ALBUM_2025723_250727_8.webp"
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "與職人同台合影，展示禮儀司儀的自信與敬業態度。",
+        "images": [
+          "./img/explore/許正寶喪禮司儀/課程安排2/大合照/LINE_ALBUM_2025723_250727_62.webp"
+        ]
       }
     ],
     "cases": [
@@ -613,23 +646,6 @@ window.providersData = {
           "./img/explore/許正寶喪禮司儀/精選案例/希望種子職業探索/LINE_ALBUM_2025723_250727_72.webp",
           "./img/explore/許正寶喪禮司儀/精選案例/希望種子職業探索/LINE_ALBUM_2025723_250727_8.webp",
           "./img/explore/許正寶喪禮司儀/精選案例/希望種子職業探索/LINE_ALBUM_2025723_250727_86.webp"
-        ]
-      },
-      {
-        "id": "大合照",
-        "title": "大合照",
-        "summary": "與職人同台合影，展示禮儀司儀的自信與敬業態度。",
-        "images": [
-          "./img/explore/許正寶喪禮司儀/課程安排2/大合照/LINE_ALBUM_2025723_250727_62.webp"
-        ]
-      },
-      {
-        "id": "職人介紹",
-        "title": "職人介紹",
-        "summary": "認識禮儀司儀職人，分享司儀在生命禮儀中扮演的重要角色。",
-        "images": [
-          "./img/explore/許正寶喪禮司儀/課程安排2/職人介紹/LINE_ALBUM_2025723_250727_104.webp",
-          "./img/explore/許正寶喪禮司儀/課程安排2/職人介紹/LINE_ALBUM_2025723_250727_99.webp"
         ]
       }
     ]

@@ -564,8 +564,21 @@ function renderNavFooter() {
 
       function resolveAbs(u) { try { return new URL(u, document.baseURI).href; } catch { return u; } }
       function addVersionParam(u) {
-        try { const url = new URL(u, document.baseURI); if (!url.searchParams.has('v')) url.searchParams.set('v', __assetV); return url.href; }
-        catch { return (u + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(__assetV)); }
+        try {
+          const url = new URL(u, document.baseURI);
+          if (!url.searchParams.has('v')) {
+            if (url.pathname.includes('/js/data/')) {
+              url.searchParams.set('v', Date.now().toString());
+            } else {
+              url.searchParams.set('v', __assetV);
+            }
+          }
+          return url.href;
+        }
+        catch {
+          const v = u.includes('/js/data/') ? Date.now() : __assetV;
+          return (u + (u.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(v));
+        }
       }
       function normalizeNoV(u) {
         try { const url = new URL(u, document.baseURI); url.searchParams.delete('v'); return url.href; }

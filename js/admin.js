@@ -1291,6 +1291,9 @@
           <label class="text-sm">標題
             <input class="min-w-[250px] pv-tl-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title || ''}">
           </label>
+          <label class="text-sm">關聯 blog 文章 ID
+            <input class="min-w-[250px] pv-tl-blog-id w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="例如：interview-ceremony" value="${escHtml(row.relatedBlogPostId || row.blogPostId || row.blogId || '')}">
+          </label>
           <label class="text-sm">內容
             <textarea class="min-w-[250px] pv-tl-detail w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="detail">${toPlainText(row.detail) || ''}</textarea>
           </label>
@@ -1321,9 +1324,10 @@
     return Array.from(list.children).map(el => ({
       time: el.querySelector('.pv-tl-time')?.value?.trim() || '',
       title: el.querySelector('.pv-tl-title')?.value?.trim() || '',
+      relatedBlogPostId: el.querySelector('.pv-tl-blog-id')?.value?.trim() || '',
       // 細節文字支援連結/換行
       detail: linkifyHtml(el.querySelector('.pv-tl-detail')?.value || '')
-    })).filter(x => x.time || x.title || x.detail);
+    })).filter(x => x.time || x.title || x.relatedBlogPostId || x.detail);
   }
 
   function buildCaseItem(c = {}, idx = 0) {

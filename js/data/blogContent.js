@@ -38,9 +38,6 @@ window.blogContent = {
     ],
     "images": [
       "./img/部落格/榮耀時刻.webp",
-      "./img/1000012756_61e30f039f.webp",
-      "./img/DSC09555___ba0754ae5a.webp",
-      "./img/DSC01739__8a8686e4b1.webp"
     ]
   },
   {
