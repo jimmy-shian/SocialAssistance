@@ -365,7 +365,7 @@ function open() {
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           ${(provider.timeline || []).map((item, idx) => {
-            const stepImg = (provider.images && provider.images.length) ? provider.images[idx % provider.images.length] : fallbackImages[idx % fallbackImages.length];
+            const stepImg = item.image || ((provider.images && provider.images.length) ? provider.images[idx % provider.images.length] : fallbackImages[idx % fallbackImages.length]);
             return `
               <div class="card-dynamic-bg rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 border border-[var(--border)] flex flex-col">
                 <div class="p-5 flex-1 flex flex-col">

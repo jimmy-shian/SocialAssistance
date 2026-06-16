@@ -125,7 +125,7 @@ if (data.sdgs && Array.isArray(data.sdgs)) {
       }
 
       .sdgs-item.animating .sdg-icon-wrapper svg path {
-        animation: sdgDraw 2.5s ease-out forwards;
+        animation: sdgDraw 2.5s cubic-bezier(0.7, 0, 0.9, 0.3) forwards;
       }
 
       @keyframes sdgDraw {

@@ -16,6 +16,11 @@
   function providerCard(p) {
     const item = el('div', 'provider-list-item');
 
+    // Add faint background image
+    const bg = el('div', 'provider-list-bg');
+    bg.style.backgroundImage = `url("./img/explore/${encodeURIComponent(p.id)}/封面圖1/封面照.webp")`;
+    item.appendChild(bg);
+
     // Left container: Title + Category tag
     const leftCol = el('div', 'provider-list-left');
     const h3 = el('h3');
