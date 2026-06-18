@@ -72,11 +72,6 @@ main {
   overflow: clip;
 }
 
-main > .container {
-  padding-top: clamp(2rem, 5vw, 4.5rem);
-  padding-bottom: clamp(3rem, 7vw, 6rem);
-}
-
 .hero-slider-asym {
   min-height: min(88vh, 860px);
   background:
@@ -626,3 +621,372 @@ html.dark .services-circular-section {
   border-color: rgba(154, 205, 50, 0.15) !important;
 }
 
+/* Philosophy Section Ribbon Overrides */
+.philosophy-section.asym-layout {
+  background: var(--primary) !important;
+  border: none !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+  position: relative;
+  color: #ffffff !important;
+  padding: clamp(3rem, 6vw, 5rem) 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 3rem !important;
+  border-radius: 0 !important; /* Straight full-width ribbon edges */
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.philosophy-section.asym-layout::before,
+.philosophy-section.asym-layout::after {
+  content: none !important;
+  display: none !important;
+}
+
+.philosophy-image-box {
+  display: block !important;
+  width: 100% !important;
+}
+
+.philosophy-image-box img {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 16px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+  transform: rotate(-1.5deg) !important;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease !important;
+}
+
+.philosophy-image-box:hover img,
+.philosophy-section.asym-layout:hover .philosophy-image-box img {
+  transform: rotate(0deg) scale(1.03) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3) !important;
+}
+
+.philosophy-grid-wrapper {
+  display: grid !important;
+  grid-template-columns: 35fr 75fr !important;
+  gap: clamp(1.5rem, 5vw, 4rem) !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: var(--container-max) !important;
+}
+
+@media (max-width: 768px) {
+  .philosophy-grid-wrapper {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+}
+
+.philosophy-section.asym-layout .philosophy-content {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 3px dashed #79d2ff !important; /* Light blue dashed border */
+  border-radius: 48% 52% 60% 40% / 38% 55% 45% 62% !important;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.02), 0 10px 30px rgba(0,0,0,0.15) !important;
+  color: #ffffff !important;
+  padding: clamp(2rem, 4vw, 3rem) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.philosophy-section.asym-layout .philosophy-content .section-label {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 1.15rem !important;
+}
+
+.philosophy-section.asym-layout .philosophy-content h2 {
+  color: #ffffff !important;
+  font-weight: 900;
+  margin-top: 0.6rem;
+  margin-bottom: 1.6rem;
+  font-size: clamp(1.5rem, 4.5vw, 2.5rem) !important;
+  line-height: 1.25;
+}
+
+.philosophy-section.asym-layout .philosophy-content blockquote {
+  color: rgba(255, 255, 255, 0.98) !important;
+  border-left: 4px solid #1598da !important; /* Match light blue color */
+  padding-left: 1.8rem !important;
+  font-style: italic !important;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem) !important;
+  line-height: 1.85 !important;
+  max-width: 44rem !important;
+}
+
+html.dark .philosophy-section.asym-layout {
+  background: #4B6323 !important; /* Rich, dark saturated olive green ribbon background for dark mode compatibility */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Services Circular Section Mobile Optimization */
+@media (max-width: 768px) {
+  .services-circular-section {
+    border-radius: 24px !important;
+    background: #e2ede0 !important;
+    box-shadow: 0 8px 24px rgba(31, 58, 39, 0.08) !important;
+    border: 1px solid rgba(107, 142, 35, 0.15) !important;
+  }
+  
+  html.dark .services-circular-section {
+    background: #232a20 !important;
+    border-color: rgba(154, 205, 50, 0.15) !important;
+  }
+
+  .services-circular-section::before,
+  .services-circular-section::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .service-circular-card .circle-wrapper {
+    border-width: 4px !important;
+  }
+}
+
+/* SDGs SVG Icon Expansion */
+.sdgs-item .sdg-icon-wrapper {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.sdgs-item .sdg-icon-wrapper svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Team Accordion Styles */
+.team-accordion-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  width: 100%;
+  min-height: 480px;
+  margin-top: 2rem;
+}
+
+.team-accordion-card {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  min-width: 240px;
+}
+
+.team-accordion-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: var(--shadow-lg);
+}
+
+.team-accordion-card.active {
+  flex: 2.8;
+  cursor: default;
+}
+
+.team-accordion-card .card-face-front {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.team-accordion-card .photo-container {
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  position: relative;
+}
+
+.team-accordion-card .team-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.team-accordion-card:hover .team-photo-img {
+  transform: scale(1.05);
+}
+
+.team-accordion-card .team-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+}
+
+.team-accordion-card .info-container {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.team-accordion-card .card-face-back {
+  flex: 0;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background: var(--bg-highlight);
+  display: flex;
+  flex-direction: column;
+}
+
+.team-accordion-card.active .card-face-back {
+  flex: 1.5;
+  width: auto;
+  opacity: 1;
+  padding: 2rem;
+  border-left: 1px solid var(--border);
+}
+
+.team-accordion-card .back-content-wrapper {
+  min-width: 280px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+@media (max-width: 992px) {
+  .team-accordion-container {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .team-accordion-card {
+    flex-direction: column;
+    min-width: 100%;
+    height: auto;
+    flex: none !important;
+  }
+
+  .team-accordion-card.active {
+    flex: none !important;
+  }
+
+  .team-accordion-card .card-face-front {
+    flex-direction: row;
+    min-height: 160px;
+    align-items: center;
+  }
+
+  .team-accordion-card .photo-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-left: 1.5rem;
+    flex-shrink: 0;
+    border: 3px solid var(--primary-light);
+  }
+
+  .team-accordion-card .info-container {
+    padding: 1.5rem;
+    text-align: left;
+  }
+
+  .team-accordion-card .card-face-back {
+    height: 0;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .team-accordion-card.active .card-face-back {
+    height: auto;
+    opacity: 1;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .team-accordion-card .card-face-front {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 1.5rem;
+  }
+
+  .team-accordion-card .photo-container {
+    margin-left: 0;
+  }
+
+  .team-accordion-card .info-container {
+    text-align: center;
+  }
+}
+
+/* Scroll Reveal CSS Definitions for Redesign Test */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-reveal-child {
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.scroll-reveal-child.reveal-left {
+  transform: translateX(-40px);
+}
+
+.scroll-reveal-child.reveal-center {
+  transform: translateY(40px);
+}
+
+.scroll-reveal-child.reveal-right {
+  transform: translateX(40px);
+}
+
+.scroll-reveal.revealed .scroll-reveal-child.reveal-left,
+.scroll-reveal.revealed .scroll-reveal-child.reveal-center,
+.scroll-reveal.revealed .scroll-reveal-child.reveal-right {
+  opacity: 1;
+  transform: translate(0) !important;
+}
+
+/* Staggered offsets for desktop grid checks */
+.team-section .team-card.reveal-left {
+  transform: translateY(-16px);
+}
+
+.team-section .team-card.reveal-center {
+  transform: translateY(0);
+}
+
+.team-section .team-card.reveal-right {
+  transform: translateY(16px);
+}
+
+#achievements-grid > a.reveal-left {
+  transform: translateY(-16px);
+}
+
+#achievements-grid > a.reveal-center {
+  transform: translateY(0);
+}
+
+#achievements-grid > a.reveal-right {
+  transform: translateY(16px);
+}

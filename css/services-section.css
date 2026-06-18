@@ -205,6 +205,9 @@ html.dark .service-feature-card {
   box-shadow: var(--surface-shadow);
 }
 
+  box-shadow: var(--surface-shadow);
+}
+
 html.dark .service-feature-card:hover {
   border-color: color-mix(in srgb, var(--primary) 38%, var(--border));
   box-shadow: var(--surface-shadow-strong);
@@ -266,24 +269,46 @@ html.dark .service-alt-card:hover {
 }
 
 /* Scroll Reveal Animations */
-.scroll-anim {
+.scroll-reveal {
   opacity: 0;
-  transform: translateY(40px) scale(0.97);
-  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, opacity;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.scroll-anim.scroll-visible {
+.scroll-reveal.revealed {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateY(0);
+}
+
+.scroll-reveal-child {
+  opacity: 0;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.scroll-reveal-child.reveal-left {
+  transform: translateX(-40px);
+}
+
+.scroll-reveal-child.reveal-center {
+  transform: translateY(40px);
+}
+
+.scroll-reveal-child.reveal-right {
+  transform: translateX(40px);
+}
+
+.scroll-reveal.revealed .scroll-reveal-child.reveal-left,
+.scroll-reveal.revealed .scroll-reveal-child.reveal-center,
+.scroll-reveal.revealed .scroll-reveal-child.reveal-right {
+  opacity: 1;
+  transform: translate(0) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .scroll-anim {
+  .scroll-reveal,
+  .scroll-reveal-child {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
   }
 }
-
-

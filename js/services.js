@@ -15,23 +15,26 @@
     const gallery = Array.isArray(data.gallery) && data.gallery.length ? data.gallery : items.map(x => x.image).filter(Boolean);
     
     root.innerHTML = `
-      <header class="text-center max-w-3xl mx-auto mb-12">
+      <header class="text-center max-w-3xl mx-auto mb-12 scroll-reveal">
         <span class="ui-eyebrow text-[var(--primary)] font-black tracking-wider text-base md:text-lg">SERVICES</span>
         <h1 class="heading-display mt-3 font-black tracking-tight text-[var(--text-primary)]">${esc(data.title || '服務項目')}</h1>
         <p class="lead-text mt-4 text-[var(--text-secondary)] font-semibold text-lg md:text-xl">${esc(data.lead || '')}</p>
       </header>
 
-      <div class="space-y-16 mb-16">
+      <div class="space-y-16 mb-16 scroll-reveal">
         ${items.map((item, i) => {
           const isEven = i % 2 === 1;
           const badgeBg = isEven ? 'bg-[#dfc8b8] text-[#4d2a23]' : 'bg-[#b9dca8] text-[#224419]';
           const cardBorder = isEven ? 'border-[#dfc8b8]' : 'border-[#b9dca8]';
           const imgBorder = isEven ? 'border-[#d2b6a0]' : 'border-[#a9c9a0]';
-          const delay = (i * 0.05).toFixed(2);
+          const delay = (i * 0.15).toFixed(2);
           const detail = item.detail || item.content || item.desc;
           
+          // Use alternating slide directions to slide from alternating sides
+          const animClass = isEven ? 'reveal-right' : 'reveal-left';
+          
           return `
-            <article id="service-${i + 1}" class="service-alt-card flex flex-col ${isEven ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12 p-6 md:p-10 rounded-3xl border-2 ${cardBorder} bg-white/40 dark:bg-black/20 backdrop-blur-md relative overflow-visible transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5" style="animation-delay:${delay}s">
+            <article id="service-${i + 1}" class="service-alt-card scroll-reveal-child ${animClass} flex flex-col ${isEven ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12 p-6 md:p-10 rounded-3xl border-2 ${cardBorder} bg-white/40 dark:bg-black/20 backdrop-blur-md relative overflow-visible transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5" style="transition-delay: ${delay}s">
               <!-- Text Area -->
               <div class="flex-1 z-10">
                 <div class="flex items-center gap-3 mb-4">
@@ -65,7 +68,7 @@
       <!-- Achievements Section -->
       <div id="achievements-placeholder"></div>
 
-      <section class="service-gallery-full mt-16" aria-label="服務照片輪播">
+      <section class="service-gallery-full mt-16 scroll-reveal" aria-label="服務照片輪播">
         <div class="service-gallery-track">
           ${gallery.concat(gallery).map((src, i) => `<img decoding="async" src="${esc(src)}" alt="服務照片 ${i + 1}" loading="lazy">`).join('')}
         </div>
@@ -91,32 +94,30 @@
     if (!root) return;
 
     // Elements to animate
-    const animElements = root.querySelectorAll('header, .service-alt-card, #achievements-placeholder > section, .service-gallery-full');
+    const animElements = root.querySelectorAll('.scroll-reveal');
     
-    animElements.forEach(el => {
-      el.classList.add('scroll-anim');
-    });
-
     if ('IntersectionObserver' in window) {
       const observerOptions = {
         root: null,
         rootMargin: '0px 0px -8% 0px',
-        threshold: 0.1
+        threshold: 0.15
       };
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('scroll-visible');
-          } else {
-            entry.target.classList.remove('scroll-visible');
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
           }
         });
       }, observerOptions);
 
-      animElements.forEach(el => observer.observe(el));
+      // Use a brief timeout to let the browser register and paint the initial state (opacity: 0)
+      setTimeout(() => {
+        animElements.forEach(el => observer.observe(el));
+      }, 50);
     } else {
-      animElements.forEach(el => el.classList.add('scroll-visible'));
+      animElements.forEach(el => el.classList.add('revealed'));
     }
   }
 

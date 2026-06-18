@@ -245,6 +245,18 @@ function renderNavFooter() {
   if (navPlaceholder) navPlaceholder.innerHTML = navHTML;
   if (footerPlaceholder) footerPlaceholder.innerHTML = footerHTML;
 
+  // Smooth scroll to bottom when clicking "Contact Us" links
+  const contactLinks = document.querySelectorAll('a[href="#contact"]');
+  contactLinks.forEach(link => {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+    });
+  });
+
   // Append style to document head for border wrap hover effect on nav buttons
   if (!document.getElementById('nav-hover-style')) {
     const style = document.createElement('style');
