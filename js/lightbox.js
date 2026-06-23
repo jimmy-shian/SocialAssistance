@@ -6,21 +6,24 @@
     lb = document.createElement('div');
     lb.id = 'global-lightbox';
     lb.className = 'lightbox';
+    lb.setAttribute('role', 'dialog');
+    lb.setAttribute('aria-modal', 'true');
+    lb.setAttribute('aria-label', '圖片檢視器');
     lb.innerHTML = `
       <img decoding="async" alt="擴大顯示" />
-      <div class="nav" aria-hidden="true">
-        <button class="nav-btn prev" aria-label="上一張">‹</button>
-        <button class="nav-btn next" aria-label="下一張">›</button>
+      <div class="lightbox-nav" aria-hidden="true">
+        <button class="lightbox-nav-btn lightbox-prev" type="button" aria-label="上一張">&#8249;</button>
+        <button class="lightbox-nav-btn lightbox-next" type="button" aria-label="下一張">&#8250;</button>
       </div>
-      <div class="thumbs" role="listbox" aria-label="縮圖快速切換"></div>
-      <button class="close-btn" aria-label="關閉">×</button>
+      <div class="lightbox-thumbs" role="listbox" aria-label="縮圖快速切換"></div>
+      <button class="lightbox-close-btn" type="button" aria-label="關閉">&#x2715;</button>
     `;
     document.body.appendChild(lb);
     const img = lb.querySelector('img');
-    const btnPrev = lb.querySelector('.prev');
-    const btnNext = lb.querySelector('.next');
-    const btnClose = lb.querySelector('.close-btn');
-    const thumbs = lb.querySelector('.thumbs');
+    const btnPrev = lb.querySelector('.lightbox-prev');
+    const btnNext = lb.querySelector('.lightbox-next');
+    const btnClose = lb.querySelector('.lightbox-close-btn');
+    const thumbs = lb.querySelector('.lightbox-thumbs');
     const state = { index: 0, sources: [] };
 
     function show(i) {
@@ -28,7 +31,6 @@
       state.index = ((i % state.sources.length) + state.sources.length) % state.sources.length;
       img.src = state.sources[state.index];
       img.alt = `圖片 ${state.index + 1}`;
-      // update active thumb
       const nodes = thumbs ? thumbs.querySelectorAll('img.thumb') : [];
       nodes.forEach((t, idx) => {
         if (idx === state.index) t.classList.add('active'); else t.classList.remove('active');
@@ -51,24 +53,27 @@
     }
 
     function open(i, sources) {
-      // unique sources to avoid duplicates
       if (Array.isArray(sources)) {
         state.sources = Array.from(new Set(sources));
       }
       renderThumbs();
       show(i || 0);
       lb.classList.add('open');
+      document.body.classList.add('modal-open');
     }
 
-    function close() { lb.classList.remove('open'); }
+    function close() {
+      lb.classList.remove('open');
+      document.body.classList.remove('modal-open');
+    }
     function next() { show(state.index + 1); }
     function prev() { show(state.index - 1); }
 
     lb.addEventListener('click', (e) => {
       const inImage = img.contains(e.target);
-      const inNav = !!e.target.closest('.nav');
-      const inThumbs = !!e.target.closest('.thumbs');
-      const inClose = !!e.target.closest('.close-btn');
+      const inNav = !!e.target.closest('.lightbox-nav');
+      const inThumbs = !!e.target.closest('.lightbox-thumbs');
+      const inClose = !!e.target.closest('.lightbox-close-btn');
       if (!inImage && !inNav && !inThumbs && !inClose) close();
     });
     btnClose.addEventListener('click', close);
@@ -94,11 +99,9 @@
 
   function enableLightboxOn(container, sources) {
     const ctrl = ensureLightbox();
-    // Event delegation so cloned images work too
     container.addEventListener('click', (e) => {
       const target = e.target.closest('img');
       if (!target) return;
-      // If just finished a drag, suppress click-to-open
       if (container.dataset.dragging === '1') return;
       e.preventDefault();
       const src = target.getAttribute('src') || '';

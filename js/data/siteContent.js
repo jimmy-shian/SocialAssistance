@@ -85,10 +85,10 @@ window.siteContent = {
   resources: {
     title: '資源與部落格',
     tags: [
-      { text: '問卷與回饋', link: './member.html' },
-      { text: '自立評估', link: './member.html' },
-      { text: '活動認證/照片', link: './member.html' },
-      { text: '學習歷程檔案', link: './member.html' }
+      { text: '合作諮詢', link: './services.html' },
+      { text: '自立培養', link: './services.html' },
+      { text: '活動紀錄', link: './blog.html' },
+      { text: '探索場域', link: './explore.html' }
     ]
   },
   blogPosts: [

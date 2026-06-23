@@ -1,68 +1,28 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>業者介紹 - 核心生涯探索平台</title>
+  <title>探索場域 | 聽見核心工作室</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <script>
-    (function () {
-      try {
-        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
-        var raw = localStorage.getItem(K), v = null;
-        try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
-        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
-        var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + encodeURIComponent(v);
-        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.head).insertBefore(s, cur);
-      } catch (e) { var s = document.createElement('script'); s.src = './tailwind.config.js?v=' + Date.now(); document.head.appendChild(s); }
-    })();
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="./css/style.css" rel="stylesheet">
-  <script>
-    (function () {
-      try {
-        var K = (window.AppConfig && window.AppConfig.versionCacheKey) || 'app_data_version';
-        var raw = localStorage.getItem(K), v = null; try { if (raw) { var obj = JSON.parse(raw) || {}; var vals = Object.values(obj); if (vals && vals.length) v = vals.join('.'); } } catch (e) { }
-        if (!v) { try { v = sessionStorage.getItem('asset_v'); if (!v) { v = String(Date.now()); sessionStorage.setItem('asset_v', v); } } catch (e) { v = String(Date.now()); } }
-        var l = document.querySelector('link[rel="stylesheet"][href^="./css/style.css"],link[rel="stylesheet"][href^="css/style.css"]');
-        if (l) { var href = l.getAttribute('href') || ''; try { var url = new URL(href, document.baseURI); url.searchParams.set('v', v); l.href = url.href; } catch (e) { var h = href.split('#')[0].replace(/([?&])v=[^&]*(&|$)/, '$1').replace(/[?&]$/, ''); l.href = h + (h.indexOf('?') > -1 ? '&' : '?') + 'v=' + encodeURIComponent(v); } }
-      } catch (e) { }
-    })();
-  </script>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/font/LXGWWenKaiTC-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
-  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-  <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin>
-  <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin>
-  <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin>
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/utilities.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
-
-<body class="section-bg-2 category-page">
+<body>
   <div id="nav-placeholder"></div>
-  <div class="category-bg-decor" aria-hidden="true"></div>
-
-  <main class="container mx-auto px-6 py-12 main-content" id="provider-root">
-    <!-- 內容由 js/provider-detail.js 根據 URL ?id=... 動態注入 -->
-    <div class="text-center text-gray-500">載入中…</div>
-  </main>
-
+  <main id="provider-root" class="container-wide page-hero"></main>
   <div id="footer-placeholder"></div>
-  <script>
-    (function () {
-      try {
-        var k = 'asset_v';
-        var v = sessionStorage.getItem(k); if (!v) { v = String(Date.now()); sessionStorage.setItem(k, v); }
-        var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + encodeURIComponent(v);
-        var cur = document.currentScript; (cur && cur.parentNode ? cur.parentNode : document.body).insertBefore(s, cur);
-      } catch (e) { var s = document.createElement('script'); s.src = './js/navFooter.js?v=' + Date.now(); document.body.appendChild(s); }
-    })();
-  </script>
+  <script src="./js/navFooter.js"></script>
+  <script src="./js/toast.js"></script>
+  <script src="./js/lightbox.js"></script>
+  <script src="./js/data/providers.js"></script>
+  <script src="./js/data/blogContent.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./js/provider-detail.js"></script>
+  <script src="./js/map-provider.js"></script>
+  <script src="./js/main.js"></script>
 </body>
-
 </html>
+

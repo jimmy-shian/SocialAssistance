@@ -256,7 +256,7 @@
         <img decoding="async" src="${escHtml(src)}" alt="${escHtml(name)}" loading="lazy">
         <span class="image-picker-name">${escHtml(name)}</span>
       </button>`;
-    }).join('') : '<div class="text-sm text-gray-500 dark:text-gray-300">沒有符合的圖片。</div>';
+    }).join('') : '<div class="text-sm text-gray-500">沒有符合的圖片。</div>';
   }
 
   function applyPickedImage(uploadInput, src) {
@@ -524,7 +524,7 @@
     imgs.forEach((url, i) => {
       const isGas = /^gas:\/\/image\//.test(url); const preview = isGas ? previewCache[url] : null;
       const cell = document.createElement('div');
-      cell.className = 'sc-story-cell drag-transition relative h-40 md:h-52 rounded overflow-hidden border border-gray-300 dark:border-gray-700 cursor-move';
+      cell.className = 'sc-story-cell drag-transition relative h-40 md:h-52 rounded overflow-hidden border border-gray-300 cursor-move';
       cell.draggable = true;
       cell.dataset.index = String(i);
       cell.innerHTML = preview
@@ -536,7 +536,7 @@
           ? `<div class="image-frame image-frame--card w-full h-full">
                <img decoding="async" src="${url}" alt="story${i + 1}">
              </div>`
-          : `<div class="w-full h-full grid place-items-center bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300">無圖片</div>`;
+          : `<div class="w-full h-full grid place-items-center bg-gray-100 text-xs text-gray-600">無圖片</div>`;
       const ctrls = document.createElement('div');
       ctrls.className = 'absolute top-1 right-1 flex gap-1 z-10';
       ctrls.innerHTML = `
@@ -1045,7 +1045,7 @@
     const sk = [];
     for (let i = 0; i < 3; i++) {
       sk.push(`
-        <div class="skeleton-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <div class="skeleton-card bg-white border border-gray-200">
           <div class="flex items-center gap-3 mb-3">
             <div class="skeleton-avatar skeleton"></div>
             <div class="flex-1">
@@ -1158,7 +1158,7 @@
           const b = document.createElement('button');
           b.type = 'button';
           b.setAttribute('data-value', o.value);
-          b.className = 'block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200';
+          b.className = 'block w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700';
           b.textContent = o.textContent || o.value;
           menu.appendChild(b);
         });
@@ -1280,22 +1280,22 @@
   // ===== Timeline 編輯 =====
   function buildTlItem(row = {}, idx = 0) {
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 bg-white';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="flex items-center justify-between gap-3">
         <div class="flex flex-wrap gap-2">
           <label class="text-sm">時間
-            <input class="min-w-[250px] pv-tl-time w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="time" value="${row.time || ''}">
+            <input class="min-w-[250px] pv-tl-time w-full rounded border px-2 py-1 bg-white" placeholder="time" value="${row.time || ''}">
           </label>
           <label class="text-sm">標題
-            <input class="min-w-[250px] pv-tl-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="title" value="${row.title || ''}">
+            <input class="min-w-[250px] pv-tl-title w-full rounded border px-2 py-1 bg-white" placeholder="title" value="${row.title || ''}">
           </label>
           <label class="text-sm">關聯 blog 文章 ID
-            <input class="min-w-[250px] pv-tl-blog-id w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="例如：interview-ceremony" value="${escHtml(row.relatedBlogPostId || row.blogPostId || row.blogId || '')}">
+            <input class="min-w-[250px] pv-tl-blog-id w-full rounded border px-2 py-1 bg-white" placeholder="例如：interview-ceremony" value="${escHtml(row.relatedBlogPostId || row.blogPostId || row.blogId || '')}">
           </label>
           <label class="text-sm">內容
-            <textarea class="min-w-[250px] pv-tl-detail w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2" placeholder="detail">${toPlainText(row.detail) || ''}</textarea>
+            <textarea class="min-w-[250px] pv-tl-detail w-full rounded border px-2 py-1 bg-white" rows="2" placeholder="detail">${toPlainText(row.detail) || ''}</textarea>
           </label>
         </div>
         <div class="flex items-center gap-2 flex-wrap ml-auto">
@@ -1332,7 +1332,7 @@
 
   function buildCaseItem(c = {}, idx = 0) {
     const wrap = document.createElement('div');
-    wrap.className = 'p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow';
+    wrap.className = 'p-4 rounded-lg bg-gray-50 shadow';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="flex items-center justify-between flex-wrap gap-2">
@@ -1347,18 +1347,18 @@
       </div>
       <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-3 mt-3">
         <label class="text-sm">id（唯一）
-          <input class="pv-id w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${c.id || ''}" placeholder="不需填寫">
+          <input class="pv-id w-full rounded border px-2 py-1 bg-white" value="${c.id || ''}" placeholder="不需填寫">
         </label>
         <label class="text-sm">title（題名）
-          <input class="pv-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${c.title || ''}">
+          <input class="pv-title w-full rounded border px-2 py-1 bg-white" value="${c.title || ''}">
         </label>
       </div>
       <label class="block text-sm mt-2">summary（摘要）
-        <textarea class="pv-summary w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(c.summary) || ''}</textarea>
+        <textarea class="pv-summary w-full rounded border px-2 py-1 bg-white" rows="2">${toPlainText(c.summary) || ''}</textarea>
       </label>
       <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-3 mt-2">
         <label class="text-sm">images（每行一個 URL）
-          <textarea class="pv-images w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${(Array.isArray(c.images) ? c.images : []).join('\n')}</textarea>
+          <textarea class="pv-images w-full rounded border px-2 py-1 bg-white" rows="4">${(Array.isArray(c.images) ? c.images : []).join('\n')}</textarea>
           <div class="pv-imgmgr mt-2">
             <div class="flex items-center justify-between mb-1">
               <span class="text-xs text-gray-500">拖曳縮圖可排序；拖放圖片或貼上網址可新增</span>
@@ -1368,8 +1368,8 @@
           </div>
         </label>
         <label class="text-sm">video（YouTube/Vimeo/MP4）
-          <input class="pv-video w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${c.video || ''}">
-          <div class="pv-video-preview image-frame image-frame--card image-frame--rounded mt-2 bg-gray-200 dark:bg-gray-700 grid place-items-center text-xs text-gray-600 dark:text-gray-300">
+          <input class="pv-video w-full rounded border px-2 py-1 bg-white" value="${c.video || ''}">
+          <div class="pv-video-preview image-frame image-frame--card image-frame--rounded mt-2 bg-gray-200 grid place-items-center text-xs text-gray-600">
             <img decoding="async" class="hidden" src="" alt="影片縮圖">
             <span class="pv-video-preview-text">${c.video ? '預覽載入中…' : '輸入影片網址後顯示縮圖'}</span>
           </div>
@@ -1520,7 +1520,7 @@
     list.innerHTML = '';
     imgs.forEach((url, i) => {
       const cell = document.createElement('div');
-      cell.className = 'pv-img-cell drag-transition relative w-20 h-20 rounded overflow-hidden border border-gray-300 dark:border-gray-700';
+      cell.className = 'pv-img-cell drag-transition relative w-20 h-20 rounded overflow-hidden border border-gray-300';
       cell.draggable = true;
       cell.dataset.index = String(i);
       const isGas = /^gas:\/\/image\//.test(url);
@@ -1537,7 +1537,7 @@
         `;
       } else if (isGas) {
         cell.innerHTML = `
-          <div class="w-full h-full grid place-items-center bg-gray-100 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-300">待發佈圖片</div>
+          <div class="w-full h-full grid place-items-center bg-gray-100 text-xs text-gray-600">待發佈圖片</div>
           <div class="absolute top-1 right-1 flex gap-1">
             <button type="button" class="pv-img-up bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↑</button>
             <button type="button" class="pv-img-down bg-yellow-500/90 hover:bg-yellow-600 text-white rounded px-1 text-xs">↓</button>
@@ -1858,7 +1858,7 @@
   // ===== About 視覺化 =====
   function buildModelItem(row = {}, idx = 0) {
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 bg-white';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
@@ -1869,16 +1869,16 @@
       </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
         <label class="text-sm">標題
-          <input class="ab-model-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.title || ''}">
+          <input class="ab-model-title w-full rounded border px-2 py-1 bg-white" value="${row.title || ''}">
         </label>
         <label class="text-sm">描述
-          <textarea class="ab-model-desc w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.desc) || ''}</textarea>
+          <textarea class="ab-model-desc w-full rounded border px-2 py-1 bg-white" rows="2">${toPlainText(row.desc) || ''}</textarea>
         </label>
         <label class="text-sm">連結（可選）
-          <input class="ab-model-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.href || ''}">
+          <input class="ab-model-href w-full rounded border px-2 py-1 bg-white" value="${row.href || ''}">
         </label>
         <label class="text-sm flex-1">連結文字（可選）
-          <input class="ab-model-linktext w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.linkText || ''}">
+          <input class="ab-model-linktext w-full rounded border px-2 py-1 bg-white" value="${row.linkText || ''}">
         </label>
       </div>`;
     return wrap;
@@ -1950,7 +1950,7 @@
   function buildAchItem(row, idx) {
     const isObj = row && typeof row === 'object';
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-col';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 bg-white flex-col';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
@@ -1961,17 +1961,17 @@
       </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 items-center">
         <label class="text-sm">文字
-          <textarea class="ab-ach-text w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${isObj ? (row.text || '') : (row || '')}</textarea>
+          <textarea class="ab-ach-text w-full rounded border px-2 py-1 bg-white" rows="2">${isObj ? (row.text || '') : (row || '')}</textarea>
         </label>
         <label class="text-sm">連結（可選）
-          <input class="ab-ach-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${isObj ? (row.href || '') : ''}">
+          <input class="ab-ach-href w-full rounded border px-2 py-1 bg-white" value="${isObj ? (row.href || '') : ''}">
         </label>
       </div>`;
     return wrap;
   }
   function buildTeamItem(row = {}, idx = 0) {
     const wrap = document.createElement('div');
-    wrap.className = 'ab-team-item flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'ab-team-item flex flex-wrap p-3 rounded border border-gray-200 bg-white';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
     <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
@@ -1982,12 +1982,12 @@
     </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2 items-center">
         <label class="text-sm">姓名
-          <input class="ab-team-name w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.name || ''}">
+          <input class="ab-team-name w-full rounded border px-2 py-1 bg-white" value="${row.name || ''}">
         </label>
         <div class="min-w-0 sm:col-span-2 md:col-span-2">
           <div class="flex items-center gap-2 min-w-0">
             <label class="text-sm flex-1 min-w-0">照片
-              <input class="ab-team-photo flex-1 min-w-0 rounded border px-2 py-1 bg-white dark:bg-gray-800" placeholder="照片連結或 gas://image/..." value="${row.photo || ''}">
+              <input class="ab-team-photo flex-1 min-w-0 rounded border px-2 py-1 bg-white" placeholder="照片連結或 gas://image/..." value="${row.photo || ''}">
             </label>
             <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden tm-photo-upload" accept="image/*"></label>
           </div>
@@ -1996,18 +1996,18 @@
           </div>
         </div>
         <label class="text-sm">角色
-          <input class="ab-team-roles w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${Array.isArray(row.roles) ? row.roles.join('、') : ''}">
+          <input class="ab-team-roles w-full rounded border px-2 py-1 bg-white" value="${Array.isArray(row.roles) ? row.roles.join('、') : ''}">
         </label>
         <label class="text-sm">座右銘
-          <textarea class="ab-team-motto w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${toPlainText(row.motto) || ''}</textarea>
+          <textarea class="ab-team-motto w-full rounded border px-2 py-1 bg-white" rows="2">${toPlainText(row.motto) || ''}</textarea>
         </label>
       </div>
       <div class="grid admin-grid items-start grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-2 mt-2">
         <label class="text-sm flex flex-col gap-2">教育背景
-          <textarea class="ab-team-edu w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${(row.education || []).join('\n')}</textarea>
+          <textarea class="ab-team-edu w-full rounded border px-2 py-1 bg-white" rows="4">${(row.education || []).join('\n')}</textarea>
         </label>
         <label class="text-sm flex flex-col gap-2">經歷
-          <textarea class="ab-team-exp w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${(row.experience || []).join('\n')}</textarea>
+          <textarea class="ab-team-exp w-full rounded border px-2 py-1 bg-white" rows="4">${(row.experience || []).join('\n')}</textarea>
         </label>
       </div>
       <div class="mt-2">
@@ -2019,10 +2019,10 @@
           ${Array.isArray(row.socials) ? row.socials.map((s, i) => `
             <div class="ab-social-row flex flex-wrap gap-2 items-center min-w-0" data-index="${i}">
               <label class="text-sm flex-1 min-w-[200px]">名稱
-                <input class="ab-social-name w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${s.name || ''}">
+                <input class="ab-social-name w-full rounded border px-2 py-1 bg-white" value="${s.name || ''}">
               </label>
               <label class="text-sm flex-1 min-w-[200px]">連結
-                <input class="ab-social-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${s.href || ''}">
+                <input class="ab-social-href w-full rounded border px-2 py-1 bg-white" value="${s.href || ''}">
               </label>
               <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0" title="上移"><i class="fas fa-arrow-up"></i></button>
               <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0" title="下移"><i class="fas fa-arrow-down"></i></button>
@@ -2119,10 +2119,10 @@
       node.className = 'ab-social-row flex flex-wrap gap-2 items-center min-w-0';
       node.innerHTML = `
         <label class="text-sm flex-1 min-w-[200px]">名稱
-          <input class="ab-social-name w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+          <input class="ab-social-name w-full rounded border px-2 py-1 bg-white">
         </label>
         <label class="text-sm flex-1 min-w-[200px]">連結
-          <input class="ab-social-href w-full rounded border px-2 py-1 bg-white dark:bg-gray-800">
+          <input class="ab-social-href w-full rounded border px-2 py-1 bg-white">
         </label>
         <button type="button" class="btn-soft btn-yellow ab-social-up shrink-0" title="上移"><i class="fas fa-arrow-up"></i></button>
         <button type="button" class="btn-soft btn-yellow ab-social-down shrink-0" title="下移"><i class="fas fa-arrow-down"></i></button>
@@ -2136,7 +2136,7 @@
   // ===== Site 視覺化 (Updated for Dynamic Index) =====
   function buildHeroSlideItem(row = {}, idx = 0) {
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 bg-white';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
@@ -2147,14 +2147,14 @@
       <div class="grid grid-cols-1 gap-2 w-full">
         <div class="flex items-center gap-2">
           <label class="text-sm flex-1">圖片 URL
-            <input class="sc-slide-img w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.img || ''}" placeholder="./img/...">
+            <input class="sc-slide-img w-full rounded border px-2 py-1 bg-white" value="${row.img || ''}" placeholder="./img/...">
           </label>
           <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0 self-end mb-[2px]">上傳<input type="file" class="hidden sc-slide-upload" accept="image/*"></label>
         </div>
         <label class="text-sm">替代文字 (Alt)
-          <input class="sc-slide-alt w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.alt || ''}">
+          <input class="sc-slide-alt w-full rounded border px-2 py-1 bg-white" value="${row.alt || ''}">
         </label>
-        <div class="h-36 bg-gray-100 dark:bg-gray-800 rounded mt-1 overflow-hidden relative sc-slide-preview-box">
+        <div class="h-36 bg-gray-100 rounded mt-1 overflow-hidden relative sc-slide-preview-box">
            <img decoding="async" src="${row.img || ''}" class="sc-slide-preview w-full h-full object-contain" onerror="this.style.display='none'" onload="this.style.display='block'">
            <div class="sc-slide-uploading hidden absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs">上傳中...</div>
         </div>
@@ -2188,7 +2188,7 @@
 
   function buildServiceItem(row = {}, idx = 0) {
     const wrap = document.createElement('div');
-    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900';
+    wrap.className = 'flex flex-wrap p-3 rounded border border-gray-200 bg-white';
     wrap.dataset.index = String(idx);
     wrap.innerHTML = `
       <div class="mt-2 flex items-center gap-2 flex-wrap ml-auto">
@@ -2198,26 +2198,26 @@
       </div>
       <div class="grid admin-grid items-start grid-cols-1 md:grid-cols-2 gap-2 items-center w-full">
         <label class="text-sm">標題
-          <input class="sc-svc-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.title || ''}">
+          <input class="sc-svc-title w-full rounded border px-2 py-1 bg-white" value="${row.title || ''}">
         </label>
         <label class="text-sm">Icon (FontAwesome)
-          <input class="sc-svc-icon w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.icon || ''}" placeholder="fas fa-star">
+          <input class="sc-svc-icon w-full rounded border px-2 py-1 bg-white" value="${row.icon || ''}" placeholder="fas fa-star">
         </label>
         <label class="text-sm md:col-span-2">描述
-          <textarea class="sc-svc-desc w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${row.desc || ''}</textarea>
+          <textarea class="sc-svc-desc w-full rounded border px-2 py-1 bg-white" rows="2">${row.desc || ''}</textarea>
         </label>
         <label class="text-sm md:col-span-2">詳細內容 (detail)
-          <textarea class="sc-svc-detail w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${row.detail || ''}</textarea>
+          <textarea class="sc-svc-detail w-full rounded border px-2 py-1 bg-white" rows="2">${row.detail || ''}</textarea>
         </label>
         <label class="text-sm">連結 (HTML Path)
-          <input class="sc-svc-link w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.link || ''}">
+          <input class="sc-svc-link w-full rounded border px-2 py-1 bg-white" value="${row.link || ''}">
         </label>
         <div class="text-sm">
           <span>圖片</span>
           <div class="flex gap-2 items-end mt-1">
-            <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${row.image || row.img || ''}" placeholder="./img/... 或上傳">
+            <input class="sc-svc-image flex-1 rounded border px-2 py-1 bg-white" value="${row.image || row.img || ''}" placeholder="./img/... 或上傳">
             <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden sc-svc-upload" accept="image/*"></label>
-            <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden shrink-0">
+            <div class="w-24 h-24 bg-gray-200 rounded overflow-hidden shrink-0">
               <img decoding="async" src="${row.image || row.img || ''}" class="w-full h-full object-contain sc-svc-thumb" onerror="this.style.display='none'" onload="this.style.display='block'">
             </div>
           </div>
@@ -2418,8 +2418,8 @@
       host.appendChild(box);
     }
     box.innerHTML = extra.length
-      ? `<h4 class="font-semibold mb-2">其他資料欄位</h4><p class="text-sm text-gray-600 dark:text-gray-300">偵測到此資料還有 ${extra.length} 個非主要欄位，儲存時會保留：${extra.map(escHtml).join('、')}</p>`
-      : `<h4 class="font-semibold mb-2">資料結構</h4><p class="text-sm text-gray-600 dark:text-gray-300">目前資料符合服務項目頁表單，可直接新增、修改、排序與儲存。</p>`;
+      ? `<h4 class="font-semibold mb-2">其他資料欄位</h4><p class="text-sm text-gray-600">偵測到此資料還有 ${extra.length} 個非主要欄位，儲存時會保留：${extra.map(escHtml).join('、')}</p>`
+      : `<h4 class="font-semibold mb-2">資料結構</h4><p class="text-sm text-gray-600">目前資料符合服務項目頁表單，可直接新增、修改、排序與儲存。</p>`;
   }
 
   // Global Binding for Site Editor Buttons
@@ -2943,7 +2943,7 @@
           <div class="grid md:grid-cols-2 gap-8 items-start">
             <div class="space-y-4">
               ${d.story.heading ? `<h2 class="text-3xl md:text-4xl font-extrabold">${esc(d.story.heading)}</h2>` : ''}
-              ${d.story.body ? `<div class="prose prose-lg dark:prose-invert max-w-none leading-relaxed">${d.story.body}</div>` : ''}
+              ${d.story.body ? `<div class="prose prose-lg max-w-none leading-relaxed">${d.story.body}</div>` : ''}
             </div>
             <div class="grid grid-cols-2 gap-3">
               ${imgs.slice(0, 4).map((u, i) => { const src = resolveImage(u); return `<div class=\"rounded-lg overflow-hidden shadow\"><img decoding="async" src=\"${src}\" alt=\"story${i + 1}\" class=\"w-full h-40 md:h-52 object-cover\"></div>`; }).join('')}
@@ -2965,8 +2965,8 @@
               <div class="${left ? 'md:order-2' : 'md:order-1'} order-2">
                 <div class="pl-8 p-2 md:p-3">
                   <h3 class="text-2xl font-bold mb-2">${esc(it.title || '')}</h3>
-                  <p class="text-lg text-gray-700 dark:text-gray-300">${it.text || ''}</p>
-                  ${it.details ? `<div class="collapse-content mt-3"><p class="text-base md:text-lg text-gray-700 dark:text-gray-200">${it.details}</p></div>` : ''}
+                  <p class="text-lg text-gray-700">${it.text || ''}</p>
+                  ${it.details ? `<div class="collapse-content mt-3"><p class="text-base md:text-lg text-gray-700">${it.details}</p></div>` : ''}
                 </div>
               </div>
             </div>`;
@@ -2990,9 +2990,9 @@
 
         <section id="video-section">
           ${d.video?.title ? `<div id="video-title" class="text-xl font-semibold mb-3">${esc(d.video.title)}</div>` : ''}
-          <div id="index-video" class="aspect-video rounded overflow-hidden bg-gray-200 dark:bg-gray-700 grid place-items-center">
+          <div id="index-video" class="aspect-video rounded overflow-hidden bg-gray-200 grid place-items-center">
             ${(() => {
-        const url = d.video?.url || ''; if (!url) return '<div class="text-sm text-gray-500 dark:text-gray-300">尚未設定影片</div>';
+        const url = d.video?.url || ''; if (!url) return '<div class="text-sm text-gray-500">尚未設定影片</div>';
         if (isYT(url)) return `<iframe class="w-full h-full" src="https://www.youtube.com/embed/${ytId(url)}" allowfullscreen></iframe>`;
         if (isVimeo(url)) return `<iframe class="w-full h-full" src="https://player.vimeo.com/video/${vimeoId(url)}" allowfullscreen></iframe>`;
         if (/\.mp4(\?|$)/i.test(url)) return `<video class="w-full h-full" controls src="${url}"></video>`;
@@ -3011,15 +3011,15 @@
       <div class="space-y-10">
         <header class="text-center">
           <h1 class="heading-display">${(data.heroTitle || '關於我們')}</h1>
-          <p class="mt-3 lead-text text-gray-700 dark:text-gray-300">${data.lead || ''}</p>
+          <p class="mt-3 lead-text text-gray-700">${data.lead || ''}</p>
         </header>
         <section>
           <h2 class="heading-section mb-6">${data.modelTitle || '四階段引導模型'}</h2>
           <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             ${(Array.isArray(data.model) ? data.model : []).map(m => `
-              <div class="p-6 shadow-lg rounded-lg bg-gray-50 dark:bg-gray-800">
+              <div class="p-6 shadow-lg rounded-lg bg-gray-50">
                 <h3 class="font-semibold mb-2">${m.title || ''}</h3>
-                <p class="text-gray-700 dark:text-gray-300 text-sm">${m.desc || ''}</p>
+                <p class="text-gray-700 text-sm">${m.desc || ''}</p>
                 ${m.href ? `<div class="mt-3"><a class="link-cta small" href="${m.href}" target="_blank" rel="noopener">${m.linkText || '前往連結'} <span class="arrow">→</span></a></div>` : ''}
               </div>`).join('')}
           </div>
@@ -3029,19 +3029,19 @@
           <h2 class="heading-section mb-6 text-center">Our Team.</h2>
           <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             ${team.map(t => `
-              <article class="overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-900">
+              <article class="overflow-hidden rounded-lg bg-gray-100">
                 ${t.photo ? `<img decoding="async" class=\"w-full h-64 object-cover\" src=\"${resolveImage(t.photo)}\" alt=\"${t.name || ''}\">` : ''}
                 <div class="p-5 space-y-3">
-                  <div class="flex items-center gap-2 flex-wrap">${(t.roles || []).map(r => `<span class='inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200'>${r}</span>`).join('')}</div>
+                  <div class="flex items-center gap-2 flex-wrap">${(t.roles || []).map(r => `<span class='inline-block px-2 py-0.5 rounded-full text-xs bg-gray-200 text-gray-700'>${r}</span>`).join('')}</div>
                   <h3 class="text-xl font-semibold">${t.name || ''}</h3>
-                  ${t.motto ? `<blockquote class="text-gray-800 dark:text-gray-100 text-base italic">${t.motto}</blockquote>` : ''}
+                  ${t.motto ? `<blockquote class="text-gray-800 text-base italic">${t.motto}</blockquote>` : ''}
                 </div>
               </article>`).join('')}
           </div>
         </section>`: ''}
         <section>
           <h2 class="heading-section mb-6">${data.achievementsTitle || '成就經歷'}</h2>
-          <ul class="space-y-2 text-lg text-gray-700 dark:text-gray-300">
+          <ul class="space-y-2 text-lg text-gray-700">
             ${(Array.isArray(data.achievements) ? data.achievements : []).map(a => {
       if (typeof a === 'string') { return `<li>${a}</li>`; }
       if (a && a.href) { return `<li><a class='link-cta outcard' href='${a.href}' target='_blank' rel='noopener'>${a.text || ''} <span class='arrow'>→</span></a></li>`; }
@@ -3069,15 +3069,15 @@
       <div class="space-y-10">
         <header>
           <h1 class="text-3xl md:text-4xl font-bold">${p.name || ''}</h1>
-          ${p.category ? `<div class="mt-2 inline-block bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200 text-sm px-2 py-1 rounded">${p.category}</div>` : ''}
-          ${p.description ? `<p class="mt-4 text-gray-700 dark:text-gray-300">${p.description}</p>` : ''}
+          ${p.category ? `<div class="mt-2 inline-block bg-purple-100 text-purple-700 text-sm px-2 py-1 rounded">${p.category}</div>` : ''}
+          ${p.description ? `<p class="mt-4 text-gray-700">${p.description}</p>` : ''}
         </header>
         <section class="grid md:grid-cols-3 gap-6">
-          <div class="p-6 rounded-lg bg-gray-50 dark:bg-gray-800 shadow">
+          <div class="p-6 rounded-lg bg-gray-50 shadow">
             <div class="text-gray-500 text-sm">課程時間</div>
             <div class="font-semibold mt-1">${p.schedule || '-'}</div>
           </div>
-          <div class="p-6 rounded-lg bg-gray-50 dark:bg-gray-800 shadow md:col-span-2">
+          <div class="p-6 rounded-lg bg-gray-50 shadow md:col-span-2">
             <div class="text-gray-500 text-sm">地點</div>
             <div class="font-semibold mt-1">${[p.location || '', p.address || ''].filter(Boolean).join(' ') || '-'}</div>
           </div>
@@ -3086,14 +3086,14 @@
         <section>
           <h2 class="text-2xl font-bold mb-4">課程安排（時間軸）</h2>
           <div class="space-y-3">
-            ${p.timeline.map(t => `<div><div class='text-sm text-gray-500'>${t.time || ''}</div><div class='font-semibold'>${t.title || ''}</div><div class='text-gray-600 dark:text-gray-300'>${t.detail || ''}</div></div>`).join('')}
+            ${p.timeline.map(t => `<div><div class='text-sm text-gray-500'>${t.time || ''}</div><div class='font-semibold'>${t.title || ''}</div><div class='text-gray-600'>${t.detail || ''}</div></div>`).join('')}
           </div>
         </section>`: ''}
         ${(withMedia.length || textOnly.length) ? `
         <section>
           <h2 class="text-2xl font-bold mb-4">精選案例</h2>
-          ${withMedia.length ? `<div class='grid sm:grid-cols-2 lg:grid-cols-3 gap-4'>${withMedia.map(c => `<article class='p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow'>${mediaBlock(c)}<h3 class='mt-3 font-semibold'>${c.title || ''}</h3>${c.summary ? `<p class='text-gray-600 dark:text-gray-300 text-sm'>${c.summary}</p>` : ''}</article>`).join('')}</div>` : ''}
-          ${textOnly.length ? `<ul class='mt-6 space-y-3'>${textOnly.map(c => `<li class='p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow'><div class='font-semibold'>${c.title || ''}</div>${c.summary ? `<div class='text-gray-600 dark:text-gray-300'>${c.summary}</div>` : ''}</li>`).join('')}</ul>` : ''}
+          ${withMedia.length ? `<div class='grid sm:grid-cols-2 lg:grid-cols-3 gap-4'>${withMedia.map(c => `<article class='p-4 rounded-lg bg-gray-50 shadow'>${mediaBlock(c)}<h3 class='mt-3 font-semibold'>${c.title || ''}</h3>${c.summary ? `<p class='text-gray-600 text-sm'>${c.summary}</p>` : ''}</article>`).join('')}</div>` : ''}
+          ${textOnly.length ? `<ul class='mt-6 space-y-3'>${textOnly.map(c => `<li class='p-4 rounded-lg bg-gray-50 shadow'><div class='font-semibold'>${c.title || ''}</div>${c.summary ? `<div class='text-gray-600'>${c.summary}</div>` : ''}</li>`).join('')}</ul>` : ''}
         </section>`: ''}
       </div>`;
   }
@@ -3106,14 +3106,14 @@
            <h1 class="text-3xl font-bold">資源與部落格 (Preview)</h1>
            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
              ${posts.map(p => `
-               <article class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow">
+               <article class="bg-white rounded-lg overflow-hidden shadow">
                   <div class="h-48 overflow-hidden bg-gray-200">
                      ${p.cover ? `<img decoding="async" src="${p.cover}" class="w-full h-full object-cover">` : ''}
                   </div>
                   <div class="p-4">
                      <div class="text-xs text-gray-500 mb-1">${p.date || ''}</div>
                      <h3 class="font-bold text-lg mb-2 line-clamp-2">${p.title || '無標題'}</h3>
-                     <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">${p.summary || ''}</p>
+                     <p class="text-sm text-gray-600 line-clamp-3">${p.summary || ''}</p>
                   </div>
                </article>
              `).join('')}
@@ -3298,7 +3298,7 @@ if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about
   // ===== Blog Editor Logic (Schema: id, title, date, category, excerpt, image, link, content) =====
   function buildPostItem(p = {}, idx = 0) {
     const wrap = document.createElement('div');
-    wrap.className = 'p-4 rounded-lg bg-gray-50 dark:bg-gray-800 shadow relative';
+    wrap.className = 'p-4 rounded-lg bg-gray-50 shadow relative';
     wrap.dataset.index = String(idx);
 
     // Ensure ID exists
@@ -3309,7 +3309,7 @@ if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about
     wrap.innerHTML = `
       <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
-           <h4 class="font-bold text-gray-700 dark:text-gray-200">#${idx + 1}</h4>
+           <h4 class="font-bold text-gray-700">#${idx + 1}</h4>
            <span class="text-xs text-gray-400 font-mono">${pid}</span>
            <input type="hidden" class="bl-id" value="${pid}">
         </div>
@@ -3324,36 +3324,36 @@ if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about
       </div>
       <div class="grid admin-grid gap-4">
         <label class="text-sm">標題 (title)
-          <input class="bl-title w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.title)}">
+          <input class="bl-title w-full rounded border px-2 py-1 bg-white" value="${escHtml(p.title)}">
         </label>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <label class="text-sm">日期 (date)
-              <input type="text" class="bl-date w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${p.date || ''}" placeholder="YYYY/MM/DD">
+              <input type="text" class="bl-date w-full rounded border px-2 py-1 bg-white" value="${p.date || ''}" placeholder="YYYY/MM/DD">
             </label>
              <label class="text-sm">類別 (category)
-              <input class="bl-category w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.category || '')}" placeholder="如：news, daily, interview">
+              <input class="bl-category w-full rounded border px-2 py-1 bg-white" value="${escHtml(p.category || '')}" placeholder="如：news, daily, interview">
             </label>
              <label class="text-sm">連結 (link)
-              <input class="bl-link w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(plink)}" placeholder="./blog.html">
+              <input class="bl-link w-full rounded border px-2 py-1 bg-white" value="${escHtml(plink)}" placeholder="./blog.html">
             </label>
         </div>
          <label class="text-sm">摘要 (excerpt)
-          <textarea class="bl-excerpt w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="2">${escHtml(p.excerpt)}</textarea>
+          <textarea class="bl-excerpt w-full rounded border px-2 py-1 bg-white" rows="2">${escHtml(p.excerpt)}</textarea>
         </label>
         <label class="text-sm">內文 (content，可留空)
-          <textarea class="bl-content w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="3">${escHtml(p.content || '')}</textarea>
+          <textarea class="bl-content w-full rounded border px-2 py-1 bg-white" rows="3">${escHtml(p.content || '')}</textarea>
         </label>
         <label class="text-sm">時間軸 (timeline，每行：時間｜標題｜說明；榮耀時刻會自動套用)
-          <textarea class="bl-timeline w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="4">${escHtml(formatBlogTimeline(p.timeline))}</textarea>
+          <textarea class="bl-timeline w-full rounded border px-2 py-1 bg-white" rows="4">${escHtml(formatBlogTimeline(p.timeline))}</textarea>
         </label>
         <label class="text-sm">活動照片 (images，每行一張圖片路徑；聽見日常與榮耀時刻會自動套用)
-          <textarea class="bl-images w-full rounded border px-2 py-1 bg-white dark:bg-gray-800" rows="3" placeholder="每行一張圖，例如：./img/photo1.webp">${escHtml((p.images || []).join('\n'))}</textarea>
+          <textarea class="bl-images w-full rounded border px-2 py-1 bg-white" rows="3" placeholder="每行一張圖，例如：./img/photo1.webp">${escHtml((p.images || []).join('\n'))}</textarea>
         </label>
          <label class="text-sm">圖片 (image)
            <div class="flex gap-2 items-end">
-              <input class="bl-image flex-1 rounded border px-2 py-1 bg-white dark:bg-gray-800" value="${escHtml(p.image || '')}" placeholder="./img/... 或上傳">
+              <input class="bl-image flex-1 rounded border px-2 py-1 bg-white" value="${escHtml(p.image || '')}" placeholder="./img/... 或上傳">
               <label class="btn-soft btn-blue text-xs cursor-pointer shrink-0">上傳<input type="file" class="hidden bl-image-upload" accept="image/*"></label>
-              <div class="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden relative shrink-0">
+              <div class="w-24 h-24 bg-gray-200 rounded overflow-hidden relative shrink-0">
                  <img decoding="async" src="${p.image || ''}" class="w-full h-full object-contain bl-image-preview" onerror="this.style.display='none'" onload="this.style.display='block'">
               </div>
            </div>
@@ -3462,3 +3462,4 @@ if (window.location.hostname === 'srcdoc' || window.location.href.indexOf('about
   }
 
 })();
+

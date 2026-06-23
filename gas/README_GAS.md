@@ -86,7 +86,7 @@ Token TTL 已縮短為 2 小時，並加入 nonce 防重放與基本限流。
 
 > 我們也在以下前端檔加入事件監聽：
 > - `js/about.js`：收到 `aboutContent` 更新時重新渲染 `about.html`
-> - `js/content-render.js`：`siteContent` 或 `providers` 更新時重新渲染首頁
+> - `js/render-index.js`：`siteContent` 更新時重新渲染首頁
 > - `js/provider-detail.js`：`providers` 更新時重新渲染當前業者頁
 
 ---
@@ -156,3 +156,4 @@ curl -s -X POST -H "Content-Type: text/plain" \
   -d '{"token":"T","keys":["siteContent"], "nonce":"N"}' \
   "${BASE}?action=publish"
 ```
+

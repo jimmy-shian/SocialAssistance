@@ -1,198 +1,90 @@
-// Explore page dynamic rendering and filtering with horizontal layout and chips
 (function () {
-  function qs(sel, root = document) { return root.querySelector(sel); }
-  function el(tag, cls) { const e = document.createElement(tag); if (cls) e.className = cls; return e; }
+  const root = document.getElementById('explore-root');
+  if (!root) return;
+  function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  const all = () => Object.entries(window.providersData || {}).map(([id, p]) => ({ id, ...p, id: p.id || id }));
+  const categories = () => Array.from(new Set(all().map(p => p.category).filter(Boolean)));
+  const locations = () => Array.from(new Set(all().map(p => (p.location || '').split(/\s+/)[0]).filter(Boolean)));
+  let state = { keyword: '', category: '', location: '', tag: '' };
 
-  const grid = qs('#providers-grid');
-  const searchInput = qs('#search-input');
-  const categorySelect = qs('#category-select'); // hidden input storing current value
-  const searchBtn = qs('#search-btn');
-  const showMoreBtn = qs('#show-more-btn');
-  const showMoreContainer = qs('#show-more-container');
-
-  const dataset = () => (window.providersData || {});
-  let itemsToShow = 6;
-
-  const categoryThemeMap = {
-    agriculture: 'category-agriculture',
-    '農業': 'category-agriculture',
-    '農林漁牧業': 'category-agriculture',
-    funeral: 'category-funeral',
-    '殯葬業': 'category-funeral',
-    communication: 'category-communication',
-    '通訊業': 'category-communication',
-    floral: 'category-floral',
-    '花藝類': 'category-floral',
-    music: 'category-music',
-    '樂器零售業': 'category-music',
-    food: 'category-food',
-    '餐飲業': 'category-food',
-    'car-beauty': 'category-car-beauty',
-    '汽車美容業': 'category-car-beauty'
-  };
-  window.categoryThemeMap = categoryThemeMap;
-  const categoryThemeClasses = Array.from(new Set(Object.values(categoryThemeMap)));
-
-  function getCategoryThemeClass(category) {
-    return categoryThemeMap[(category || '').trim()] || '';
-  }
-
-  function setCategoryTheme(category) {
-    document.body.classList.add('category-page');
-    document.body.classList.remove(...categoryThemeClasses);
-    const themeClass = getCategoryThemeClass(category);
-    if (themeClass) document.body.classList.add(themeClass);
+  function match(p) {
+    const text = [p.name, p.category, p.location, p.description, ...(p.know || []), ...(p.learn || []), ...(p.gain || [])].join(' ').toLowerCase();
+    const kw = state.keyword.trim().toLowerCase();
+    return (!kw || text.includes(kw)) && (!state.category || p.category === state.category) && (!state.location || (p.location || '').includes(state.location)) && (!state.tag || text.includes(state.tag.toLowerCase()));
   }
 
   function providerCard(p) {
-    const item = el('div', 'provider-list-item');
-    const themeClass = getCategoryThemeClass(p.category);
-    if (themeClass) item.dataset.categoryTheme = themeClass;
-
-    // Add faint background image
-    const bg = el('div', 'provider-list-bg');
-    bg.style.backgroundImage = `url("./img/explore/${encodeURIComponent(p.id)}/封面圖1/封面照.webp")`;
-    item.appendChild(bg);
-
-    // Left container: Title + Category tag
-    const leftCol = el('div', 'provider-list-left');
-    const h3 = el('h3');
-    h3.textContent = p.name;
-    const tag = el('span', 'provider-category-tag');
-    tag.textContent = p.category;
-    h3.appendChild(tag);
-    leftCol.appendChild(h3);
-    item.appendChild(leftCol);
-
-    // Right container: Location + Description + Link
-    const rightCol = el('div', 'provider-list-right');
-    
-    // Location (with SVG pin)
-    const loc = el('div', 'provider-location mb-2');
-    loc.innerHTML = `
-      <svg class="w-4 h-4 text-[var(--primary)] fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-      </svg>
-      <span>${p.location || ''}</span>
-    `;
-    rightCol.appendChild(loc);
-
-    const desc = el('p', 'provider-description');
-    desc.textContent = p.description || '';
-    rightCol.appendChild(desc);
-
-    const link = el('a', 'provider-link');
-    link.href = `./provider.html?id=${encodeURIComponent(p.id)}`;
-    link.innerHTML = `查看詳情 <span class="arrow">→</span>`;
-    rightCol.appendChild(link);
-    item.appendChild(rightCol);
-
-    return item;
+    const image = (p.images && p.images[0]) || '';
+    return `<article class="resource-item">
+      <a class="image-frame resource-item__image" href="./provider.html?id=${encodeURIComponent(p.id)}">${image ? `<img src="${esc(image)}" alt="${esc(p.name)}" loading="lazy">` : ''}</a>
+      <div>
+        <div class="article-row__meta"><span class="category-pill">${esc(p.category || '探索資源')}</span><span class="date-text">${esc(p.location || '')}</span></div>
+        <h3>${esc(p.name)}</h3>
+        <p class="line-clamp-3">${esc(p.description || '')}</p>
+        <a class="button-text" href="./provider.html?id=${encodeURIComponent(p.id)}">進入場域 →</a>
+      </div>
+    </article>`;
   }
 
-  function filterList(list, keyword, category) {
-    const kw = (keyword || '').trim().toLowerCase();
-    const cat = (category || '').trim();
-    return list.filter(p => {
-      const kwok = !kw || (p.name + ' ' + (p.description || '')).toLowerCase().includes(kw);
-      const catok = !cat || cat === '所有產業' || p.category === cat ||
-                    (cat === '農林漁牧業' && (p.category === '農業' || p.category === '農林漁牧業'));
-      return kwok && catok;
-    });
+  function filtersHtml() {
+    const cats = categories();
+    const locs = locations();
+    const tags = ['自立', '職業', '親子', '冒險', '農業', '美感', '口語', '科技'];
+    return `<aside class="side-panel resource-filters">
+      <button class="filter-toggle" id="filter-toggle" type="button" aria-expanded="true" aria-controls="resource-filter-body">
+        <span>搜尋條件</span><span aria-hidden="true">＋</span>
+      </button>
+      <div id="resource-filter-body" class="field-stack">
+        <h2>搜尋條件</h2>
+        <div class="filter-group"><label for="resource-keyword">關鍵字</label><input id="resource-keyword" type="search" placeholder="輸入場域、產業或能力" value="${esc(state.keyword)}"></div>
+        <div class="filter-group"><label for="resource-category">產業類別</label><select id="resource-category"><option value="">全部類別</option>${cats.map(c => `<option value="${esc(c)}" ${state.category === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+        <div class="filter-group"><label for="resource-location">地區</label><select id="resource-location"><option value="">全部地區</option>${locs.map(c => `<option value="${esc(c)}" ${state.location === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+        <div class="filter-group"><label>服務 / 體驗標籤</label><div class="chip-list">${tags.map(t => `<button class="chip ${state.tag === t ? 'active' : ''}" type="button" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div></div>
+        <button class="button-secondary" type="button" id="resource-reset">清除條件</button>
+      </div>
+    </aside>`;
   }
 
   function render() {
-    if (!grid) return;
-    setCategoryTheme(categorySelect && categorySelect.value);
-    grid.setAttribute('aria-busy', 'true');
-    grid.innerHTML = '';
-    
-    // Ensure each provider has an ID
-    const all = Object.entries(dataset()).map(([k, p]) => ({ ...p, id: p && p.id ? p.id : k }));
-    const filtered = filterList(all, searchInput && searchInput.value, categorySelect && categorySelect.value);
-    
-    if (!filtered.length) {
-      const empty = el('div', 'text-center text-gray-500 col-span-full py-8');
-      empty.textContent = '未找到符合條件的課程';
-      grid.appendChild(empty);
-      if (showMoreContainer) showMoreContainer.style.display = 'none';
-    } else {
-      const visibleItems = filtered.slice(0, itemsToShow);
-      for (const p of visibleItems) {
-        grid.appendChild(providerCard(p));
-      }
-      
-      if (showMoreContainer) {
-        showMoreContainer.style.display = filtered.length > itemsToShow ? 'flex' : 'none';
-      }
-    }
-    grid.setAttribute('aria-busy', 'false');
+    const list = all().filter(match);
+    root.innerHTML = `<div class="resource-layout">
+      ${filtersHtml()}
+      <section>
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:22px;flex-wrap:wrap">
+          <div><span class="section-label">resources</span><h2 style="margin-bottom:0">${list.length} 個探索場域</h2></div>
+          <p class="muted" style="margin:0">左側可篩選，右側快速比較場域照片、類別與位置。</p>
+        </div>
+        <div class="resource-grid">${list.length ? list.map(providerCard).join('') : '<p class="muted">沒有符合條件的場域。</p>'}</div>
+      </section>
+    </div>`;
+    bind();
   }
 
-  function init() {
-    if (searchBtn) searchBtn.addEventListener('click', () => { itemsToShow = 6; render(); });
-    if (searchInput) searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { itemsToShow = 6; render(); } });
-    
-    // live filtering while typing with debounce
-    if (searchInput) {
-      let t;
-      searchInput.addEventListener('input', () => {
-        clearTimeout(t);
-        t = setTimeout(() => {
-          itemsToShow = 6;
-          render();
-        }, 150);
+  function bind() {
+    const kw = document.getElementById('resource-keyword');
+    const cat = document.getElementById('resource-category');
+    const loc = document.getElementById('resource-location');
+    let timer;
+    if (kw) kw.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => { state.keyword = kw.value; render(); }, 160); });
+    if (cat) cat.addEventListener('change', () => { state.category = cat.value; render(); });
+    if (loc) loc.addEventListener('change', () => { state.location = loc.value; render(); });
+    document.querySelectorAll('[data-tag]').forEach(btn => btn.addEventListener('click', () => { state.tag = state.tag === btn.dataset.tag ? '' : btn.dataset.tag; render(); }));
+    const reset = document.getElementById('resource-reset');
+    if (reset) reset.addEventListener('click', () => { state = { keyword: '', category: '', location: '', tag: '' }; render(); });
+    const panel = document.querySelector('.resource-filters');
+    const toggle = document.getElementById('filter-toggle');
+    if (panel && toggle) {
+      const shouldCollapse = window.matchMedia && window.matchMedia('(max-width: 980px)').matches;
+      panel.classList.toggle('collapsed', shouldCollapse);
+      toggle.setAttribute('aria-expanded', String(!shouldCollapse));
+      toggle.addEventListener('click', () => {
+        const collapsed = !panel.classList.contains('collapsed');
+        panel.classList.toggle('collapsed', collapsed);
+        toggle.setAttribute('aria-expanded', String(!collapsed));
       });
     }
-
-    // Chips filtering
-    const chipsContainer = qs('#category-chips');
-    if (chipsContainer) {
-      chipsContainer.addEventListener('click', (e) => {
-        const btn = e.target.closest('.chip');
-        if (!btn) return;
-        
-        // Remove active class from all chips
-        chipsContainer.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-
-        const val = btn.getAttribute('data-value');
-        if (categorySelect) {
-          categorySelect.value = val;
-          categorySelect.dispatchEvent(new Event('change'));
-        }
-        
-        itemsToShow = 6;
-        render();
-      });
-    }
-
-    // Show more button action
-    if (showMoreBtn) {
-      showMoreBtn.addEventListener('click', () => {
-        itemsToShow += 6;
-        render();
-      });
-    }
-
-    render();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  // Re-render when providers dataset updated from GAS
-  try {
-    const EVT = (window.DataAPI && window.DataAPI.EVENT) || 'data:updated';
-    document.addEventListener(EVT, (ev) => {
-      const ds = (window.AppConfig && window.AppConfig.datasets && window.AppConfig.datasets.providers) || 'providers';
-      const keys = (ev && ev.detail && ev.detail.keys) || [];
-      if (!keys.length || keys.includes(ds)) {
-        render();
-      }
-    });
-  } catch (e) { }
+  render();
 })();
+

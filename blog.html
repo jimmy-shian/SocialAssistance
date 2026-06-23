@@ -1,100 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>部落格 | 聽見核心工作室</title>
-        <meta name="description" content="聽見核心工作室的部落格，分享活動紀錄、重要通知、人物專訪與榮耀時刻。">
-        <link rel="icon" href="favicon.ico" type="image/x-icon">
-        <script src="./tailwind.config.js"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-        <link rel="preload" href="https://cdn.jsdelivr.net/gh/jimmy-shian/SocialAssistance@main/assets/font/LXGWWenKaiTC-Regular.woff2" as="font" type="font/woff2" crossorigin>
-        <link href="./css/style.css" rel="stylesheet">
-        <link href="./css/holo-card.css" rel="stylesheet">
-        <link href="./css/ui-refine.css" rel="stylesheet">
-        <link href="./css/blog.css" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-        <style>
-            .dark\:bg-\[radial-gradient\(ellipse_at_center\2c rgba\(235\2c 235\2c 235\2c 0\.85\)_0\%\2c rgba\(235\2c 235\2c 235\2c 0\.5\)_35\%\2c rgba\(235\2c 235\2c 235\2c 0\.2\)_55\%\2c rgba\(235\2c 235\2c 235\2c 0\)_75\%\)\]:is(.dark *) {
-                background-image: radial-gradient(ellipse at center, rgba(235, 235, 235, 0.85) 0%, rgba(235, 235, 235, 0.5) 35%, rgba(235, 235, 235, 0.2) 55%, rgba(235, 235, 235, 0) 75%);
-            }
-        </style>
-    </head>
-
-    <body class="section-bg-1">
-        <div id="nav-placeholder"></div>
-
-        <main class="container mx-auto px-6 py-12">
-            <!-- Blog Header & Tabs (Merged) -->
-            <header class="blog-header-section text-center mb-12">
-                <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">BLOG</span>
-                <h1 class="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-6">部落格</h1>
-                <div class="flex flex-wrap justify-center gap-3" id="blog-tabs">
-                    <button class="blog-tab active px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="all">全部</button>
-                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="daily">聽見日常</button>
-                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="news">重要通知</button>
-                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="interview">人物專訪</button>
-                    <button class="blog-tab px-5 py-2 rounded-full border border-[var(--border)] font-medium transition-all" data-category="glory">榮耀時刻</button>
-                </div>
-            </header>
-
-            <!-- Blog Sections (Rendered Vertically) -->
-            <!-- Blog Glory Section (榮耀時刻) -->
-            <section id="blog-glory-section" class="mb-16 blog-section-container" aria-live="polite"></section>
-
-            <!-- Blog Daily Section (聽見日常) -->
-            <section id="blog-daily-section" class="mb-16 blog-section-container">
-                <div class="text-center mb-8">
-                    <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">DAILY LIFE</span>
-                    <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mt-1">聽見日常</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="blog-daily-grid">
-                    <!-- Cards rendered dynamically -->
-                </div>
-            </section>
-
-            <!-- Blog News Section (重要資訊) -->
-            <section id="blog-news-section" class="mb-16 blog-section-container">
-                <div class="text-center mb-8">
-                    <span class="text-sm text-[var(--accent)] font-semibold uppercase tracking-wider">IMPORTANT INFO</span>
-                    <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mt-1">重要資訊</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto" id="blog-news-grid">
-                    <!-- Cards rendered dynamically -->
-                </div>
-            </section>
-
-            <!-- Blog Interview Section (人物造訪) -->
-            <section id="blog-interview-section" class="mb-16 blog-section-container">
-                <div class="text-center mb-8">
-                    <span class="text-sm text-[var(--primary)] font-semibold uppercase tracking-wider">INTERVIEWS</span>
-                    <h2 class="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mt-1">人物造訪</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="blog-interview-grid">
-                    <!-- Cards rendered dynamically -->
-                </div>
-            </section>
-
-            <!-- Load More Button (Hidden by default in structured view) -->
-            <div class="text-center mt-12" id="load-more-container" style="display: none;">
-                <button id="btn-load-more"
-                    class="px-8 py-3 rounded-full bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--primary)] hover:text-white transition-all duration-300 font-medium group">
-                    顯示更多
-                    <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                </button>
-            </div>
-        </main>
-
-        <div id="footer-placeholder"></div>
-
-        <!-- Blog Data -->
-        <script src="./js/data/blogContent.js"></script>
-        <script src="./js/blog.js"></script>
-        <script src="./js/navFooter.js"></script>
-        <script src="./js/holo-card.js"></script>
-    </body>
-
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>最新消息 | 聽見核心工作室</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/utilities.css">
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+  <main id="blog-root" class="container-wide"></main>
+  <div id="footer-placeholder"></div>
+  <script src="./js/navFooter.js"></script>
+  <script src="./js/toast.js"></script>
+  <script src="./js/lightbox.js"></script>
+  <script src="./js/data/blogContent.js"></script>
+  <script src="./js/blog.js"></script>
+  <script src="./js/main.js"></script>
+</body>
 </html>
