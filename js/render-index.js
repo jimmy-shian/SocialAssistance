@@ -23,15 +23,126 @@
     </svg>`;
   }
 
+
+  function prepareStrokeDrawings(scope) {
+    const area = scope || document;
+    const targets = area.querySelectorAll('.draw-svg path, .sdg-border-svg rect, .nav-link-ring rect, .sdgs-path-svg path, .sdg-icon-wrap svg:not(.sdg-border-svg) path, .sdg-icon-wrap svg:not(.sdg-border-svg) circle, .sdg-icon-wrap svg:not(.sdg-border-svg) rect, .sdg-icon-wrap svg:not(.sdg-border-svg) line, .sdg-icon-wrap svg:not(.sdg-border-svg) polyline, .sdg-icon-wrap svg:not(.sdg-border-svg) polygon');
+    targets.forEach(el => {
+      if (!el || typeof el.getTotalLength !== 'function') return;
+      const length = Math.ceil(el.getTotalLength());
+      if (!Number.isFinite(length) || length <= 0) return;
+      el.style.setProperty('--draw-length', String(length));
+      el.style.setProperty('--draw-mid', String(Math.max(1, Math.round(length * 0.36))));
+      el.style.strokeDasharray = String(length);
+      el.style.strokeDashoffset = String(length);
+    });
+  }
+
+  function navRingMarkup() {
+    return '<svg class="nav-link-ring" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="2" y="2" width="96" height="40" rx="20" ry="20"></rect></svg>';
+  }
+
+  function enhanceNavRings() {
+    const links = Array.from(document.querySelectorAll('.nav-link'));
+    if (!links.length) return false;
+    links.forEach(link => {
+      if (!link.querySelector('.nav-link-text')) {
+        const label = document.createElement('span');
+        label.className = 'nav-link-text';
+        Array.from(link.childNodes).forEach(node => {
+          if (node.nodeType === 1 && node.classList && node.classList.contains('nav-link-ring')) return;
+          label.appendChild(node);
+        });
+        link.appendChild(label);
+      }
+      if (!link.querySelector('.nav-link-ring')) {
+        link.insertAdjacentHTML('afterbegin', navRingMarkup());
+      }
+      prepareStrokeDrawings(link);
+    });
+    return true;
+  }
+
+  function bootNavRingEnhancer() {
+    enhanceNavRings();
+    const navHost = document.getElementById('nav-placeholder') || document.body;
+    if ('MutationObserver' in window && navHost) {
+      const observer = new MutationObserver(() => enhanceNavRings());
+      observer.observe(navHost, { childList: true, subtree: true });
+      window.setTimeout(() => observer.disconnect(), 5000);
+    } else {
+      window.setTimeout(enhanceNavRings, 200);
+      window.setTimeout(enhanceNavRings, 800);
+    }
+  }
+
+  function playSdgOnce(el) {
+    if (!el || el.dataset.animating === '1') return;
+    el.dataset.animating = '1';
+    el.classList.remove('animating');
+    void el.offsetWidth;
+    el.classList.add('animating');
+    window.clearTimeout(el._sdgAnimationUnlock);
+    const index = Number(getComputedStyle(el).getPropertyValue('--i')) || 0;
+    el._sdgAnimationUnlock = window.setTimeout(() => {
+      delete el.dataset.animating;
+    }, 2700 + index * 100);
+  }
+
+  function bootSdgIconAnimations(scope) {
+    const area = scope || document;
+    const items = Array.from(area.querySelectorAll('.sdg-item'));
+    items.forEach(el => {
+      if (el.dataset.sdgHoverBound === '1') return;
+      el.dataset.sdgHoverBound = '1';
+      el.addEventListener('mouseenter', () => playSdgOnce(el));
+    });
+  }
+
   function sdgIconSvg(id, color) {
     const safeColor = esc(color || '#5f7f62');
-    const icons = {
-      4: '<path class="sdg-icon-path" d="M15 20l17-8 17 8-17 8-17-8Z"/><path class="sdg-icon-path" d="M21 26v11c7 5 15 5 22 0V26"/><path class="sdg-icon-path" d="M48 23v15"/><path class="sdg-icon-path" d="M16 45h22c5 0 8 2 10 6H23c-4 0-7-2-7-6Z"/>',
-      10: '<path class="sdg-icon-path" d="M32 11v42"/><path class="sdg-icon-path" d="M19 20h26"/><path class="sdg-icon-path" d="M19 32h26"/><path class="sdg-icon-path" d="M19 44h26"/><path class="sdg-icon-path sdg-icon-fill" d="M17 14l-9 9 9 9v-7h8V21h-8v-7Z"/><path class="sdg-icon-path sdg-icon-fill" d="M47 50l9-9-9-9v7h-8v4h8v7Z"/>',
-      11: '<path class="sdg-icon-path" d="M12 51h40"/><path class="sdg-icon-path" d="M16 51V31h10v20"/><path class="sdg-icon-path" d="M29 51V18h11v33"/><path class="sdg-icon-path" d="M43 51V26h9v25"/><path class="sdg-icon-path" d="M20 36h2M20 43h2M33 25h2M33 32h2M33 39h2M47 33h2M47 40h2"/>',
-      17: '<circle class="sdg-icon-path" cx="32" cy="32" r="7"/><circle class="sdg-icon-path" cx="32" cy="18" r="8"/><circle class="sdg-icon-path" cx="44" cy="25" r="8"/><circle class="sdg-icon-path" cx="44" cy="39" r="8"/><circle class="sdg-icon-path" cx="32" cy="46" r="8"/><circle class="sdg-icon-path" cx="20" cy="39" r="8"/><circle class="sdg-icon-path" cx="20" cy="25" r="8"/>'
+    const svgs = {
+        4: `<svg viewBox="0 0 1000 458"><g fill="currentColor" fill-rule="evenodd"><path d="M443.4 134.2L264 30.6v335l179.4 54V134.3m19.6.7v285l180.6-54.4v-335L463 135M784.4 22.2C784.4 10.4 775 1 763.2 1S742 10.3 742 22v23h42.4V22.2m-37 337.5H742l21.2 74.2 21.2-74.5H779h5.4v-298H742v298h5.3"></path><path d="M682.2 45L663 29.8v345L463.6 439h-20.3L245 383.8v-354L225.8 45v352.2l216.7 60h22l200-63.5 17.7-5.2V45"></path></g></svg>`,
+        10: `<svg viewBox="0 0 1000 547"><g fill="currentColor" fill-rule="evenodd"><path d="M595 304H403l-2 2v58l2 2h192l2-2v-58l-2-2m0-123H403c-1 0-2 1-2 3v57c0 2 1 3 2 3h192c1 0 2-1 2-3v-57c0-2-1-3-2-3m-3-87L500 2h-2l-92 92c-1 1 0 3 1 3h184c2 0 2-2 1-3m87 273l92-92v-2l-92-92c-1-1-3-1-3 1v184c0 1 2 2 3 1m-273 86l92 92h2l92-92c1-1 1-2-1-2H407c-1 0-2 1-1 2m-86-272l-93 92v2l93 92c1 1 2 0 2-1V182c0-2-1-2-2-1"></path></g></svg>`,
+        11: `<svg viewBox="0 0 1000 508"><g fill="currentColor" fill-rule="evenodd"><path d="M165 367.3h150.5c2 0 3.6-1.7 3.6-3.7 0-1-.2-1.8-.8-2.4l-.2-.3-75-97-.6-.7c-.7-.7-1.6-1.2-2.7-1.2-1 0-1.8.5-2.4 1l-.5.6-.7.8-73 95.8-1 1.3c-.4.6-.7 1.3-.7 2 0 2 1.7 3.8 3.7 3.8M315 381H164.3c-2 0-3.7 1.6-3.7 3.6v118c0 2 1.6 3.7 3.7 3.7h48.5V432c0-2 1.6-3.6 3.7-3.6h45c2 0 3.7 1.6 3.7 3.7v74.3H315c2 0 3.7-1.7 3.7-3.7v-118c0-2-1.7-3.6-3.7-3.6M822.4 398.4c0 2-1.6 3.5-3.6 3.5h-44.6c-2 0-3.7-1.7-3.7-3.6v-27c0-2 1.7-3.7 3.7-3.7h44.6c2 0 3.6 1.6 3.6 3.6v27zm0 50c0 2-1.6 3.6-3.6 3.6h-44.6c-2 0-3.7-1.6-3.7-3.6v-27c0-2 1.7-3.6 3.7-3.6h44.6c2 0 3.6 1.6 3.6 3.5v27zm-68-50c0 2-1.7 3.5-3.8 3.5H706c-2 0-3.6-1.7-3.6-3.6v-27c0-2 1.7-3.7 3.7-3.7h44.6c2 0 3.7 1.6 3.7 3.6v27zm0 50c0 2-1.7 3.6-3.8 3.6H706c-2 0-3.6-1.6-3.6-3.6v-27c0-2 1.7-3.6 3.7-3.6h44.6c2 0 3.7 1.6 3.7 3.5v27zm81.5-98.3H686.6c-2 0-3.6 1.6-3.6 3.6v150.7c0 2 1.7 3.5 3.7 3.5H836c2 0 3.6-1.6 3.6-3.5V353.6c0-2-1.7-3.5-3.7-3.5zM468 107.5c0 1-1 2-2 2h-33.5c-1 0-2-1-2-2V70.2c0-1 1-2 2-2H466c1 0 2 1 2 2v37.3zm0 85.5c0 1-1 2-2 2h-33.5c-1 0-2-1-2-2v-37.2c0-1 1-2 2-2H466c1 0 2 1 2 2V193zm0 85.6c0 1-1 2-2 2h-33.5c-1 0-2-1-2-2v-37.3c0-1 1-2 2-2H466c1 0 2 1 2 2v37.3zm0 85.5c0 1.2-1 2-2 2h-33.5c-1 0-2-.8-2-2v-37c0-1.2 1-2 2-2H466c1 0 2 .8 2 2v37zm0 85.7c0 1-1 2-2 2h-33.5c-1 0-2-1-2-2v-37.3c0-1 1-2 2-2H466c1 0 2 1 2 2v37.3zm-65.7-342.2c0 1-1 2-2 2H367c-1 0-2-1-2-2V70.2c0-1 1-2 2-2h33.4c1 0 2 1 2 2v37.3zm0 85.5c0 1-1 2-2 2H367c-1 0-2-1-2-2v-37.2c0-1 1-2 2-2h33.4c1 0 2 1 2 2V193zm0 85.6c0 1-1 2-2 2H367c-1 0-2-1-2-2v-37.3c0-1 1-2 2-2h33.4c1 0 2 1 2 2v37.3zm0 85.5c0 1.2-1 2-2 2H367c-1 0-2-.8-2-2v-37c0-1.2 1-2 2-2h33.4c1 0 2 .8 2 2v37zm0 85.7c0 1-1 2-2 2H367c-1 0-2-1-2-2v-37.3c0-1 1-2 2-2h33.4c1 0 2 1 2 2v37.3zM489 .4H343.3c-2 0-3.6 1.6-3.6 3.6v499c0 2 1.6 3.5 3.6 3.5h146c2 0 3.5-1.6 3.5-3.6V4c0-2-1.6-3.6-3.6-3.6zM839.4 335c0 1.6-1.3 3-3 3H686.2c-1.6 0-3-1.4-3-3v-30c0-1.8 1.4-3 3-3h150.2c1.7 0 3 1.2 3 3v30M649 247c0 2-1.7 3.7-3.7 3.7h-43.5c-2 0-3.6-1.6-3.6-3.6v-27c0-2 1.6-3.7 3.6-3.7h43.5c2 0 3.6 1.6 3.6 3.6v27zm0 50.4c0 2-1.7 3.6-3.7 3.6h-43.5c-2 0-3.6-1.6-3.6-3.6v-27.2c0-2 1.6-3.6 3.6-3.6h43.5c2 0 3.6 1.6 3.6 3.6v27.2zm0 50.4c0 2-1.7 3.5-3.7 3.5h-43.5c-2 0-3.6-1.6-3.6-3.5v-27.3c0-2 1.6-3.6 3.6-3.6h43.5c2 0 3.6 1.5 3.6 3.5v27.3zm0 50.3c0 2-1.7 3.6-3.7 3.6h-43.5c-2 0-3.6-1.6-3.6-3.5V371c0-2 1.6-3.5 3.6-3.5h43.5c2 0 3.6 1.5 3.6 3.5V398zm0 50.4c0 2-1.7 3.6-3.7 3.6h-43.5c-2 0-3.6-1.6-3.6-3.6v-27.2c0-2 1.6-3.6 3.6-3.6h43.5c2 0 3.6 1.6 3.6 3.6v27.2zm-66.5-211v60c0 2-1.6 3.6-3.6 3.6h-43.6c-2 0-3.6-1.6-3.6-3.5V290c0-.6 0-1 .3-1.4l.3-.4c0-.2.2-.4.3-.5 0-.2.3-.4.4-.6 5.6-7.8 30.7-38.8 41.2-51.7l1-1.3c1-1 2-1.5 3.3-1.5 2 0 3.6 1.5 4 3.4v1.5zm0 110.4c0 2-1.7 3.5-3.7 3.5h-43.5c-2 0-3.6-1.6-3.6-3.5v-27.3c0-2 1.6-3.6 3.6-3.6h43.5c2 0 3.6 1.5 3.6 3.5v27.3zm0 50.3c0 2-1.7 3.6-3.7 3.6h-43.5c-2 0-3.6-1.6-3.6-3.5V371c0-2 1.6-3.5 3.6-3.5h43.5c2 0 3.6 1.5 3.6 3.5V398zm0 50.4c0 2-1.7 3.6-3.7 3.6h-43.5c-2 0-3.6-1.6-3.6-3.6v-27.2c0-2 1.6-3.6 3.6-3.6h43.5c2 0 3.6 1.6 3.6 3.6v27.2zm22.6-255l1-1.2c10-12.6 26.5-33 34.5-42.8l1-1.3c.8-.8 2-1.4 3.3-1.4 2 0 3.6 1.4 4 3.3v46c0 2.2-1.8 4-4 4h-.2-36-.2-.2c-2.2 0-4-1.8-4-4 0-1 .4-1.8 1-2.5zm60.5-98.7c-.5-1.7-2-2.8-3.7-2.8-.8 0-1.5.2-2 .6h-.4l-1.2 1.7-143.5 182-.6 1c-.7.6-1 1.6-1.2 2.7v223.7c0 2 1.6 3.5 3.6 3.5h146c1.8 0 3.4-1.6 3.4-3.5V96c0-.4 0-1-.3-1.3z"></path></g></svg>`,
+        17: `<svg viewBox="0 0 1000 486"><g fill="currentColor" fill-rule="evenodd"><path d="M588.7 225.7c25.7-23.8 41.8-57.8 41.8-95.5 0-5.6-.4-11-1-16.6 52 5.6 92.8 49.8 92.8 103.4 0 30.5-13.2 57.8-34.2 77-19.5-37-56.2-63-99.3-68.3M677.2 355c0 57.3-46.7 104-104 104-18.7 0-36.2-5-51.4-13.7 22.2-23.3 35.8-54.8 35.8-89.5 0-8.5-.8-16.8-2.4-25 18.7 10.5 40.2 16.4 63 16.4 20.4 0 39.7-4.7 57-13 1.2 6.7 2 13.7 2 20.8m-354 .8c0-7.4 1-14.6 2.4-21.5 17.2 8.3 36.4 13 56.6 13 23 0 44.3-6 63-16.3-1.5 7.8-2.3 15.8-2.3 24 0 35 14 67 36.7 90.6-15.4 9-33.2 14.2-52.3 14.2-57.4 0-104-46.6-104-104M278 217c0-53.6 40.8-97.8 93-103.4-.8 5.5-1.2 11-1.2 16.6 0 38 16.4 72.4 42.6 96.3-43.3 5-80 31-100 67.6-21-19-34.4-46.4-34.4-77m222-190.8c42.7 0 79.3 25.8 95.4 62.6-42.3 7.4-77.6 35.4-95.4 73.2-17.6-37.8-53-65.8-95.3-73.2C421 52 457.5 26.2 500 26.2M525 262.8c14.4-7.5 30.8-12 48-12 41 0 76.4 24 93.4 58.3-14.4 7.7-30.8 12-48 12-41 0-76.4-23.8-93.4-58.2m-50 .7c-17 34-52 57.5-92.8 57.5-17.2 0-33.4-4.3-47.7-11.7 17-34 52.2-57.5 93-57.5 17 0 33.3 4.3 47.6 11.7m-77.4-149.3c50 7.5 88.7 50.7 88.7 102.8 0 5.5-.6 10.8-1.4 16-50.2-7.5-88.8-50.6-88.8-102.8 0-5.4.6-10.7 1.4-16m103 315.3c-19.3-19-31.5-45.3-31.5-74.5 0-28.8 12-55 30.8-73.7 19.4 19 31.6 45.3 31.6 74.5 0 28.8-11.7 54.8-30.7 73.7m103.6-299.3c0 52.2-38.6 95.3-88.7 102.8-.8-5.2-1.4-10.5-1.4-16 0-52 38.6-95.3 88.7-102.7.7 5.2 1.3 10.5 1.3 16M748.5 217c0-70.2-56-127.6-125.5-130-18-50.7-66-87-122.8-87-56.6 0-104.8 36.3-122.8 87C307.8 89.3 252 146.7 252 217c0 41.7 19.7 78.8 50.3 102.7-3.4 11.5-5.2 23.6-5.2 36 0 72 58.5 130.3 130.4 130.3 27.2 0 52.5-8.4 73.5-22.8 20.6 14 45.4 22 72 22 72 0 130.4-58.4 130.4-130.2 0-12.3-1.8-24.2-5-35.5 30.5-23.8 50-61 50-102.5"></path></g></svg>`
     };
-    return '<svg class="sdg-icon-svg" viewBox="0 0 64 64" style="color:' + safeColor + '" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' + (icons[id] || icons[17]) + '</svg>';
+    const raw = svgs[id] || svgs[17];
+    return oldSdgSvgMarkup(raw, safeColor);
+  }
+
+
+  function oldSdgSvgMarkup(markup, color) {
+    const raw = String(markup || '').trim();
+    if (!/^<svg[\s>]/i.test(raw)) return '';
+    const safeColor = esc(color || '#5f7f62');
+    const cleaned = raw
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '');
+    return cleaned.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+      let nextAttrs = attrs || '';
+      if (/\bclass\s*=\s*(['"])/i.test(nextAttrs)) {
+        nextAttrs = nextAttrs.replace(/\bclass\s*=\s*(['"])(.*?)\1/i, (m, quote, value) => `class=${quote}sdg-legacy-svg js-draw-svg ${value}${quote}`);
+      } else {
+        nextAttrs += ' class="sdg-legacy-svg js-draw-svg"';
+      }
+      if (!/\bstyle\s*=\s*(['"])/i.test(nextAttrs)) nextAttrs += ` style="color:${safeColor}"`;
+      if (!/\baria-hidden\s*=/i.test(nextAttrs)) nextAttrs += ' aria-hidden="true"';
+      if (!/\bfocusable\s*=/i.test(nextAttrs)) nextAttrs += ' focusable="false"';
+      return `<svg${nextAttrs}>`;
+    });
+  }
+
+  function sdgLegacySvg(item) {
+    const data = item || {};
+    const color = data.color || '#5f7f62';
+    const directSvg = oldSdgSvgMarkup(data.svg || data.iconSvg || data.svgMarkup || data.legacySvg || data.oldSvg || data.sdgSvg, color);
+    if (directSvg) return directSvg;
+    const image = data.svgPath || data.iconPath || data.icon || data.image || data.img;
+    if (image && /\.svg(?:[?#].*)?$/i.test(String(image))) {
+      return `<img class="sdg-legacy-img" src="${esc(image)}" alt="" aria-hidden="true" loading="lazy">`;
+    }
+    return sdgIconSvg(data.id, color);
   }
   const hero = site.hero || {};
   const slides = Array.isArray(hero.slides) ? hero.slides : [];
@@ -39,6 +150,12 @@
   const posts = Array.isArray(blog.posts) ? blog.posts.slice(0, 4) : [];
   const featuredProviders = Object.values(providers).filter(p => p && p.featuredOnIndex).slice(0, 4);
   const sdgs = Array.isArray(site.sdgs) ? site.sdgs : [];
+  const sdgDisplayOrder = [4, 17, 11, 10];
+  const orderedSdgs = [...sdgs].sort((a, b) => {
+    const ai = sdgDisplayOrder.indexOf(Number(a && a.id));
+    const bi = sdgDisplayOrder.indexOf(Number(b && b.id));
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
   const model = Array.isArray(about.model) ? about.model : [];
   const achievements = Array.isArray(about.achievements) ? about.achievements : [];
   const heroInfo = String(hero.info || '')
@@ -113,14 +230,18 @@
             </div>
           </div>
           <div class="sdg-lineup sdg-lineup--icon">
-            ${sdgs.map((item, i) => `<a class="sdg-item sdg-item--icon" href="${esc(item.link || '#')}" target="_blank" rel="noopener" style="--sdg-color:${esc(item.color || '#5f7f62')};--i:${i}">
+            <svg class="sdgs-path-svg" viewBox="0 0 1000 320" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+              <path d="M 125,100 C 225,100 275,220 375,220 C 475,220 525,100 625,100 C 725,100 775,220 875,220" fill="none" stroke="rgba(74, 222, 128, 0.15)" stroke-width="8" stroke-linecap="round"/>
+              <path d="M 125,100 C 225,100 275,220 375,220 C 475,220 525,100 625,100 C 725,100 775,220 875,220" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" class="sdgs-path-glow"/>
+            </svg>
+            ${orderedSdgs.map((item, i) => `<a class="sdg-item sdg-item--icon sdg-item-${esc(item.id || i)}" href="${esc(item.link || '#')}" target="_blank" rel="noopener" style="--sdg-color:${esc(item.color || '#5f7f62')};--i:${i}">
               <div class="sdg-icon-wrap sdg-draw-anim" style="--sdg-color:${esc(item.color || '#5f7f62')}">
-                ${sdgIconSvg(item.id, item.color || '#5f7f62')}
-                <svg class="sdg-border-svg" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                ${sdgLegacySvg(item)}
+                <svg class="sdg-border-svg" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                   <rect x="3" y="3" width="104" height="104" rx="10" stroke="${esc(item.color || '#5f7f62')}" stroke-width="3" stroke-dasharray="420" stroke-dashoffset="420"/>
                 </svg>
               </div>
-              <span><strong>${esc(item.title)}</strong><small>${esc(item.desc || '')}</small></span>
+              <span><span class="sdg-item__num">SDG ${esc(item.id || '')}</span><strong>${esc(item.title)}</strong><small>${esc(item.desc || '')}</small></span>
             </a>`).join('')}
           </div>
         </section>` : ''}
@@ -189,6 +310,10 @@
       </div>
     </section>`;
 
+  prepareStrokeDrawings(root);
+  bootSdgIconAnimations(root);
+  bootNavRingEnhancer();
+
   const media = document.getElementById('home-hero-media');
   if (media) {
     const imgs = Array.from(media.querySelectorAll('img'));
@@ -204,17 +329,13 @@
     if (imgs.length > 1) setInterval(() => show(idx + 1), 5200);
   }
 
-  const revealTargets = root.querySelectorAll('.draw-svg, .achievement-item, .sdg-item, .sdg-icon-svg, .model-row');
+  const revealTargets = root.querySelectorAll('.draw-svg, .achievement-item, .sdg-item, .model-row, .sdg-lineup');
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('is-visible');
-        // SDG border draw animation
-        const borderRect = entry.target.querySelector && entry.target.querySelector('.sdg-border-svg rect');
-        if (borderRect) {
-          borderRect.style.animation = 'sdgBorderDraw 1s cubic-bezier(0.2,0,0,1) forwards';
-        }
+        if (entry.target.classList && entry.target.classList.contains('sdg-item')) playSdgOnce(entry.target);
         const num = entry.target.querySelector && entry.target.querySelector('.achievement-number');
         if (num && num.dataset.to && !num.dataset.done) {
           num.dataset.done = 'true';
@@ -235,6 +356,7 @@
   } else {
     revealTargets.forEach(el => {
       el.classList.add('is-visible');
+      if (el.classList && el.classList.contains('sdg-item')) playSdgOnce(el);
     });
   }
 })();
