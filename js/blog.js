@@ -70,7 +70,30 @@
 
   function scrollToListTitle() {
     const target = document.getElementById('blog-list-title') || root.querySelector('.page-hero');
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!target) return;
+    const header = document.querySelector('.site-header');
+    const headerHeight = header ? header.offsetHeight : 74;
+    const sidePanel = document.querySelector('.blog-layout .side-panel');
+    let offset = headerHeight;
+    if (window.innerWidth <= 980 && sidePanel) {
+      offset += sidePanel.offsetHeight;
+    } else {
+      offset += 20;
+    }
+    const targetY = target.getBoundingClientRect().top + window.scrollY - offset;
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    if (Math.abs(distance) < 5) return;
+    const duration = Math.min(800, Math.max(300, Math.abs(distance) * 0.4));
+    const startTime = performance.now();
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function animate(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      window.scrollTo(0, startY + distance * easeOutCubic(progress));
+      if (progress < 1) requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
   }
 
   /**
@@ -170,7 +193,7 @@
         <aside class="side-panel">
           <h2>文章分類</h2>
           <div class="chip-list">${cats.map(c => `<button class="chip category-filter ${active === c ? 'active' : ''}" type="button" data-category="${c}">${labels[c]}</button>`).join('')}</div>
-          <div style="margin-top:26px">
+          <div class="blog-latest-posts" style="margin-top:26px">
             <h3>新著文章</h3>
             <div class="footer-links" style="gap:12px">${latest.map(p => `<button type="button" class="button-text footer-copy" data-open="${esc(p.id)}">${esc(p.title)}</button>`).join('')}</div>
           </div>

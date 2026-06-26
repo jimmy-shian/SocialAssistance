@@ -37,6 +37,13 @@
     return (location.pathname.split('/').pop() || 'index.html').replace('#', '') || 'index.html';
   }
 
+  // Footer-specific nav items: only 首頁、探索資源、部落格
+  const FOOTER_NAV_ITEMS = [
+    ['index.html', '首頁'],
+    ['explore.html', '探索資源'],
+    ['blog.html', '部落格']
+  ];
+
   function navLinks(className = 'nav-link') {
     const cur = currentPage();
     const items = getNavItems();
@@ -127,7 +134,7 @@
             </div>
             <div>
               <div class="site-footer__title">網站地圖</div>
-              <div class="footer-links">${navItems.map(([href,label]) => `<a class="footer-link" href="./${href}">${label}</a>`).join('')}</div>
+              <div class="footer-links">${FOOTER_NAV_ITEMS.map(([href,label]) => `<a class="footer-link" href="./${href}">${label}</a>`).join('')}</div>
             </div>
             <div>
               <div class="site-footer__title">社群</div>

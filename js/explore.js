@@ -30,8 +30,9 @@
     const cats = categories();
     const locs = locations();
     const tags = ['自立', '職業', '親子', '冒險', '農業', '美感', '口語', '科技'];
-    return `<aside class="side-panel resource-filters">
-      <button class="filter-toggle" id="filter-toggle" type="button" aria-expanded="true" aria-controls="resource-filter-body">
+    const isMobile = window.innerWidth <= 980;
+    return `<aside class="side-panel resource-filters ${isMobile ? 'collapsed' : ''}">
+      <button class="filter-toggle" id="filter-toggle" type="button" aria-expanded="${isMobile ? 'false' : 'true'}" aria-controls="resource-filter-body">
         <span>搜尋條件</span><span aria-hidden="true">+</span>
       </button>
       <div id="resource-filter-body"><div class="field-stack">
@@ -188,19 +189,56 @@
       });
     }
 
-    // Document click listener to close dropdowns when clicking outside
-    const documentClickHandler = () => {
+    // Document click listener to close dropdowns and mobile filter panel when clicking outside
+    document.addEventListener('click', (e) => {
+      // Close custom select dropdowns when clicking outside
       document.querySelectorAll('.custom-select').forEach(el => {
-        el.classList.remove('active');
-        el.setAttribute('aria-expanded', 'false');
+        if (!el.contains(e.target)) {
+          el.classList.remove('active');
+          el.setAttribute('aria-expanded', 'false');
+        }
       });
-    };
-    document.addEventListener('click', documentClickHandler);
+
+      // Close mobile filters panel when clicking outside
+      if (window.innerWidth <= 980) {
+        const panel = document.querySelector('.resource-filters');
+        const toggle = document.getElementById('filter-toggle');
+        if (panel && !panel.classList.contains('collapsed') && !panel.contains(e.target)) {
+          panel.classList.add('collapsed');
+          if (toggle) {
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        }
+      }
+    });
   }
 
   function scrollToResults() {
     const target = document.querySelector('.resource-layout section') || document.querySelector('.resource-grid');
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!target) return;
+    const header = document.querySelector('.site-header');
+    const headerHeight = header ? header.offsetHeight : 74;
+    const filterBar = document.querySelector('.resource-filters');
+    let offset = headerHeight;
+    if (window.innerWidth <= 980 && filterBar) {
+      offset += filterBar.offsetHeight;
+    } else {
+      offset += 20;
+    }
+    const targetY = target.getBoundingClientRect().top + window.scrollY - offset;
+    const startY = window.scrollY;
+    const distance = targetY - startY;
+    if (Math.abs(distance) < 5) return;
+    const duration = Math.min(800, Math.max(300, Math.abs(distance) * 0.4));
+    const startTime = performance.now();
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function animate(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      window.scrollTo(0, startY + distance * easeOutCubic(progress));
+      if (progress < 1) requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
   }
 
   render();
