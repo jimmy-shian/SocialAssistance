@@ -11,19 +11,19 @@
     lb.setAttribute('aria-label', '圖片檢視器');
     lb.innerHTML = `
       <img decoding="async" alt="擴大顯示" />
-      <div class="lightbox-nav" aria-hidden="true">
-        <button class="lightbox-nav-btn lightbox-prev" type="button" aria-label="上一張">&#8249;</button>
-        <button class="lightbox-nav-btn lightbox-next" type="button" aria-label="下一張">&#8250;</button>
+      <div class="nav" aria-hidden="true">
+        <button class="nav-btn lightbox-prev" type="button" aria-label="上一張">&#8249;</button>
+        <button class="nav-btn lightbox-next" type="button" aria-label="下一張">&#8250;</button>
       </div>
-      <div class="lightbox-thumbs" role="listbox" aria-label="縮圖快速切換"></div>
-      <button class="lightbox-close-btn" type="button" aria-label="關閉">&#x2715;</button>
+      <div class="thumbs" role="listbox" aria-label="縮圖快速切換"></div>
+      <button class="close-btn" type="button" aria-label="關閉">&#x2715;</button>
     `;
     document.body.appendChild(lb);
     const img = lb.querySelector('img');
     const btnPrev = lb.querySelector('.lightbox-prev');
     const btnNext = lb.querySelector('.lightbox-next');
-    const btnClose = lb.querySelector('.lightbox-close-btn');
-    const thumbs = lb.querySelector('.lightbox-thumbs');
+    const btnClose = lb.querySelector('.close-btn');
+    const thumbs = lb.querySelector('.thumbs');
     const state = { index: 0, sources: [] };
 
     function show(i) {
@@ -71,9 +71,9 @@
 
     lb.addEventListener('click', (e) => {
       const inImage = img.contains(e.target);
-      const inNav = !!e.target.closest('.lightbox-nav');
-      const inThumbs = !!e.target.closest('.lightbox-thumbs');
-      const inClose = !!e.target.closest('.lightbox-close-btn');
+      const inNav = !!e.target.closest('.nav');
+      const inThumbs = !!e.target.closest('.thumbs');
+      const inClose = !!e.target.closest('.close-btn');
       if (!inImage && !inNav && !inThumbs && !inClose) close();
     });
     btnClose.addEventListener('click', close);
