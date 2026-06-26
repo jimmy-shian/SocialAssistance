@@ -66,8 +66,73 @@
         </div>
         <div class="filter-group"><label>服務 / 體驗標籤</label><div class="chip-list">${tags.map(t => `<button class="chip ${state.tag === t ? 'active' : ''}" type="button" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div></div>
         <button class="button-secondary" type="button" id="resource-reset">清除條件</button>
+        <div id="explore-map" class="explore-map-container" style="height:240px; margin-top:20px; border-radius:var(--radius-card); border:1px solid var(--color-line); overflow:hidden; position:relative; z-index: 10;"></div>
       </div></div>
     </aside>`;
+  }
+
+  let exploreMapInstance = null;
+
+  function initExploreMap(list) {
+    if (window.innerWidth <= 980) return;
+    const mapEl = document.getElementById('explore-map');
+    if (!mapEl) return;
+
+    if (exploreMapInstance) {
+      try {
+        exploreMapInstance.remove();
+      } catch (e) {
+        console.error(e);
+      }
+      exploreMapInstance = null;
+    }
+
+    const withCoords = list.filter(p => p && p.coords);
+    if (!withCoords.length) {
+      mapEl.style.display = 'none';
+      return;
+    } else {
+      mapEl.style.display = 'block';
+    }
+
+    try {
+      exploreMapInstance = L.map('explore-map', {
+        center: [23.48, 120.44],
+        zoom: 11,
+        scrollWheelZoom: false,
+        zoomControl: false
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(exploreMapInstance);
+
+      const latLngs = [];
+      withCoords.forEach(p => {
+        const marker = L.marker([p.coords.lat, p.coords.lng]).addTo(exploreMapInstance);
+        latLngs.push([p.coords.lat, p.coords.lng]);
+        const href = `./provider.html?id=${encodeURIComponent(p.id)}`;
+        const popupHtml = `
+          <div style="cursor:pointer; text-align:center" onclick="window.location.href='${href}'">
+            <strong style="font-size:13px">${esc(p.name)}</strong><br>
+            <span style="font-size:11px;color:#6b7280">點擊進入場域</span>
+          </div>
+        `;
+        marker.bindPopup(popupHtml);
+        marker.on('mouseover', () => marker.openPopup());
+        marker.on('click', () => { window.location.href = href; });
+      });
+
+      if (latLngs.length > 0) {
+        if (latLngs.length === 1) {
+          exploreMapInstance.setView(latLngs[0], 13);
+        } else {
+          exploreMapInstance.fitBounds(L.latLngBounds(latLngs), { padding: [15, 15] });
+        }
+      }
+    } catch (err) {
+      console.error('Leaflet initialization failed', err);
+    }
   }
 
   function render() {
@@ -83,6 +148,7 @@
       </section>
     </div>`;
     bind();
+    initExploreMap(list);
   }
 
   function setupCustomSelect(id, stateKey) {

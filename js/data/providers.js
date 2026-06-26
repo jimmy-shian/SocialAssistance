@@ -818,5 +818,348 @@ window.providersData = {
         ]
       }
     ]
+  },
+  "DJTaro": {
+    "id": "DJTaro",
+    "name": "DJTaro",
+    "category": "音樂表演類",
+    "schedule": "每週六 13:00–16:00",
+    "location": "嘉義市 東區",
+    "address": "嘉義市東區興美七街138號",
+    "coords": {
+      "lat": 23.456,
+      "lng": 120.435
+    },
+    "gmapUrl": "https://www.google.com/maps?q=23.456,120.435",
+    "featuredOnIndex": true,
+    "description": "探索城市電音與藝術創作的魅力！在職人引導下，學習混音設備的操作，感受音樂如何為城市生活注入新的生命與能量。",
+    "know": [
+      "電子音樂的發展與多元文化",
+      "專業混音與打碟設備的原理",
+      "音樂在地方創生與社群凝聚中的角色"
+    ],
+    "learn": [
+      "混音台與控制器基本操作",
+      "歌曲拍速對齊（Beatmatching）技巧",
+      "基本音樂轉場與音效調整實作"
+    ],
+    "gain": [
+      "親自操作 DJ 設備的趣味體驗",
+      "音樂節奏感與表達力的提升",
+      "探索音樂在生活場域的無限可能"
+    ],
+    "images": [
+      "./img/explore/DJTaro/封面圖1/封面照.webp"
+    ],
+    "relatedBlogPostId": "interview-taro",
+    "timeline": [
+      {
+        "time": "09:00",
+        "title": "職人介紹",
+        "detail": "認識專業 DJ 職人，介紹音樂工作室環境、混音器材與基礎樂理概念。",
+        "images": [
+          "./img/explore/DJTaro/課程安排2/職人介紹/職人介紹1.webp"
+        ]
+      },
+      {
+        "time": "09:30",
+        "title": "職人工作說明",
+        "detail": "解說 DJ 播放器的介面功能、音頻調整（EQ）及刷碟等基本技巧的應用。",
+        "images": [
+          "./img/explore/DJTaro/課程安排2/職人工作說明/職人工作說明1.webp",
+          "./img/explore/DJTaro/課程安排2/職人工作說明/職人工作說明2.webp"
+        ]
+      },
+      {
+        "time": "10:00",
+        "title": "職業體驗內容說明",
+        "detail": "示範如何選歌、對拍（Beatmatch）以及使用混音座流暢地進行歌曲切換。",
+        "images": [
+          "./img/explore/DJTaro/課程安排2/職業體驗內容說明/職業體驗內容說明1.webp",
+          "./img/explore/DJTaro/課程安排2/職業體驗內容說明/職業體驗內容說明2.webp"
+        ]
+      },
+      {
+        "time": "10:30",
+        "title": "職業體驗",
+        "detail": "學員親自上機操作混音盤，練習調整拍速與音效，嘗試做出屬於自己的音樂轉場。",
+        "images": [
+          "./img/explore/DJTaro/課程安排2/職業體驗/職業體驗1.webp",
+          "./img/explore/DJTaro/課程安排2/職業體驗/職業體驗2.webp",
+          "./img/explore/DJTaro/課程安排2/職業體驗/職業體驗3.webp",
+          "./img/explore/DJTaro/課程安排2/職業體驗/職業體驗4.webp"
+        ]
+      },
+      {
+        "time": "11:30",
+        "title": "Q＆A時間",
+        "detail": "與職人深入對談，探討電子音樂在地方活動的應用及音樂產業的多元面貌。",
+        "images": [
+          "./img/explore/DJTaro/課程安排2/Q＆A時間/Q＆A時間1.webp",
+          "./img/explore/DJTaro/課程安排2/Q＆A時間/Q＆A時間2.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "在專業 DJ 器材前合影留念，記錄今日獨特的音樂探索成果。",
+        "images": [
+          "./img/explore/DJTaro/課程安排2/大合照/大合照1.webp"
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "id": "可負擔蒙特梭利",
+        "title": "可負擔蒙特梭利",
+        "summary": "結合電子音樂與適性教育，為學員帶來聽覺與創意感官探索體驗，開啟全新視野。",
+        "images": [
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_1.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_2.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_3.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_4.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_5.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_6.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_7.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_8.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_9.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_10.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_11.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_12.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_13.webp",
+          "./img/explore/DJTaro/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_14.webp"
+        ]
+      }
+    ]
+  },
+  "東石50分life工作室": {
+    "id": "東石50分life工作室",
+    "name": "東石50分life工作室",
+    "category": "漁業與食農教育",
+    "schedule": "每週日 09:00–12:00",
+    "location": "嘉義縣 東石鄉",
+    "address": "嘉義縣東石鄉塭仔村後埔第13鄰2附8號",
+    "coords": {
+      "lat": 23.442,
+      "lng": 120.181
+    },
+    "gmapUrl": "https://www.google.com/maps?q=23.442,120.181",
+    "featuredOnIndex": true,
+    "description": "跟著淑芳姐與樟哥走入廢棄魚塭改建的生態園區，體驗抓蝦摸魚、認識生態養殖，並親手製作美味的虱目魚一夜干。",
+    "know": [
+      "友善環境的生態養殖系統",
+      "漁港與漁村的歷史文化變遷",
+      "虱目魚的加工與保存科學"
+    ],
+    "learn": [
+      "魚塭投放蝦苗與生態採收方法",
+      "虱目魚去鱗、剖背與去內臟實作技巧",
+      "海風日曬與一夜干製作熟成工序"
+    ],
+    "gain": [
+      "親近土地與海洋的食農實踐體驗",
+      "對生命及環境永續理念的深刻體會",
+      "親手製作無添加虱目魚干的成就感"
+    ],
+    "images": [
+      "./img/explore/東石50分life工作室/封面圖1/封面照.webp"
+    ],
+    "relatedBlogPostId": "interview-dongshi",
+    "timeline": [
+      {
+        "time": "09:00",
+        "title": "職人介紹",
+        "detail": "認識淑芳姐與樟哥，聽他們分享如何將廢棄魚塭打造成生態共生池的奮鬥故事。",
+        "images": [
+          "./img/explore/東石50分life工作室/課程安排2/職人介紹/職人介紹1.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職人介紹/職人介紹2.webp"
+        ]
+      },
+      {
+        "time": "09:30",
+        "title": "職人工作說明",
+        "detail": "現場講解魚池水質檢測、飼料投放與魚類共生系統的運作方式。",
+        "images": [
+          "./img/explore/東石50分life工作室/課程安排2/職人工作說明/職人工作說明1.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職人工作說明/職人工作說明2.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職人工作說明/職人工作說明3.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職人工作說明/職人工作說明4.webp"
+        ]
+      },
+      {
+        "time": "10:00",
+        "title": "職業體驗內容說明",
+        "detail": "示範一夜干製作技巧，包含魚體清洗、去鱗、剖背劃刀與均勻抹鹽工序。",
+        "images": [
+          "./img/explore/東石50分life工作室/課程安排2/職業體驗內容說明/職業體驗內容說明1.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職業體驗內容說明/職業體驗內容說明2.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職業體驗內容說明/職業體驗內容說明3.webp"
+        ]
+      },
+      {
+        "time": "10:30",
+        "title": "職業體驗",
+        "detail": "學員動手實作，親自剖魚、洗淨並吊掛風乾，並到魚塭體驗拉網捕撈的樂趣。",
+        "images": [
+          "./img/explore/東石50分life工作室/課程安排2/職業體驗/職業體驗1.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職業體驗/職業體驗2.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職業體驗/職業體驗3.webp",
+          "./img/explore/東石50分life工作室/課程安排2/職業體驗/職業體驗4.webp"
+        ]
+      },
+      {
+        "time": "11:30",
+        "title": "Q＆A時間",
+        "detail": "品嚐在地新鮮虱目魚，並與職人交流青年返鄉創生與生態永續的看法。",
+        "images": [
+          "./img/explore/東石50分life工作室/課程安排2/Q＆A時間/Q＆A時間1.webp",
+          "./img/explore/東石50分life工作室/課程安排2/Q＆A時間/Q＆A時間2.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "在美麗的生態魚塭前，與今日親手製作的一夜干及夥伴們合影紀念。",
+        "images": [
+          "./img/explore/東石50分life工作室/課程安排2/大合照/大合照1.webp"
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "id": "職業探索課程",
+        "title": "職業探索課程",
+        "summary": "透過走入真實的生態漁場，學習尊重自然與傳統漁業智慧，開啟多元的職業視野。",
+        "images": [
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_1.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_2.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_3.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_4.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_5.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_6.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_7.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_8.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_9.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_10.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_11.webp",
+          "./img/explore/東石50分life工作室/精選案例3/職業探索課程/職業探索課程_12.webp"
+        ]
+      }
+    ]
+  },
+  "祥偶劇團": {
+    "id": "祥偶劇團",
+    "name": "祥偶劇團",
+    "category": "傳統布袋戲藝文推廣",
+    "schedule": "每週六 14:00–17:00",
+    "location": "嘉義縣 義竹鄉",
+    "address": "嘉義縣義竹鄉溪洲村下溪洲59號",
+    "coords": {
+      "lat": 23.32,
+      "lng": 120.25
+    },
+    "gmapUrl": "https://www.google.com/maps?q=23.320,120.250",
+    "featuredOnIndex": true,
+    "description": "承襲掌中戲世家精神，由黃團長親自指導。學習傳統布袋戲偶操演、認識經典劍俠戲，體驗傳統藝術在現代的傳承與蛻變。",
+    "know": [
+      "台灣傳統布袋戲與劍俠戲的歷史源流",
+      "角色行當（生、旦、淨、末、丑）的特徵與發聲",
+      "掌中戲彩繪佈景與配音配樂的藝術價值"
+    ],
+    "learn": [
+      "布袋戲偶基本握法與跑、跳、對打等操偶技巧",
+      "口白發聲與角色語調變換實作",
+      "布袋戲後場鑼鼓點與簡易配樂搭配"
+    ],
+    "gain": [
+      "親自上台演出經典橋段的難忘回憶",
+      "對傳統工藝與表演藝術結合之美的新認識",
+      "團隊分工默契與說話表達力的趣味鍛鍊"
+    ],
+    "images": [
+      "./img/explore/祥偶劇團/封面照1/封面照.webp"
+    ],
+    "relatedBlogPostId": "interview-puppet",
+    "timeline": [
+      {
+        "time": "09:00",
+        "title": "職人介紹",
+        "detail": "由第四代傳承人黃團長介紹劇團歷史「嘉芳社掌中班」與布袋戲世家的傳承責任。",
+        "images": [
+          "./img/explore/祥偶劇團/課程安排2/職人介紹/職人介紹1.webp",
+          "./img/explore/祥偶劇團/課程安排2/職人介紹/職人介紹2.webp"
+        ]
+      },
+      {
+        "time": "09:30",
+        "title": "職人工作說明",
+        "detail": "解說傳統戲偶的構造、服飾與生旦淨末丑不同行當的動作姿態要領。",
+        "images": [
+          "./img/explore/祥偶劇團/課程安排2/職人工作說明/職人工作說明1.webp",
+          "./img/explore/祥偶劇團/課程安排2/職人工作說明/職人工作說明2.webp",
+          "./img/explore/祥偶劇團/課程安排2/職人工作說明/職人工作說明3.webp"
+        ]
+      },
+      {
+        "time": "10:00",
+        "title": "職業體驗內容說明",
+        "detail": "示範基本的操偶手法，包括擺動身段、行進轉身及武打過招等核心技巧。",
+        "images": [
+          "./img/explore/祥偶劇團/課程安排2/職業體驗內容說明/職業體驗內容說明1.webp",
+          "./img/explore/祥偶劇團/課程安排2/職業體驗內容說明/職業體驗內容說明2.webp"
+        ]
+      },
+      {
+        "time": "10:30",
+        "title": "職業體驗",
+        "detail": "學員分組選取戲偶，實際在小戲台上練習對話、身段與武打，體驗掌中藝術的生命力。",
+        "images": [
+          "./img/explore/祥偶劇團/課程安排2/職業體驗/職業體驗1.webp",
+          "./img/explore/祥偶劇團/課程安排2/職業體驗/職業體驗2.webp",
+          "./img/explore/祥偶劇團/課程安排2/職業體驗/職業體驗3.webp",
+          "./img/explore/祥偶劇團/課程安排2/職業體驗/職業體驗4.webp"
+        ]
+      },
+      {
+        "time": "11:30",
+        "title": "Q＆A時間",
+        "detail": "與團長暢談傳統文化在現代的轉型與校園社區推廣布袋戲的心路歷程。",
+        "images": [
+          "./img/explore/祥偶劇團/課程安排2/Q＆A時間/Q＆A時間1.webp",
+          "./img/explore/祥偶劇團/課程安排2/Q＆A時間/Q＆A時間2.webp"
+        ]
+      },
+      {
+        "time": "11:50",
+        "title": "大合照",
+        "detail": "手持戲偶在戲台前合影，共同留存這份傳承傳統民俗的珍貴回憶。",
+        "images": [
+          "./img/explore/祥偶劇團/課程安排2/大合照/大合照1.webp"
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "id": "可負擔蒙特梭利",
+        "title": "可負擔蒙特梭利",
+        "summary": "藉由布袋戲的角色刻劃與故事詮釋，引導學員建立自信與多元文化認同，推動適性學習。",
+        "images": [
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_1.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_2.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_3.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_4.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_5.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_6.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_7.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_8.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_9.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_10.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_11.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_12.webp",
+          "./img/explore/祥偶劇團/精選案例3/可負擔蒙特梭利/可負擔蒙特梭利_13.webp"
+        ]
+      }
+    ]
   }
 };
+
