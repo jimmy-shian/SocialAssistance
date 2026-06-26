@@ -30,8 +30,8 @@ window.siteContent = {
     ],
     label: 'SOUND CORE STUDIO',
     title: '孩子成長路上的<br><span class="text-[var(--primary)]">陪跑者</span>',
-    subtitle: '「聽見、看見、感受 每個孩子的需要」',
-    info: '嘉義市西區車店里蘭州五街６６號<br>0988-368-450<br>專業探索課程設計',
+    subtitle: '聽見.看見.感受每個孩子的需求，提供環境探索嘗試機會',
+    info: '0988-368-450<br>專業探索課程設計',
     buttons: [
       { text: '開始探索', link: './explore.html', style: 'primary' },
       { text: '了解更多', link: '#about', style: 'outline' }
@@ -92,7 +92,7 @@ window.siteContent = {
       id: 11,
       title: '永續城鄉',
       color: '#FD9D24',
-      desc: '推廣合適的樹木種植與修剪，促進在地綠化與社區永續發展。',
+      desc: '促進在地綠化與社區永續發展。',
       link: 'https://globalgoals.tw/11-sustainable-cities-and-communities'
     },
     {

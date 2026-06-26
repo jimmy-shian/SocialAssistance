@@ -190,7 +190,7 @@ border-image: repeating-linear-gradient(90deg, var(--color-line) 0 10px, transpa
 .home-hero__dots { position: absolute; left: 22px; bottom: 22px; display: flex; gap: 8px; }
 .home-hero__dots button { width: 10px; height: 10px; border: 0; border-radius: 999px; background: rgba(255,255,255,.72); padding: 0; }
 .home-hero__dots button.active { width: 28px; background: #fff; }
-.service-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--color-line); }
+.service-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--color-line); }
 .service-link { display: grid; gap: 10px; padding: 26px 22px; border-bottom: 1px solid var(--color-line); border-right: 1px solid var(--color-line); }
 .service-link:nth-child(4n) { border-right: 0; }
 .service-link img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 18px; }

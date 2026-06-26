@@ -224,7 +224,7 @@
       _returnUrl = decodeURIComponent(from);
       // Clean the URL so refresh / share doesn't keep the from param
       url.searchParams.delete('from');
-      history.replaceState(null, '', url.pathname + url.hash);
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
     }
   }
 

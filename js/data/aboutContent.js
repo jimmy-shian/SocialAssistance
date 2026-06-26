@@ -20,9 +20,9 @@ window.aboutContent = {
       "desc": "獨立完成專案，展現學習成果，建立自信與成就感。"
     }
   ],
-  "achievementsTitle": "成就經歷",
+  "achievementsTitle": "歷年服務",
   "achievements": [
-    "服務超過 300 人次的青少年",
+    "服務超過 3000 人次的青少年",
     "與嘉義地區 10+ 家在地業者建立合作關係",
     {
       "text": "開發 20+ 小時的體驗式課程教材",

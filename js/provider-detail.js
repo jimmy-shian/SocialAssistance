@@ -16,6 +16,7 @@
   const cases = Array.isArray(provider.cases) ? provider.cases : [];
   const allCaseImages = cases.flatMap(c => Array.isArray(c.images) ? c.images : []).slice(0, 12);
   const returnUrl = encodeURIComponent(location.href);
+  const returnUrlWithHash = encodeURIComponent(location.href.split('#')[0] + '#interview');
 
   function listBlock(title, items) {
     return `<div class="plain-list-block interactive-lift"><h3>${esc(title)}</h3><ul>${(items || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
@@ -94,13 +95,13 @@
           <span class="section-label">interview</span>
           <h2>人物專訪</h2>
           <article class="article-row provider-interview-card interactive-row">
-            <a class="image-frame article-row__image interactive-image" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrl}">${relatedInterview.image ? `<img src="${esc(relatedInterview.image)}" alt="${esc(relatedInterview.title)}" loading="lazy">` : ''}</a>
-            <div>
-              <div class="article-row__meta"><span class="category-pill">人物專訪</span><span class="date-text">${esc(relatedInterview.date || '')}</span></div>
-              <h3><a href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrl}">${esc(relatedInterview.title)}</a></h3>
-              <p class="line-clamp-3">${esc(relatedInterview.excerpt || relatedInterview.content || '')}</p>
-              <a class="button-text" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrl}">前往閱讀 →</a>
-            </div>
+            <a class="image-frame article-row__image interactive-image" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrlWithHash}">${relatedInterview.image ? `<img src="${esc(relatedInterview.image)}" alt="${esc(relatedInterview.title)}" loading="lazy">` : ''}</a>
+          <div>
+            <div class="article-row__meta"><span class="category-pill">人物專訪</span><span class="date-text">${esc(relatedInterview.date || '')}</span></div>
+            <h3><a href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrlWithHash}">${esc(relatedInterview.title)}</a></h3>
+            <p class="line-clamp-3">${esc(relatedInterview.excerpt || relatedInterview.content || '')}</p>
+            <a class="button-text" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrlWithHash}">前往閱讀 →</a>
+          </div>
           </article>
         </section>` : ''}
 
@@ -149,4 +150,17 @@
       requestAnimationFrame(animate);
     });
   });
+
+  // Handle hash scrolling on page load (since elements are rendered dynamically)
+  if (location.hash) {
+    const targetId = location.hash.substring(1);
+    const targetElement = document.getElementById(targetId);
+    if (targetElement) {
+      setTimeout(() => {
+        const headerOffset = 96;
+        const targetY = targetElement.getBoundingClientRect().top + window.scrollY - headerOffset;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+      }, 100);
+    }
+  }
 })();

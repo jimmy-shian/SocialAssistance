@@ -183,7 +183,7 @@
         <h1>${hero.title || '孩子成長路上的<br>陪跑者'}</h1>
         <p class="page-hero__lead">${esc(hero.subtitle || '聽見、看見、感受每個孩子的需要')}</p>
         <div class="home-hero__info">
-          ${(heroInfo.length ? heroInfo : ['嘉義市西區車店里蘭州五街66號', '0988-368-450', '專業探索課程設計']).map(x => `<span>${esc(x)}</span>`).join('')}
+          ${(heroInfo.length ? heroInfo : ['0988-368-450', '專業探索課程設計']).map(x => `<span>${esc(x)}</span>`).join('')}
         </div>
         <div class="action-row">
           <a class="button-primary" href="./explore.html">開始探索</a>
