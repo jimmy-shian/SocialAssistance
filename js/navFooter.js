@@ -1,7 +1,10 @@
 // Shared navigation and footer for the warm institution redesign.
+// Reads contact/nav data from window.siteContent (js/data/siteContent.js).
 (function () {
-  const CONTACT = {
+  // Fallback defaults – used only when siteContent hasn't loaded yet.
+  const FALLBACK_CONTACT = {
     name: '聽見核心工作室',
+    tagline: '孩子成長路上的陪跑者。聽見、看見、感受每個孩子的需要。',
     phone: '0988-368-450',
     phoneRaw: '0988368450',
     email: 'soundcore.3co@gmail.com',
@@ -13,9 +16,8 @@
     threads: 'https://www.threads.net/@soundcore_2025?hl=zh-tw',
     gmap: 'https://maps.google.com/?q=嘉義市西區車店里蘭州五街66號'
   };
-  window.contactData = CONTACT;
 
-  const navItems = [
+  const FALLBACK_NAV_ITEMS = [
     ['index.html', '首頁'],
     ['about.html', '關於我們'],
     ['services.html', '服務項目'],
@@ -23,15 +25,24 @@
     ['blog.html', '最新消息']
   ];
 
+  function getContact() {
+    return (window.siteContent && window.siteContent.contact) || FALLBACK_CONTACT;
+  }
+
+  function getNavItems() {
+    return (window.siteContent && window.siteContent.navItems) || FALLBACK_NAV_ITEMS;
+  }
+
   function currentPage() {
     return (location.pathname.split('/').pop() || 'index.html').replace('#', '') || 'index.html';
   }
 
   function navLinks(className = 'nav-link') {
     const cur = currentPage();
-    return navItems.map(([href, label]) => {
+    const items = getNavItems();
+    return items.map(([href, label]) => {
       const active = cur === href || (cur === '' && href === 'index.html');
-      return `<a class="${className}" href="./${href}"${active ? ' aria-current="page"' : ''}><span class="nav-link-text">${label}</span><svg class="nav-link-ring" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="97" height="37" rx="18.5" ry="18.5" pathLength="320"></rect></svg></a>`;
+      return `<a class="${className}" href="./${href}"${active ? ' aria-current="page"' : ''}><span class="nav-link-text">${label}</span></a>`;
     }).join('');
   }
 
@@ -46,6 +57,10 @@
   }
 
   function render() {
+    const CONTACT = getContact();
+    const navItems = getNavItems();
+    window.contactData = CONTACT;
+
     document.documentElement.classList.remove('dark');
     try { localStorage.removeItem('color-theme'); } catch (e) {}
 
@@ -56,16 +71,18 @@
       navPlaceholder.innerHTML = `
         <header class="site-header">
           <div class="site-header__inner">
-            <a class="site-brand" href="./index.html" aria-label="聽見核心工作室首頁">
-              <img decoding="async" src="./img/soundcore3co-title.webp" alt="聽見核心工作室">
-              <span>聽見核心工作室</span>
+            <a class="site-brand" href="./index.html" aria-label="${CONTACT.name}首頁">
+              <img decoding="async" src="./img/soundcore3co-title.webp" alt="${CONTACT.name}">
+              <span>${CONTACT.name}</span>
             </a>
             <nav class="site-nav" aria-label="主選單">
               ${navLinks()}
               <a class="nav-cta" href="#contact">聯絡我們</a>
             </nav>
             <button class="nav-menu-button" id="nav-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="開啟選單">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
+              <span class="hamburger-line"></span>
             </button>
           </div>
           <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
@@ -91,21 +108,21 @@
               </div>
             </div>
             <div class="site-footer__image interactive-image">
-              <img decoding="async" src="./img/主頁/主頁大照片/LINE_ALBUM_2025126_251208_54.webp" alt="活動現場照片" loading="lazy">
+              <img decoding="async" src="./img/soundcore3co-title.webp" alt="活動現場照片" loading="lazy">
             </div>
           </div>
           <div class="container-wide site-footer__grid">
             <div>
-              <div class="site-footer__title">聽見核心工作室</div>
-              <p>孩子成長路上的陪跑者。聽見、看見、感受每個孩子的需要。</p>
+              <div class="site-footer__title footer-brand-name">${CONTACT.name}</div>
+              <p>${CONTACT.tagline}</p>
             </div>
             <div>
               <div class="site-footer__title">聯絡資訊</div>
               <div class="footer-links">
-                <a class="footer-contact-line" href="${CONTACT.gmap}" target="_blank" rel="noopener">${CONTACT.address}</a>
-                <button type="button" id="copy-phone-btn" class="footer-contact-line footer-copy">${CONTACT.phone}</button>
-                <a class="footer-contact-line" href="mailto:${CONTACT.email}">${CONTACT.email}</a>
-                <span class="footer-contact-line">統編：${CONTACT.taxId}</span>
+                <a class="footer-contact-line footer-contact-line--address" href="${CONTACT.gmap}" target="_blank" rel="noopener">${CONTACT.address}</a>
+                <button type="button" id="copy-phone-btn" class="footer-contact-line footer-copy footer-contact-line--phone">${CONTACT.phone}</button>
+                <a class="footer-contact-line footer-contact-line--email" href="mailto:${CONTACT.email}">${CONTACT.email}</a>
+                <span class="footer-contact-line footer-contact-line--taxid">統編：${CONTACT.taxId}</span>
               </div>
             </div>
             <div>
@@ -122,7 +139,7 @@
               </div>
             </div>
           </div>
-          <div class="container-wide footer-bottom">Copyright &copy; 2026 Sound Core 聽見核心工作室. All Rights Reserved.</div>
+          <div class="container-wide footer-bottom">Copyright &copy; 2026 Sound Core ${CONTACT.name}. All Rights Reserved.</div>
         </footer>`;
     }
 
@@ -134,22 +151,74 @@
         menu.classList.toggle('open', open);
         menu.setAttribute('aria-hidden', String(!open));
         toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? '關閉選單' : '開啟選單');
       });
       menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
         menu.classList.remove('open');
         menu.setAttribute('aria-hidden', 'true');
         toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', '開啟選單');
       }));
     }
 
-    document.querySelectorAll('a[href="#contact"]').forEach(link => {
-      link.addEventListener('click', e => {
-        const target = document.getElementById('contact');
-        if (!target) return;
+    // Use global event delegation to handle clicks on any "#contact" link, avoiding issues with re-renders or dynamic elements.
+    document.addEventListener('click', e => {
+      var link = e.target.closest('a[href="#contact"], a[href$="#contact"]');
+      if (!link) return;
+
+      // Prevent any element with a higher z-index (e.g. blog-lightbox-modal)
+      // from intercepting the event when it shouldn't.
+      // Check that the click target or an ancestor is the nav-cta or within site-header.
+      // If a modal is open, the header should still be clickable because it sits above content.
+
+      var target = document.getElementById('contact');
+      if (target) {
         e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
+
+        // Custom smooth scroll to bypass potential CSS transition interference
+        var headerOffset = 96; // match scroll-padding-top for sticky header
+        var targetY = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+        var startY = window.scrollY;
+        var distance = targetY - startY;
+        if (Math.abs(distance) < 5) return; // already at target
+        var duration = Math.min(800, Math.max(300, Math.abs(distance) * 0.4));
+        var startTime = performance.now();
+        function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+        function animate(now) {
+          var elapsed = now - startTime;
+          var progress = Math.min(elapsed / duration, 1);
+          window.scrollTo(0, startY + distance * easeOutCubic(progress));
+          if (progress < 1) requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+        // Auto-close mobile menu if open
+        var menu = document.getElementById('mobile-menu');
+        var toggle = document.getElementById('nav-toggle');
+        if (menu && menu.classList.contains('open')) {
+          menu.classList.remove('open');
+          menu.setAttribute('aria-hidden', 'true');
+          if (toggle) {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', '開啟選單');
+          }
+        }
+      }
     });
+
+    // Handle smooth scrolling on page load if the hash is #contact
+    if (window.location.hash === '#contact') {
+      // Prevent browser's default instant jump
+      window.scrollTo(0, 0);
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const target = document.getElementById('contact');
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 150);
+      });
+    }
 
     const copy = document.getElementById('copy-phone-btn');
     if (copy) copy.addEventListener('click', async () => {
@@ -157,11 +226,50 @@
       if (window.Toast) window.Toast.show('電話已複製', 'success', 1500);
     });
 
+    // SVG border-draw animation for nav links
+    function initBorderDraw() {
+      var svgNS = 'http://www.w3.org/2000/svg';
+      document.querySelectorAll('.site-nav .nav-link').forEach(function(el) {
+        var old = el.querySelector('.nav-border-svg');
+        if (old) old.remove();
+        var w = el.offsetWidth;
+        var h = el.offsetHeight;
+        if (w === 0 || h === 0) return;
+        var sw = 1.5;
+        var inset = sw / 2;
+        var rw = w - sw;
+        var rh = h - sw;
+        var rx = (h - sw) / 2;
+        var perimeter = 2 * Math.max(0, rw - 2 * rx) + 2 * Math.PI * rx;
+        el.style.setProperty('--nav-perimeter', perimeter);
+        var svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('class', 'nav-border-svg');
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        var rect = document.createElementNS(svgNS, 'rect');
+        rect.setAttribute('class', 'nav-border-rect');
+        rect.setAttribute('x', String(inset));
+        rect.setAttribute('y', String(inset));
+        rect.setAttribute('width', String(rw));
+        rect.setAttribute('height', String(rh));
+        rect.setAttribute('rx', String(rx));
+        rect.setAttribute('fill', 'none');
+        rect.setAttribute('stroke', 'currentColor');
+        rect.setAttribute('stroke-width', String(sw));
+        rect.setAttribute('stroke-dasharray', String(perimeter));
+        svg.appendChild(rect);
+        el.appendChild(svg);
+      });
+    }
+    requestAnimationFrame(function() {
+      requestAnimationFrame(initBorderDraw);
+    });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(initBorderDraw);
+    }
+
     document.dispatchEvent(new CustomEvent('nav-footer-rendered'));
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
   else render();
 })();
-
-

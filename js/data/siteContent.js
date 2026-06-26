@@ -1,4 +1,25 @@
 window.siteContent = {
+  contact: {
+    name: '聽見核心工作室',
+    tagline: '孩子成長路上的陪跑者。聽見、看見、感受每個孩子的需要。',
+    phone: '0988-368-450',
+    phoneRaw: '0988368450',
+    email: 'soundcore.3co@gmail.com',
+    address: '嘉義市西區車店里蘭州五街66號',
+    taxId: '94369582',
+    line: 'https://lin.ee/1C3roAfA',
+    facebook: 'https://www.facebook.com/profile.php?id=61571413520720&locale=zh_TW',
+    instagram: 'https://instagram.com/soundcore_2025/',
+    threads: 'https://www.threads.net/@soundcore_2025?hl=zh-tw',
+    gmap: 'https://maps.google.com/?q=嘉義市西區車店里蘭州五街66號'
+  },
+  navItems: [
+    ['index.html', '首頁'],
+    ['about.html', '關於我們'],
+    ['services.html', '服務項目'],
+    ['explore.html', '探索資源'],
+    ['blog.html', '最新消息']
+  ],
   hero: {
     slides: [
       { img: './img/主頁/主頁大照片/DJI_20250327_091156_736.webp', alt: '攀樹活動' },
