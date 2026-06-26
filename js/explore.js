@@ -32,16 +32,40 @@
     const tags = ['自立', '職業', '親子', '冒險', '農業', '美感', '口語', '科技'];
     return `<aside class="side-panel resource-filters">
       <button class="filter-toggle" id="filter-toggle" type="button" aria-expanded="true" aria-controls="resource-filter-body">
-        <span>搜尋條件</span><span aria-hidden="true">＋</span>
+        <span>搜尋條件</span><span aria-hidden="true">+</span>
       </button>
-      <div id="resource-filter-body" class="field-stack">
+      <div id="resource-filter-body"><div class="field-stack">
         <h2>搜尋條件</h2>
         <div class="filter-group"><label for="resource-keyword">關鍵字</label><input id="resource-keyword" type="search" placeholder="輸入場域、產業或能力" value="${esc(state.keyword)}"></div>
-        <div class="filter-group"><label for="resource-category">產業類別</label><select id="resource-category"><option value="">全部類別</option>${cats.map(c => `<option value="${esc(c)}" ${state.category === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
-        <div class="filter-group"><label for="resource-location">地區</label><select id="resource-location"><option value="">全部地區</option>${locs.map(c => `<option value="${esc(c)}" ${state.location === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+        <div class="filter-group">
+          <label>產業類別</label>
+          <div class="custom-select" id="custom-select-category" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+            <div class="custom-select-trigger">
+              <span>${esc(state.category || '全部類別')}</span>
+              <span class="arrow"></span>
+            </div>
+            <div class="custom-select-options" role="listbox">
+              <div class="custom-select-option ${!state.category ? 'selected' : ''}" data-value="" role="option" aria-selected="${!state.category}">全部類別</div>
+              ${cats.map(c => `<div class="custom-select-option ${state.category === c ? 'selected' : ''}" data-value="${esc(c)}" role="option" aria-selected="${state.category === c}">${esc(c)}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="filter-group">
+          <label>地區</label>
+          <div class="custom-select" id="custom-select-location" tabindex="0" role="combobox" aria-expanded="false" aria-haspopup="listbox">
+            <div class="custom-select-trigger">
+              <span>${esc(state.location || '全部地區')}</span>
+              <span class="arrow"></span>
+            </div>
+            <div class="custom-select-options" role="listbox">
+              <div class="custom-select-option ${!state.location ? 'selected' : ''}" data-value="" role="option" aria-selected="${!state.location}">全部地區</div>
+              ${locs.map(c => `<div class="custom-select-option ${state.location === c ? 'selected' : ''}" data-value="${esc(c)}" role="option" aria-selected="${state.location === c}">${esc(c)}</div>`).join('')}
+            </div>
+          </div>
+        </div>
         <div class="filter-group"><label>服務 / 體驗標籤</label><div class="chip-list">${tags.map(t => `<button class="chip ${state.tag === t ? 'active' : ''}" type="button" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div></div>
         <button class="button-secondary" type="button" id="resource-reset">清除條件</button>
-      </div>
+      </div></div>
     </aside>`;
   }
 
@@ -60,29 +84,123 @@
     bind();
   }
 
+  function setupCustomSelect(id, stateKey) {
+    const container = document.getElementById(id);
+    if (!container) return;
+    const trigger = container.querySelector('.custom-select-trigger');
+    const options = container.querySelectorAll('.custom-select-option');
+
+    // Toggle dropdown
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.querySelectorAll('.custom-select').forEach(el => {
+        if (el !== container) {
+          el.classList.remove('active');
+          el.setAttribute('aria-expanded', 'false');
+        }
+      });
+      const isActive = container.classList.toggle('active');
+      container.setAttribute('aria-expanded', String(isActive));
+    });
+
+    // Select option
+    options.forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state[stateKey] = opt.dataset.value;
+        container.classList.remove('active');
+        container.setAttribute('aria-expanded', 'false');
+        render();
+        scrollToResults();
+      });
+    });
+
+    // Keyboard navigation
+    container.addEventListener('keydown', (e) => {
+      const activeOptions = Array.from(options);
+      let currentIndex = activeOptions.findIndex(o => o.classList.contains('selected'));
+      if (currentIndex === -1) currentIndex = 0;
+
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (container.classList.contains('active')) {
+          const focusedOpt = activeOptions[currentIndex];
+          if (focusedOpt) {
+            state[stateKey] = focusedOpt.dataset.value;
+            container.classList.remove('active');
+            container.setAttribute('aria-expanded', 'false');
+            render();
+            scrollToResults();
+          }
+        } else {
+          container.classList.add('active');
+          container.setAttribute('aria-expanded', 'true');
+        }
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        container.classList.remove('active');
+        container.setAttribute('aria-expanded', 'false');
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (!container.classList.contains('active')) {
+          container.classList.add('active');
+          container.setAttribute('aria-expanded', 'true');
+        } else {
+          activeOptions[currentIndex].classList.remove('selected');
+          currentIndex = (currentIndex + 1) % activeOptions.length;
+          activeOptions[currentIndex].classList.add('selected');
+          activeOptions[currentIndex].scrollIntoView({ block: 'nearest' });
+        }
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!container.classList.contains('active')) {
+          container.classList.add('active');
+          container.setAttribute('aria-expanded', 'true');
+        } else {
+          activeOptions[currentIndex].classList.remove('selected');
+          currentIndex = (currentIndex - 1 + activeOptions.length) % activeOptions.length;
+          activeOptions[currentIndex].classList.add('selected');
+          activeOptions[currentIndex].scrollIntoView({ block: 'nearest' });
+        }
+      }
+    });
+  }
+
   function bind() {
     const kw = document.getElementById('resource-keyword');
-    const cat = document.getElementById('resource-category');
-    const loc = document.getElementById('resource-location');
     let timer;
-    if (kw) kw.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => { state.keyword = kw.value; render(); }, 160); });
-    if (cat) cat.addEventListener('change', () => { state.category = cat.value; render(); });
-    if (loc) loc.addEventListener('change', () => { state.location = loc.value; render(); });
-    document.querySelectorAll('[data-tag]').forEach(btn => btn.addEventListener('click', () => { state.tag = state.tag === btn.dataset.tag ? '' : btn.dataset.tag; render(); }));
+    if (kw) kw.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => { state.keyword = kw.value; render(); scrollToResults(); }, 160); });
+    
+    // Bind custom select dropdowns
+    setupCustomSelect('custom-select-category', 'category');
+    setupCustomSelect('custom-select-location', 'location');
+
+    document.querySelectorAll('[data-tag]').forEach(btn => btn.addEventListener('click', () => { state.tag = state.tag === btn.dataset.tag ? '' : btn.dataset.tag; render(); scrollToResults(); }));
     const reset = document.getElementById('resource-reset');
-    if (reset) reset.addEventListener('click', () => { state = { keyword: '', category: '', location: '', tag: '' }; render(); });
+    if (reset) reset.addEventListener('click', () => { state = { keyword: '', category: '', location: '', tag: '' }; render(); scrollToResults(); });
     const panel = document.querySelector('.resource-filters');
     const toggle = document.getElementById('filter-toggle');
     if (panel && toggle) {
-      const shouldCollapse = window.matchMedia && window.matchMedia('(max-width: 980px)').matches;
-      panel.classList.toggle('collapsed', shouldCollapse);
-      toggle.setAttribute('aria-expanded', String(!shouldCollapse));
       toggle.addEventListener('click', () => {
         const collapsed = !panel.classList.contains('collapsed');
         panel.classList.toggle('collapsed', collapsed);
         toggle.setAttribute('aria-expanded', String(!collapsed));
       });
     }
+
+    // Document click listener to close dropdowns when clicking outside
+    const documentClickHandler = () => {
+      document.querySelectorAll('.custom-select').forEach(el => {
+        el.classList.remove('active');
+        el.setAttribute('aria-expanded', 'false');
+      });
+    };
+    document.addEventListener('click', documentClickHandler);
+  }
+
+  function scrollToResults() {
+    const target = document.querySelector('.resource-layout section') || document.querySelector('.resource-grid');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   render();

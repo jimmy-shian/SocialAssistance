@@ -26,7 +26,7 @@
 
   function prepareStrokeDrawings(scope) {
     const area = scope || document;
-    const targets = area.querySelectorAll('.draw-svg path, .sdg-border-svg rect, .nav-link-ring rect, .sdgs-path-svg path, .sdg-icon-wrap svg:not(.sdg-border-svg) path, .sdg-icon-wrap svg:not(.sdg-border-svg) circle, .sdg-icon-wrap svg:not(.sdg-border-svg) rect, .sdg-icon-wrap svg:not(.sdg-border-svg) line, .sdg-icon-wrap svg:not(.sdg-border-svg) polyline, .sdg-icon-wrap svg:not(.sdg-border-svg) polygon');
+    const targets = area.querySelectorAll('.draw-svg path, .sdg-border-svg rect, .nav-link-ring rect, .sdgs-path-svg path');
     targets.forEach(el => {
       if (!el || typeof el.getTotalLength !== 'function') return;
       const length = Math.ceil(el.getTotalLength());
@@ -38,64 +38,58 @@
     });
   }
 
-  function navRingMarkup() {
-    return '<svg class="nav-link-ring" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect x="2" y="2" width="96" height="40" rx="20" ry="20"></rect></svg>';
-  }
-
-  function enhanceNavRings() {
-    const links = Array.from(document.querySelectorAll('.nav-link'));
-    if (!links.length) return false;
-    links.forEach(link => {
-      if (!link.querySelector('.nav-link-text')) {
-        const label = document.createElement('span');
-        label.className = 'nav-link-text';
-        Array.from(link.childNodes).forEach(node => {
-          if (node.nodeType === 1 && node.classList && node.classList.contains('nav-link-ring')) return;
-          label.appendChild(node);
-        });
-        link.appendChild(label);
-      }
-      if (!link.querySelector('.nav-link-ring')) {
-        link.insertAdjacentHTML('afterbegin', navRingMarkup());
-      }
-      prepareStrokeDrawings(link);
+  function prepareSdgCards(scope) {
+    const area = scope || document;
+    const cards = area.querySelectorAll('.sdg-card');
+    cards.forEach(card => {
+      const paths = card.querySelectorAll('.sdg-icon-path');
+      paths.forEach(path => {
+        path.setAttribute('pathLength', '1');
+      });
     });
-    return true;
   }
 
-  function bootNavRingEnhancer() {
-    enhanceNavRings();
-    const navHost = document.getElementById('nav-placeholder') || document.body;
-    if ('MutationObserver' in window && navHost) {
-      const observer = new MutationObserver(() => enhanceNavRings());
-      observer.observe(navHost, { childList: true, subtree: true });
-      window.setTimeout(() => observer.disconnect(), 5000);
-    } else {
-      window.setTimeout(enhanceNavRings, 200);
-      window.setTimeout(enhanceNavRings, 800);
-    }
+  function sdgDrawableShapes(el) {
+    if (!el) return [];
+    return Array.from(el.querySelectorAll('.sdg-icon-path'));
   }
 
   function playSdgOnce(el) {
-    if (!el || el.dataset.animating === '1') return;
-    el.dataset.animating = '1';
-    el.classList.remove('animating');
-    void el.offsetWidth;
-    el.classList.add('animating');
-    window.clearTimeout(el._sdgAnimationUnlock);
-    const index = Number(getComputedStyle(el).getPropertyValue('--i')) || 0;
-    el._sdgAnimationUnlock = window.setTimeout(() => {
-      delete el.dataset.animating;
-    }, 2700 + index * 100);
+    const isSdg11 = el.classList.contains('sdg-card-11');
+    const duration = isSdg11 ? '4.6s' : '4.2s';
+    sdgDrawableShapes(el).forEach(path => {
+      path.setAttribute('pathLength', '1');
+      path.style.animation = 'none';
+      path.style.fill = 'transparent';
+      path.style.stroke = 'currentColor';
+      path.style.strokeDasharray = '1';
+      path.style.strokeDashoffset = '1';
+
+      path.getBoundingClientRect(); // force reflow
+
+      path.style.animation = `fast-draw-slow-end-fill ${duration} cubic-bezier(0.25, 0.9, 0.35, 1) forwards`;
+    });
+  }
+
+  function resetSdgDrawing(el) {
+    sdgDrawableShapes(el).forEach(path => {
+      path.style.animation = 'none';
+      path.style.transition = 'none';
+      path.style.fill = 'currentColor';
+      path.style.stroke = 'transparent';
+      path.style.strokeDasharray = 'none';
+      path.style.strokeDashoffset = 'none';
+    });
   }
 
   function bootSdgIconAnimations(scope) {
     const area = scope || document;
-    const items = Array.from(area.querySelectorAll('.sdg-item'));
+    const items = Array.from(area.querySelectorAll('.sdg-card'));
     items.forEach(el => {
       if (el.dataset.sdgHoverBound === '1') return;
       el.dataset.sdgHoverBound = '1';
       el.addEventListener('mouseenter', () => playSdgOnce(el));
+      el.addEventListener('mouseleave', () => resetSdgDrawing(el));
     });
   }
 
@@ -111,7 +105,6 @@
     return oldSdgSvgMarkup(raw, safeColor);
   }
 
-
   function oldSdgSvgMarkup(markup, color) {
     const raw = String(markup || '').trim();
     if (!/^<svg[\s>]/i.test(raw)) return '';
@@ -119,12 +112,25 @@
     const cleaned = raw
       .replace(/<script[\s\S]*?<\/script>/gi, '')
       .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, '');
-    return cleaned.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+    const marked = cleaned.replace(/<(path|circle|ellipse|rect|polygon|polyline|line)\b([^>]*?)(\/?)>/gi, (match, tag, attrs, slash) => {
       let nextAttrs = attrs || '';
       if (/\bclass\s*=\s*(['"])/i.test(nextAttrs)) {
-        nextAttrs = nextAttrs.replace(/\bclass\s*=\s*(['"])(.*?)\1/i, (m, quote, value) => `class=${quote}sdg-legacy-svg js-draw-svg ${value}${quote}`);
+        nextAttrs = nextAttrs.replace(/\bclass\s*=\s*(['"])(.*?)\1/i, (m, quote, value) => {
+          const classes = String(value || '').split(/\s+/).filter(Boolean);
+          if (!classes.includes('sdg-icon-path')) classes.unshift('sdg-icon-path');
+          return `class=${quote}${classes.join(' ')}${quote}`;
+        });
       } else {
-        nextAttrs += ' class="sdg-legacy-svg js-draw-svg"';
+        nextAttrs += ' class="sdg-icon-path"';
+      }
+      return `<${tag}${nextAttrs}${slash}>`;
+    });
+    return marked.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+      let nextAttrs = attrs || '';
+      if (/\bclass\s*=\s*(['"])/i.test(nextAttrs)) {
+        nextAttrs = nextAttrs.replace(/\bclass\s*=\s*(['"])(.*?)\1/i, (m, quote, value) => `class=${quote}sdg-icon ${value}${quote}`);
+      } else {
+        nextAttrs += ' class="sdg-icon"';
       }
       if (!/\bstyle\s*=\s*(['"])/i.test(nextAttrs)) nextAttrs += ` style="color:${safeColor}"`;
       if (!/\baria-hidden\s*=/i.test(nextAttrs)) nextAttrs += ' aria-hidden="true"';
@@ -150,7 +156,7 @@
   const posts = Array.isArray(blog.posts) ? blog.posts.slice(0, 4) : [];
   const featuredProviders = Object.values(providers).filter(p => p && p.featuredOnIndex).slice(0, 4);
   const sdgs = Array.isArray(site.sdgs) ? site.sdgs : [];
-  const sdgDisplayOrder = [4, 17, 11, 10];
+  const sdgDisplayOrder = [4, 10, 11, 17];
   const orderedSdgs = [...sdgs].sort((a, b) => {
     const ai = sdgDisplayOrder.indexOf(Number(a && a.id));
     const bi = sdgDisplayOrder.indexOf(Number(b && b.id));
@@ -166,6 +172,12 @@
 
   root.innerHTML = `
     <section class="container-wide home-hero">
+      <div class="home-hero__waves" aria-hidden="true">
+        <svg viewBox="0 0 1200 600" preserveAspectRatio="none">
+          <path class="hero-wave wave-1" d="M-100,200 C200,100 400,450 700,250 C1000,50 1100,450 1300,300" />
+          <path class="hero-wave wave-2" d="M-50,350 C150,200 450,150 750,400 C1050,650 1150,200 1350,250" />
+        </svg>
+      </div>
       <div class="home-hero__copy">
         <span class="section-label">${esc(hero.label || 'sound core studio')}</span>
         <h1>${hero.title || '孩子成長路上的<br>陪跑者'}</h1>
@@ -178,9 +190,15 @@
           <a class="button-secondary" href="./about.html">了解理念</a>
         </div>
       </div>
-      <div class="home-hero__media" id="home-hero-media">
-        ${slides.map((s, i) => `<img class="${i === 0 ? 'active' : ''}" src="${esc(s.img)}" alt="${esc(s.alt || '活動照片')}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`).join('')}
-        <div class="home-hero__dots">${slides.map((_, i) => `<button type="button" class="${i === 0 ? 'active' : ''}" data-slide="${i}" aria-label="切換照片 ${i + 1}"></button>`).join('')}</div>
+      <div class="home-hero__media-container">
+        <div class="home-hero__media" id="home-hero-media">
+          ${slides.map((s, i) => `<img class="${i === 0 ? 'active' : ''}" src="${esc(s.img)}" alt="${esc(s.alt || '活動照片')}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`).join('')}
+          <div class="home-hero__dots">${slides.map((_, i) => `<button type="button" class="${i === 0 ? 'active' : ''}" data-slide="${i}" aria-label="切換照片 ${i + 1}"></button>`).join('')}</div>
+        </div>
+        <svg class="home-hero__border-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path class="hero-border-outer" vector-effect="non-scaling-stroke" d="M 4,4 C 30,2, 70,2, 96,4 C 98,30, 98,70, 96,96 C 70,98, 30,98, 4,96 C 2,70, 2,30, 4,4 Z" />
+          <path class="hero-border-inner" vector-effect="non-scaling-stroke" d="M 6,6 C 30,4, 70,4, 94,6 C 96,30, 96,70, 94,94 C 70,96, 30,96, 6,94 C 4,70, 4,30, 6,6 Z" />
+        </svg>
       </div>
     </section>
 
@@ -219,29 +237,24 @@
             <h2>SDGs、關於我們與成就經歷</h2>
             <p class="section-lead">把永續目標、團隊陪伴模型與累積成果放回首頁主節奏，讓訪客先理解我們如何支持孩子，再前往探索場域。</p>
           </div>
-          ${drawSvg('connect')}
+          ${drawSvg('About us')}
         </div>
 
-        ${sdgs.length ? `<section class="home-subsection home-sdgs" id="sdgs">
+        ${sdgs.length ? `<section class="home-subsection home-sdgs goal-handdraw-section" id="sdgs">
           <div class="home-subsection__intro">
             <div>
               <span class="section-label">sdgs</span>
               <h2>符合聯合國永續發展目標</h2>
             </div>
           </div>
-          <div class="sdg-lineup sdg-lineup--icon">
-            <svg class="sdgs-path-svg" viewBox="0 0 1000 320" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d="M 125,100 C 225,100 275,220 375,220 C 475,220 525,100 625,100 C 725,100 775,220 875,220" fill="none" stroke="rgba(74, 222, 128, 0.15)" stroke-width="8" stroke-linecap="round"/>
-              <path d="M 125,100 C 225,100 275,220 375,220 C 475,220 525,100 625,100 C 725,100 775,220 875,220" fill="none" stroke="#4ade80" stroke-width="3" stroke-linecap="round" class="sdgs-path-glow"/>
-            </svg>
-            ${orderedSdgs.map((item, i) => `<a class="sdg-item sdg-item--icon sdg-item-${esc(item.id || i)}" href="${esc(item.link || '#')}" target="_blank" rel="noopener" style="--sdg-color:${esc(item.color || '#5f7f62')};--i:${i}">
-              <div class="sdg-icon-wrap sdg-draw-anim" style="--sdg-color:${esc(item.color || '#5f7f62')}">
+          <div class="sdg-grid">
+            ${orderedSdgs.map((item, i) => `<a class="sdg-card sdg-card-${esc(item.id || i)}" href="${esc(item.link || '#')}" target="_blank" rel="noopener" style="--sdg-color:${esc(item.color || '#5f7f62')}">
+              <div class="sdg-svg-wrapper">
                 ${sdgLegacySvg(item)}
-                <svg class="sdg-border-svg" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                  <rect x="3" y="3" width="104" height="104" rx="10" stroke="${esc(item.color || '#5f7f62')}" stroke-width="3" stroke-dasharray="420" stroke-dashoffset="420"/>
-                </svg>
               </div>
-              <span><span class="sdg-item__num">SDG ${esc(item.id || '')}</span><strong>${esc(item.title)}</strong><small>${esc(item.desc || '')}</small></span>
+              <div class="sdg-num">SDG ${esc(item.id || '')}</div>
+              <h3 class="sdg-name">${esc(item.title)}</h3>
+              <p class="sdg-desc">${esc(item.desc || '')}</p>
             </a>`).join('')}
           </div>
         </section>` : ''}
@@ -311,8 +324,8 @@
     </section>`;
 
   prepareStrokeDrawings(root);
+  prepareSdgCards(root);
   bootSdgIconAnimations(root);
-  bootNavRingEnhancer();
 
   const media = document.getElementById('home-hero-media');
   if (media) {
@@ -329,13 +342,15 @@
     if (imgs.length > 1) setInterval(() => show(idx + 1), 5200);
   }
 
-  const revealTargets = root.querySelectorAll('.draw-svg, .achievement-item, .sdg-item, .model-row, .sdg-lineup');
+  const revealTargets = root.querySelectorAll('.draw-svg, .achievement-item, .model-row, .sdg-card');
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
         entry.target.classList.add('is-visible');
-        if (entry.target.classList && entry.target.classList.contains('sdg-item')) playSdgOnce(entry.target);
+        if (entry.target.classList.contains('sdg-card')) {
+          playSdgOnce(entry.target);
+        }
         const num = entry.target.querySelector && entry.target.querySelector('.achievement-number');
         if (num && num.dataset.to && !num.dataset.done) {
           num.dataset.done = 'true';
@@ -356,7 +371,9 @@
   } else {
     revealTargets.forEach(el => {
       el.classList.add('is-visible');
-      if (el.classList && el.classList.contains('sdg-item')) playSdgOnce(el);
+      if (el.classList.contains('sdg-card')) {
+        playSdgOnce(el);
+      }
     });
   }
 })();

@@ -1,7 +1,7 @@
 (function () {
   const root = document.getElementById('provider-root');
   if (!root) return;
-  function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function esc(v) { return String(v == null ? '' : v).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/"/g, '"'); }
   function getId() { return new URL(location.href).searchParams.get('id'); }
   const id = getId();
   const provider = (window.providersData || {})[id];
@@ -15,6 +15,7 @@
   const timeline = Array.isArray(provider.timeline) ? provider.timeline : [];
   const cases = Array.isArray(provider.cases) ? provider.cases : [];
   const allCaseImages = cases.flatMap(c => Array.isArray(c.images) ? c.images : []).slice(0, 12);
+  const returnUrl = encodeURIComponent(location.href);
 
   function listBlock(title, items) {
     return `<div class="plain-list-block interactive-lift"><h3>${esc(title)}</h3><ul>${(items || []).map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>`;
@@ -40,17 +41,15 @@
         <dl class="info-list">
           <div><dt>類別</dt><dd>${esc(provider.category || '-')}</dd></div>
           <div><dt>地區</dt><dd>${esc(provider.location || '-')}</dd></div>
-          <div><dt>地址</dt><dd>${esc(provider.address || '-')}</dd></div>
         </dl>
-        <div class="anchor-list" aria-label="頁內導覽">
-          <a href="#intro">場域介紹</a>
-          <a href="#outcomes">學習收穫</a>
-          <a href="#timeline">課程安排</a>
-          ${relatedInterview ? '<a href="#interview">人物專訪</a>' : ''}
-          <a href="#map-section">地圖位置</a>
-          <a href="#cases">精選案例</a>
-        </div>
-        ${provider.gmapUrl ? `<a class="button-primary" style="margin-top:18px;width:100%" href="${esc(provider.gmapUrl)}" target="_blank" rel="noopener">Google 地圖</a>` : ''}
+  <div class="anchor-list" aria-label="頁內導覽">
+    <a href="#intro" class="smooth-scroll-link">場域介紹</a>
+    <a href="#outcomes" class="smooth-scroll-link">學習收穫</a>
+    <a href="#timeline" class="smooth-scroll-link">課程安排</a>
+    ${relatedInterview ? '<a href="#interview" class="smooth-scroll-link">人物專訪</a>' : ''}
+    <a href="#cases" class="smooth-scroll-link">精選案例</a>
+  </div>
+  ${false ? `<a class="button-primary" style="margin-top:18px;width:100%" href="${esc(provider.gmapUrl)}" target="_blank" rel="noopener">Google 地圖</a>` : ''}
       </aside>
       <article>
         <nav class="date-text" aria-label="麵包屑"><a href="./explore.html">探索資源</a> / ${esc(provider.name)}</nav>
@@ -84,7 +83,6 @@
                 <div>
                   <h3>${esc(item.title || '')}</h3>
                   <p>${esc(item.detail || '')}</p>
-                  ${interview ? `<a class="button-text provider-interview-link" href="./blog.html?id=${encodeURIComponent(interview.id)}">閱讀人物專訪：${esc(interview.title)} →</a>` : ''}
                   ${Array.isArray(item.images) && item.images.length ? `<div class="timeline-media-grid">${item.images.slice(0, 3).map((src, i) => `<button type="button" data-lightbox="${esc(item.images.join('|'))}" data-index="${i}" aria-label="查看圖片 ${i+1}"><span class="image-frame interactive-image"><img src="${esc(src)}" alt="${esc(item.title)}" loading="lazy"></span></button>`).join('')}</div>` : ''}
                 </div>
               </article>`;
@@ -96,27 +94,16 @@
           <span class="section-label">interview</span>
           <h2>人物專訪</h2>
           <article class="article-row provider-interview-card interactive-row">
-            <a class="image-frame article-row__image interactive-image" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}">${relatedInterview.image ? `<img src="${esc(relatedInterview.image)}" alt="${esc(relatedInterview.title)}" loading="lazy">` : ''}</a>
+            <a class="image-frame article-row__image interactive-image" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrl}">${relatedInterview.image ? `<img src="${esc(relatedInterview.image)}" alt="${esc(relatedInterview.title)}" loading="lazy">` : ''}</a>
             <div>
               <div class="article-row__meta"><span class="category-pill">人物專訪</span><span class="date-text">${esc(relatedInterview.date || '')}</span></div>
-              <h3><a href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}">${esc(relatedInterview.title)}</a></h3>
+              <h3><a href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrl}">${esc(relatedInterview.title)}</a></h3>
               <p class="line-clamp-3">${esc(relatedInterview.excerpt || relatedInterview.content || '')}</p>
-              <a class="button-text" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}">前往閱讀 →</a>
+              <a class="button-text" href="./blog.html?id=${encodeURIComponent(relatedInterview.id)}&from=${returnUrl}">前往閱讀 →</a>
             </div>
           </article>
         </section>` : ''}
 
-        <section class="content-band" id="map-section">
-          <span class="section-label">access</span>
-          <h2>地圖位置</h2>
-          <div class="chip-list" style="margin:12px 0 14px">
-            <button id="lock-county" type="button" class="chip">縣市</button>
-            <button id="lock-site" type="button" class="chip">場域</button>
-            <button id="lock-none" type="button" class="chip">自由</button>
-            <span id="lock-label" class="meta-pill">鎖定：縣市</span>
-          </div>
-          <div id="provider-map" class="soft-panel" style="height:360px;overflow:hidden"></div>
-        </section>
 
         <section class="content-band" id="cases">
           <span class="section-label">cases</span>
@@ -136,4 +123,30 @@
   }));
   const heroBtn = document.getElementById('provider-hero-image');
   if (heroBtn && heroImage) heroBtn.addEventListener('click', () => openLightbox(provider.images || [heroImage], 0));
+
+  // Smooth scroll for side-panel anchor links, guaranteed within 1 second
+  // Uses custom easing to bypass potential CSS transition interference
+  root.querySelectorAll('.smooth-scroll-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetElement = document.getElementById(targetId);
+      if (!targetElement) return;
+      const headerOffset = 96; // match scroll-padding-top for sticky header
+      const targetY = targetElement.getBoundingClientRect().top + window.scrollY - headerOffset;
+      const startY = window.scrollY;
+      const distance = targetY - startY;
+      if (Math.abs(distance) < 5) return; // already at target
+      const duration = Math.min(800, Math.max(300, Math.abs(distance) * 0.4)); // within 1 second
+      const startTime = performance.now();
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+      function animate(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        window.scrollTo(0, startY + distance * easeOutCubic(progress));
+        if (progress < 1) requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    });
+  });
 })();

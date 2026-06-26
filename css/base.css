@@ -3,9 +3,12 @@
   color-scheme: light;
   --color-primary: #5f7f62;
   --color-primary-dark: #2f4f3a;
+  --color-primary-darkblue: #2f4b4f;
   --color-primary-light: #eaf1e7;
+  --color-orange-light: #fff7d7;
   --color-bg: #f7f2e8;
   --color-bg-soft: #fbf7ef;
+  --color-bg-softd: linear-gradient(135deg, rgba(247, 242, 232, 0.4) 0%, rgba(236, 226, 209, 0.35) 100%);
   --color-card: #fffdf8;
   --color-brown: #7a5a3a;
   --color-text: #333333;
@@ -38,8 +41,10 @@
   --shadow-soft: 0 14px 38px rgba(47, 79, 58, 0.08);
   --shadow-hover: 0 18px 44px rgba(47, 79, 58, 0.12);
   --focus-ring: 0 0 0 4px rgba(95, 127, 98, 0.2);
-  --space-section: clamp(64px, 8vw, 104px);
+  --space-section: clamp(1rem, 8vw, 3rem);
   --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  --motion-interaction: 1.5s;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--color-bg-soft); }
@@ -60,4 +65,4 @@ input, select, textarea { width: 100%; border: 1px solid var(--color-line); bord
 input:focus, select:focus, textarea:focus { border-color: var(--color-primary); box-shadow: var(--focus-ring); }
 ::placeholder { color: var(--color-muted); }
 .hidden { display: none !important; }
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 1ms !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1000ms; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 800ms; } }
