@@ -566,7 +566,7 @@ html { scroll-padding-top: 96px; }
 }
 
 /* Lightbox fixes: above QA/blog modal, centered controls */
-.lightbox { z-index: 5000; padding: clamp(54px, 7vw, 84px) clamp(18px, 7vw, 92px); background: rgba(29, 45, 34, 0); backdrop-filter: blur(0px); opacity: 0; pointer-events: none; transition: opacity 300ms var(--ease), background-color 300ms var(--ease), backdrop-filter 300ms var(--ease); }
+.lightbox { z-index: 6500; padding: clamp(54px, 7vw, 84px) clamp(18px, 7vw, 92px); background: rgba(29, 45, 34, 0); backdrop-filter: blur(0px); opacity: 0; pointer-events: none; transition: opacity 300ms var(--ease), background-color 300ms var(--ease), backdrop-filter 300ms var(--ease); }
 .lightbox.open { opacity: 1; pointer-events: auto; background: rgba(29, 45, 34, .78); backdrop-filter: blur(6px); }
 .lightbox > img { position: relative; z-index: 1; max-width: min(100%, 1180px); max-height: calc(100vh - 170px); border-radius: var(--radius); object-fit: contain; background: #fff; box-shadow: 0 22px 80px rgba(0,0,0,.28); transform: scale(0.95); transition: transform 300ms var(--ease); }
 .lightbox.open > img { transform: scale(1); }
@@ -1088,29 +1088,29 @@ main, #blog-root {
     border-bottom: 1px solid var(--color-line);
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     padding: 0 24px;
-    max-height: calc(100vh - 160px);
+    max-height: 0;
     overflow-y: auto;
     z-index: 490 !important;
-    display: grid;
-    grid-template-rows: 0fr;
+    display: block !important;
     opacity: 0;
     transform: translateY(-10px);
     pointer-events: none;
-    transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s var(--ease), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s var(--ease), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .resource-filters #resource-filter-body > .field-stack {
     overflow: hidden;
     min-height: 0;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
   .resource-filters:not(.collapsed) #resource-filter-body {
-    grid-template-rows: 1fr;
+    max-height: 50vh;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
-  .resource-filters:not(.collapsed) #resource-filter-body,
   .resource-filters:not(.collapsed) #resource-filter-body > .field-stack {
     overflow: visible !important;
   }
@@ -1129,8 +1129,8 @@ main, #blog-root {
     padding: 0 16px;
   }
   .resource-filters #resource-filter-body > .field-stack {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 }
 
