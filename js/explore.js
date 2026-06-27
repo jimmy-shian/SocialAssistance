@@ -10,12 +10,12 @@
   function match(p) {
     const text = [p.name, p.category, p.location, p.description, ...(p.know || []), ...(p.learn || []), ...(p.gain || [])].join(' ').toLowerCase();
     const kw = state.keyword.trim().toLowerCase();
-    return (!kw || text.includes(kw)) && (!state.category || p.category === state.category) && (!state.location || (p.location || '').includes(state.location)) && (!state.tag || text.includes(state.tag.toLowerCase()));
+    return (!kw || text.includes(kw)) && (!state.category || p.category === state.category) && (!state.location || p.location === state.location) && (!state.tag || text.includes(state.tag.toLowerCase()));
   }
 
   function providerCard(p) {
     const image = (p.images && p.images[0]) || '';
-    return `<article class="resource-item">
+    return `<article class="resource-item" data-id="${esc(p.id)}">
       <a class="image-frame resource-item__image" href="./provider.html?id=${encodeURIComponent(p.id)}">${image ? `<img src="${esc(image)}" alt="${esc(p.name)}" loading="lazy">` : ''}</a>
       <div>
         <div class="article-row__meta"><span class="category-pill">${esc(p.category || '探索資源')}</span><span class="date-text">${esc(p.location || '')}</span></div>
@@ -72,6 +72,9 @@
   }
 
   let exploreMapInstance = null;
+  let markersMap = {};
+  let currentLatLngs = [];
+  let mapResetTimer = null;
 
   function initExploreMap(list) {
     if (window.innerWidth <= 980) return;
@@ -86,6 +89,8 @@
       }
       exploreMapInstance = null;
     }
+    markersMap = {};
+    currentLatLngs = [];
 
     const withCoords = list.filter(p => p && p.coords);
     if (!withCoords.length) {
@@ -110,6 +115,7 @@
       const latLngs = [];
       withCoords.forEach(p => {
         const marker = L.marker([p.coords.lat, p.coords.lng]).addTo(exploreMapInstance);
+        markersMap[p.id] = marker;
         latLngs.push([p.coords.lat, p.coords.lng]);
         const href = `./provider.html?id=${encodeURIComponent(p.id)}`;
         const popupHtml = `
@@ -123,6 +129,8 @@
         marker.on('click', () => { window.location.href = href; });
       });
 
+      currentLatLngs = latLngs;
+
       if (latLngs.length > 0) {
         if (latLngs.length === 1) {
           exploreMapInstance.setView(latLngs[0], 13);
@@ -133,6 +141,42 @@
     } catch (err) {
       console.error('Leaflet initialization failed', err);
     }
+  }
+
+  function resetMapView() {
+    if (!exploreMapInstance || !currentLatLngs.length) return;
+    if (currentLatLngs.length === 1) {
+      exploreMapInstance.setView(currentLatLngs[0], 13);
+    } else {
+      exploreMapInstance.fitBounds(L.latLngBounds(currentLatLngs), { padding: [15, 15] });
+    }
+    exploreMapInstance.closePopup();
+  }
+
+  function setupHoverLink() {
+    if (window.innerWidth <= 980) return;
+    const cards = root.querySelectorAll('.resource-item');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        if (mapResetTimer) {
+          clearTimeout(mapResetTimer);
+          mapResetTimer = null;
+        }
+        const id = card.getAttribute('data-id');
+        if (id && exploreMapInstance && markersMap[id]) {
+          const marker = markersMap[id];
+          const latLng = marker.getLatLng();
+          exploreMapInstance.setView(latLng, 13);
+          marker.openPopup();
+        }
+      });
+      card.addEventListener('mouseleave', () => {
+        if (mapResetTimer) clearTimeout(mapResetTimer);
+        mapResetTimer = setTimeout(() => {
+          resetMapView();
+        }, 150); // 150ms debounce window
+      });
+    });
   }
 
   function render() {
@@ -149,6 +193,7 @@
     </div>`;
     bind();
     initExploreMap(list);
+    setupHoverLink();
   }
 
   function setupCustomSelect(id, stateKey) {

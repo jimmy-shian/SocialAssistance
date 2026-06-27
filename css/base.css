@@ -2,9 +2,14 @@
 :root {
   color-scheme: light;
   --color-primary: #5f7f62;
+  --color-primary-variant1: #4a6a4e;
+  --color-primary-variant2: #7a9873;
+  --color-primary-variant3: #3e5a48;
   --color-primary-dark: #2f4f3a;
   --color-primary-darkblue: #2f4b4f;
   --color-primary-light: #eaf1e7;
+  --color-primary-light2: #dcebd3;
+  --color-primary-accent: #a3b897;
   --color-orange-light: #fff7d7;
   --color-bg: #f7f2e8;
   --color-bg-soft: #fbf7ef;
@@ -62,7 +67,7 @@ h2, .section-title { font-size: clamp(26px, 3vw, 42px); line-height: 1.42; }
 h3 { color: var(--color-primary-dark); font-size: clamp(20px, 2vw, 28px); line-height: 1.45; font-weight: 700; }
 p { color: var(--color-text-soft); }
 input, select, textarea { width: 100%; border: 1px solid var(--color-line); border-radius: 14px; padding: 13px 15px; color: var(--color-text); background: var(--color-card); }
-input:focus, select:focus, textarea:focus { border-color: var(--color-primary); box-shadow: var(--focus-ring); }
+input:focus, select:focus, textarea:focus { border-color: var(--color-primary-variant2); box-shadow: var(--focus-ring); }
 ::placeholder { color: var(--color-muted); }
 .hidden { display: none !important; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 1000ms; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 800ms; } }

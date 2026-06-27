@@ -5,7 +5,7 @@ window.providersData = {
     "name": "Lagic專業汽機車美容",
     "category": "汽車美容業",
     "schedule": "每週六 09:00–12:00",
-    "location": "嘉義市 東區",
+    "location": "嘉義市",
     "address": "嘉義市東區林森東路123號",
     "coords": {
       "lat": 23.485,
@@ -106,7 +106,7 @@ window.providersData = {
     "name": "享植。想植園藝店",
     "category": "花藝類",
     "schedule": "每週日 10:00–12:00",
-    "location": "嘉義市 西區",
+    "location": "嘉義市",
     "address": "嘉義市西區世賢路二段456號",
     "coords": {
       "lat": 23.472,
@@ -222,7 +222,7 @@ window.providersData = {
     "name": "佇嘉木",
     "category": "農業",
     "schedule": "星期一至星期日 9:00-12:00；13:30-16:30",
-    "location": "嘉義縣市",
+    "location": "嘉義市",
     "address": "嘉義縣朴子市竹圍里大同路２４６號",
     "coords": {
       "lat": 23.467,
@@ -332,7 +332,7 @@ window.providersData = {
     "name": "傑昇通訊嘉義吳鳳南店",
     "category": "通訊業",
     "schedule": "每週三 14:00–17:00",
-    "location": "嘉義市 東區",
+    "location": "嘉義市",
     "address": "嘉義市東區吳鳳南路789號",
     "coords": {
       "lat": 23.468,
@@ -446,7 +446,7 @@ window.providersData = {
     "name": "森韻木吉他工作室",
     "category": "樂器零售業",
     "schedule": "每週六 13:30–16:30",
-    "location": "嘉義市 西區",
+    "location": "嘉義市",
     "address": "嘉義市西區國華街101號",
     "coords": {
       "lat": 23.479,
@@ -562,7 +562,7 @@ window.providersData = {
     "name": "許正寶喪禮司儀",
     "category": "殯葬業",
     "schedule": "每週五 14:00–16:00",
-    "location": "嘉義市 西區",
+    "location": "嘉義市",
     "address": "嘉義市西區自強街202號",
     "coords": {
       "lat": 23.475,
@@ -655,7 +655,7 @@ window.providersData = {
     "name": "寶哥有酵農場",
     "category": "農業",
     "schedule": "每週六 09:00–12:00",
-    "location": "嘉義縣 中埔鄉",
+    "location": "嘉義縣",
     "address": "嘉義縣中埔鄉深坑仔1號",
     "coords": {
       "lat": 23.435,
@@ -824,7 +824,7 @@ window.providersData = {
     "name": "DJTaro",
     "category": "音樂表演類",
     "schedule": "每週六 13:00–16:00",
-    "location": "嘉義市 東區",
+    "location": "嘉義市",
     "address": "嘉義市東區興美七街138號",
     "coords": {
       "lat": 23.456,
@@ -937,7 +937,7 @@ window.providersData = {
     "name": "東石50分life工作室",
     "category": "漁業與食農教育",
     "schedule": "每週日 09:00–12:00",
-    "location": "嘉義縣 東石鄉",
+    "location": "嘉義縣",
     "address": "嘉義縣東石鄉塭仔村後埔第13鄰2附8號",
     "coords": {
       "lat": 23.442,
@@ -1052,7 +1052,7 @@ window.providersData = {
     "name": "祥偶劇團",
     "category": "傳統布袋戲藝文推廣",
     "schedule": "每週六 14:00–17:00",
-    "location": "嘉義縣 義竹鄉",
+    "location": "嘉義縣",
     "address": "嘉義縣義竹鄉溪洲村下溪洲59號",
     "coords": {
       "lat": 23.32,
